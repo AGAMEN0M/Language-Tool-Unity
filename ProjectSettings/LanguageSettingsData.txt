@@ -1,0 +1,9 @@
+/Language/Editor/LanguageFileSave.json
+/Language/Editor/LanguageSave.json
+/StreamingAssets/Language Editor/
+/LanguageFileSave.json
+/LanguageSave.json
+/StreamingAssets/Language Editor/
+True
+Assets/Language/Fonts/LanguageFontList.asset
+Assets/Language/Fonts/TMP_LanguageFontList.asset

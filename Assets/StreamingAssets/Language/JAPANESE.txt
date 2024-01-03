@@ -1,0 +1,31 @@
+Linguagem - [JAPANESE]
+Japanese
+id:-17; {こんにちは世界} S:0; Font:7; Rev:0; CType:2;
+id:-16; {テスト言語スクリプト} CType:4;
+id:-15; XRotation:0; YRotation:0; ZRotation:0; WRotation:0; XScale:0; YScale:0; ZScale:0; XAnchorMin:0; YAnchorMin:0; XAnchorMax:0; YAnchorMax:0; X:0; Y:0; Width:0; Height:0; XPivot:0; YPivot:0; CType:7;
+id:-14; XRotation:0; YRotation:0; ZRotation:0; WRotation:0; XScale:0; YScale:0; ZScale:0; XAnchorMin:0; YAnchorMin:0; XAnchorMax:0; YAnchorMax:0; X:0; Y:0; Width:0; Height:0; XPivot:0; YPivot:0; CType:7;
+id:-13; {トグル} S:0; Font:7; XRotation:0; YRotation:0; ZRotation:0; WRotation:0; XScale:0; YScale:0; ZScale:0; XAnchorMin:0; YAnchorMin:0; XAnchorMax:0; YAnchorMax:0; X:0; Y:0; Width:0; Height:0; XPivot:0; YPivot:0; Ali:0; Rev:0; CType:1;
+id:-12; {新しいテキスト} S:0; Font:7; XRotation:0; YRotation:0; ZRotation:0; WRotation:0; XScale:0; YScale:0; ZScale:0; XAnchorMin:0; YAnchorMin:0; XAnchorMax:0; YAnchorMax:0; X:0; Y:0; Width:0; Height:0; XPivot:0; YPivot:0; Ali:0; Rev:0; CType:1;
+id:-11; XRotation:0; YRotation:0; ZRotation:0; WRotation:0; XScale:0; YScale:0; ZScale:0; XAnchorMin:0; YAnchorMin:0; XAnchorMax:0; YAnchorMax:0; X:0; Y:0; Width:0; Height:0; XPivot:0; YPivot:0; CType:7;
+id:-10; XRotation:0; YRotation:0; ZRotation:0; WRotation:0; XScale:0; YScale:0; ZScale:0; XAnchorMin:0; YAnchorMin:0; XAnchorMax:0; YAnchorMax:0; X:0; Y:0; Width:0; Height:0; XPivot:0; YPivot:0; CType:7;
+id:-9; S:1; Font:7; XRotation:0; YRotation:0; ZRotation:0; WRotation:0; XScale:0; YScale:0; ZScale:0; XAnchorMin:0; YAnchorMin:0; XAnchorMax:0; YAnchorMax:0; X:0; Y:0; Width:0; Height:0; XPivot:0; YPivot:0; Ali:0; CType:3;
+id:-8; {テキストを入力してください...} S:0; Font:7; XRotation:0; YRotation:0; ZRotation:0; WRotation:0; XScale:0; YScale:0; ZScale:0; XAnchorMin:0; YAnchorMin:0; XAnchorMax:0; YAnchorMax:0; X:0; Y:0; Width:0; Height:0; XPivot:0; YPivot:0; Ali:0; Rev:0; CType:1;
+id:-7; {テスト言語} CType:5;
+id:-6; Font:7; XRotation:0; YRotation:0; ZRotation:0; WRotation:0; XScale:0; YScale:0; ZScale:0; XAnchorMin:0; YAnchorMin:0; XAnchorMax:0; YAnchorMax:0; X:0; Y:0; Width:0; Height:0; XPivot:0; YPivot:0; Ali:1; Rev:0; CType:6;
+id:-5; {オプション C} CType:6;
+id:-4; {オプション B} CType:6;
+id:-3; {オプション A} CType:6;
+id:-2; XRotation:0; YRotation:0; ZRotation:0; WRotation:0; XScale:0; YScale:0; ZScale:0; XAnchorMin:0; YAnchorMin:0; XAnchorMax:0; YAnchorMax:0; X:0; Y:0; Width:0; Height:0; XPivot:0; YPivot:0; CType:7;
+id:-1; {ボタン} S:0; Font:7; XRotation:0; YRotation:0; ZRotation:0; WRotation:0; XScale:0; YScale:0; ZScale:0; XAnchorMin:0; YAnchorMin:0; XAnchorMax:0; YAnchorMax:0; X:0; Y:0; Width:0; Height:0; XPivot:0; YPivot:0; Ali:0; Rev:0; CType:1;
+id:0; {言語IDがありません} S:0; Font:7; XRotation:0; YRotation:0; ZRotation:0; WRotation:0; XScale:0; YScale:0; ZScale:0; XAnchorMin:0; YAnchorMin:0; XAnchorMax:0; YAnchorMax:0; X:0; Y:0; Width:0; Height:0; XPivot:0; YPivot:0; Ali:0; Rev:0; CType:1;
+[Text:0; {Unityのデフォルト項目} ids:0;-1;-2;-3;-4;-5;-6;-7;-8;-9;-10;-11;-12;-13;-14;-15;-16;-17;]
+[Comments:-17; {TextMesh のデフォルト値.}]
+[Comments:-16; {LanguageScript のデフォルト値.}]
+[Comments:-13; {Toggle デフォルト値.}]
+[Comments:-12; {Text のデフォルト値.}]
+[Comments:-11; {AdjustRect のデフォルト値.}]
+[Comments:-8; {InputField のデフォルト値.}]
+[Comments:-7; {LanguageCreateFile のデフォルト値.}]
+[Comments:-3; {Dropdown のデフォルト値.}]
+[Comments:-1; {Button のデフォルト値.}]
+[Comments:0; {ID が定義されていない場合は、このメッセージが表示されます.}]

@@ -1,0 +1,31 @@
+Linguagem - [CHINESE TRADITIONAL]
+Chinese (Traditional)
+id:-17; {你好世界} S:0; Font:7; Rev:0; CType:2;
+id:-16; {測試語言腳本} CType:4;
+id:-15; XRotation:0; YRotation:0; ZRotation:0; WRotation:0; XScale:0; YScale:0; ZScale:0; XAnchorMin:0; YAnchorMin:0; XAnchorMax:0; YAnchorMax:0; X:0; Y:0; Width:0; Height:0; XPivot:0; YPivot:0; CType:7;
+id:-14; XRotation:0; YRotation:0; ZRotation:0; WRotation:0; XScale:0; YScale:0; ZScale:0; XAnchorMin:0; YAnchorMin:0; XAnchorMax:0; YAnchorMax:0; X:0; Y:0; Width:0; Height:0; XPivot:0; YPivot:0; CType:7;
+id:-13; {切換} S:0; Font:7; XRotation:0; YRotation:0; ZRotation:0; WRotation:0; XScale:0; YScale:0; ZScale:0; XAnchorMin:0; YAnchorMin:0; XAnchorMax:0; YAnchorMax:0; X:0; Y:0; Width:0; Height:0; XPivot:0; YPivot:0; Ali:0; Rev:0; CType:1;
+id:-12; {新文字} S:0; Font:7; XRotation:0; YRotation:0; ZRotation:0; WRotation:0; XScale:0; YScale:0; ZScale:0; XAnchorMin:0; YAnchorMin:0; XAnchorMax:0; YAnchorMax:0; X:0; Y:0; Width:0; Height:0; XPivot:0; YPivot:0; Ali:0; Rev:0; CType:1;
+id:-11; XRotation:0; YRotation:0; ZRotation:0; WRotation:0; XScale:0; YScale:0; ZScale:0; XAnchorMin:0; YAnchorMin:0; XAnchorMax:0; YAnchorMax:0; X:0; Y:0; Width:0; Height:0; XPivot:0; YPivot:0; CType:7;
+id:-10; XRotation:0; YRotation:0; ZRotation:0; WRotation:0; XScale:0; YScale:0; ZScale:0; XAnchorMin:0; YAnchorMin:0; XAnchorMax:0; YAnchorMax:0; X:0; Y:0; Width:0; Height:0; XPivot:0; YPivot:0; CType:7;
+id:-9; S:1; Font:7; XRotation:0; YRotation:0; ZRotation:0; WRotation:0; XScale:0; YScale:0; ZScale:0; XAnchorMin:0; YAnchorMin:0; XAnchorMax:0; YAnchorMax:0; X:0; Y:0; Width:0; Height:0; XPivot:0; YPivot:0; Ali:0; CType:3;
+id:-8; {輸入文字...} S:0; Font:7; XRotation:0; YRotation:0; ZRotation:0; WRotation:0; XScale:0; YScale:0; ZScale:0; XAnchorMin:0; YAnchorMin:0; XAnchorMax:0; YAnchorMax:0; X:0; Y:0; Width:0; Height:0; XPivot:0; YPivot:0; Ali:0; Rev:0; CType:1;
+id:-7; {測試語言} CType:5;
+id:-6; Font:7; XRotation:0; YRotation:0; ZRotation:0; WRotation:0; XScale:0; YScale:0; ZScale:0; XAnchorMin:0; YAnchorMin:0; XAnchorMax:0; YAnchorMax:0; X:0; Y:0; Width:0; Height:0; XPivot:0; YPivot:0; Ali:1; Rev:0; CType:6;
+id:-5; {選項C} CType:6;
+id:-4; {選項B} CType:6;
+id:-3; {選項A} CType:6;
+id:-2; XRotation:0; YRotation:0; ZRotation:0; WRotation:0; XScale:0; YScale:0; ZScale:0; XAnchorMin:0; YAnchorMin:0; XAnchorMax:0; YAnchorMax:0; X:0; Y:0; Width:0; Height:0; XPivot:0; YPivot:0; CType:7;
+id:-1; {按鈕} S:0; Font:7; XRotation:0; YRotation:0; ZRotation:0; WRotation:0; XScale:0; YScale:0; ZScale:0; XAnchorMin:0; YAnchorMin:0; XAnchorMax:0; YAnchorMax:0; X:0; Y:0; Width:0; Height:0; XPivot:0; YPivot:0; Ali:0; Rev:0; CType:1;
+id:0; {無語言 ID} S:0; Font:7; XRotation:0; YRotation:0; ZRotation:0; WRotation:0; XScale:0; YScale:0; ZScale:0; XAnchorMin:0; YAnchorMin:0; XAnchorMax:0; YAnchorMax:0; X:0; Y:0; Width:0; Height:0; XPivot:0; YPivot:0; Ali:0; Rev:0; CType:1;
+[Text:0; {Unity預設項目} ids:0;-1;-2;-3;-4;-5;-6;-7;-8;-9;-10;-11;-12;-13;-14;-15;-16;-17;]
+[Comments:-17; {TextMesh 預設值.}]
+[Comments:-16; {LanguageScript 預設值.}]
+[Comments:-13; {Toggle 預設值.}]
+[Comments:-12; {Text 預設值.}]
+[Comments:-11; {AdjustRect 預設值.}]
+[Comments:-8; {InputField 預設值.}]
+[Comments:-7; {LanguageCreateFile 預設值.}]
+[Comments:-3; {Dropdown 預設值.}]
+[Comments:-1; {Button 預設值.}]
+[Comments:0; {如果尚未定義 ID，則會顯示此訊息.}]

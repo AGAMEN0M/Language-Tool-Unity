@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a704ff5f69db7c4c813a9aa03f449a8, type: 3}
+  m_Name: Language Data
+  m_EditorClassIdentifier: 
+  fontListData: {fileID: 11400000, guid: 3b3be2ae93bfe1e4a844e3dc3e1429d8, type: 2}
+  TMP_fontListData: {fileID: 11400000, guid: 846025e876e546c4ca0fb5fc251a64ca, type: 2}
+  jsonNameInUnity: /Language/Editor/LanguageFileSave.json
+  jsonSaveNameInUnity: /Language/Editor/LanguageSave.json
+  folderNameInUnity: /StreamingAssets/Language Editor/
+  jsonNameInBuild: /LanguageFileSave.json
+  jsonSaveNameInBuild: /LanguageSave.json
+  folderNameInBuild: /StreamingAssets/Language Editor/

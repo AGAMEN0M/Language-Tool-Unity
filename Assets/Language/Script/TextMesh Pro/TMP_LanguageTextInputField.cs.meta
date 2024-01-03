@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: 426b4372ae9401842b6885b5527d9669
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - TMP_languageText: {instanceID: 0}
+  - fontListObject: {fileID: 11400000, guid: 846025e876e546c4ca0fb5fc251a64ca, type: 2}
+  executionOrder: 0
+  icon: {fileID: 2800000, guid: c07b7dd3a42cbb740922c66f2dd00185, type: 3}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
