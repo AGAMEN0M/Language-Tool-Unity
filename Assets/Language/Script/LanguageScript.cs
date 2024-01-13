@@ -172,11 +172,6 @@ public class LanguageScript : MonoBehaviour
 
     private bool foundID; // Flag to track if the language text option ID has been found.
 
-    private void Start()
-    {
-        LanguageUpdate(); // Update the language when the script starts.
-    }
-
     private void OnEnable()
     {
         LanguageUpdate(); // Update the language when the GameObject is enabled.

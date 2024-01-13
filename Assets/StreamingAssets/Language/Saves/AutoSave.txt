@@ -1,2 +1,31 @@
-Linguagem - []
-
+Linguagem - [ENGLISH]
+English (United States)
+id:-17; {Hello World} S:0; Font:1; Rev:0; CType:2;
+id:-16; {Test Language Script} CType:4;
+id:-15; XRotation:0; YRotation:0; ZRotation:0; WRotation:0; XScale:0; YScale:0; ZScale:0; XAnchorMin:0; YAnchorMin:0; XAnchorMax:0; YAnchorMax:0; X:0; Y:0; Width:0; Height:0; XPivot:0; YPivot:0; CType:7;
+id:-14; XRotation:0; YRotation:0; ZRotation:0; WRotation:0; XScale:0; YScale:0; ZScale:0; XAnchorMin:0; YAnchorMin:0; XAnchorMax:0; YAnchorMax:0; X:0; Y:0; Width:0; Height:0; XPivot:0; YPivot:0; CType:7;
+id:-13; {Toggle} S:0; Font:1; XRotation:0; YRotation:0; ZRotation:0; WRotation:0; XScale:0; YScale:0; ZScale:0; XAnchorMin:0; YAnchorMin:0; XAnchorMax:0; YAnchorMax:0; X:0; Y:0; Width:0; Height:0; XPivot:0; YPivot:0; Ali:0; Rev:0; CType:1;
+id:-12; {New Text} S:0; Font:1; XRotation:0; YRotation:0; ZRotation:0; WRotation:0; XScale:0; YScale:0; ZScale:0; XAnchorMin:0; YAnchorMin:0; XAnchorMax:0; YAnchorMax:0; X:0; Y:0; Width:0; Height:0; XPivot:0; YPivot:0; Ali:0; Rev:0; CType:1;
+id:-11; XRotation:0; YRotation:0; ZRotation:0; WRotation:0; XScale:0; YScale:0; ZScale:0; XAnchorMin:0; YAnchorMin:0; XAnchorMax:0; YAnchorMax:0; X:0; Y:0; Width:0; Height:0; XPivot:0; YPivot:0; CType:7;
+id:-10; XRotation:0; YRotation:0; ZRotation:0; WRotation:0; XScale:0; YScale:0; ZScale:0; XAnchorMin:0; YAnchorMin:0; XAnchorMax:0; YAnchorMax:0; X:0; Y:0; Width:0; Height:0; XPivot:0; YPivot:0; CType:7;
+id:-9; S:1; Font:1; XRotation:0; YRotation:0; ZRotation:0; WRotation:0; XScale:0; YScale:0; ZScale:0; XAnchorMin:0; YAnchorMin:0; XAnchorMax:0; YAnchorMax:0; X:0; Y:0; Width:0; Height:0; XPivot:0; YPivot:0; Ali:0; CType:3;
+id:-8; {Enter text...} S:0; Font:1; XRotation:0; YRotation:0; ZRotation:0; WRotation:0; XScale:0; YScale:0; ZScale:0; XAnchorMin:0; YAnchorMin:0; XAnchorMax:0; YAnchorMax:0; X:0; Y:0; Width:0; Height:0; XPivot:0; YPivot:0; Ali:0; Rev:0; CType:1;
+id:-7; {Test Language} CType:5;
+id:-6; Font:1; XRotation:0; YRotation:0; ZRotation:0; WRotation:0; XScale:0; YScale:0; ZScale:0; XAnchorMin:0; YAnchorMin:0; XAnchorMax:0; YAnchorMax:0; X:0; Y:0; Width:0; Height:0; XPivot:0; YPivot:0; Ali:1; Rev:0; CType:6;
+id:-5; {Option C} CType:6;
+id:-4; {Option B} CType:6;
+id:-3; {Option A} CType:6;
+id:-2; XRotation:0; YRotation:0; ZRotation:0; WRotation:0; XScale:0; YScale:0; ZScale:0; XAnchorMin:0; YAnchorMin:0; XAnchorMax:0; YAnchorMax:0; X:0; Y:0; Width:0; Height:0; XPivot:0; YPivot:0; CType:7;
+id:-1; {Button} S:0; Font:1; XRotation:0; YRotation:0; ZRotation:0; WRotation:0; XScale:0; YScale:0; ZScale:0; XAnchorMin:0; YAnchorMin:0; XAnchorMax:0; YAnchorMax:0; X:0; Y:0; Width:0; Height:0; XPivot:0; YPivot:0; Ali:0; Rev:0; CType:1;
+id:0; {No language ID} S:0; Font:1; XRotation:0; YRotation:0; ZRotation:0; WRotation:0; XScale:0; YScale:0; ZScale:0; XAnchorMin:0; YAnchorMin:0; XAnchorMax:0; YAnchorMax:0; X:0; Y:0; Width:0; Height:0; XPivot:0; YPivot:0; Ali:0; Rev:0; CType:1;
+[Text:0; {Unity default items} ids:0;-1;-2;-3;-4;-5;-6;-7;-8;-9;-10;-11;-12;-13;-14;-15;-16;-17;]
+[Comments:-17; {TextMesh Default Value.}]
+[Comments:-16; {LanguageScript Default Value.}]
+[Comments:-13; {Toggle Default Value.}]
+[Comments:-12; {Text Default Value.}]
+[Comments:-11; {AdjustRect Default Value.}]
+[Comments:-8; {InputField Default Value.}]
+[Comments:-7; {LanguageCreateFile Default Value.}]
+[Comments:-3; {Dropdown Default Value.}]
+[Comments:-1; {Button Default Value.}]
+[Comments:0; {If an ID has not been defined, it will show this message.}]

@@ -30,11 +30,6 @@ public class LanguageImage : MonoBehaviour
     public string jsonNameInBuild = "/LanguageFileSave.json"; // Path to the JSON file for language selection in the build.
     public string folderNameInBuild = "/StreamingAssets/Language/"; // Folder containing language files in the build.
 
-    private void Start()
-    {
-        LanguageUpdate(); // Update the Language Image.
-    }
-
     private void OnEnable()
     {
         LanguageUpdate(); // Update the Language Image when the component is enabled.

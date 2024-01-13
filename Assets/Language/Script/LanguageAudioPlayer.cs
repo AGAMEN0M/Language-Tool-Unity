@@ -29,11 +29,6 @@ public class LanguageAudioPlayer : MonoBehaviour
     public string jsonNameInBuild = "/LanguageFileSave.json"; // Path to the JSON file for language selection in the build.
     public string folderNameInBuild = "/StreamingAssets/Language/"; // Folder containing language files in the build.
 
-    private void Start()
-    {
-        LanguageUpdate(); // Update the language Audio Player.
-    }
-
     private void OnEnable()
     {
         LanguageUpdate(); // Update the language Audio Player when the component is enabled.

@@ -45,9 +45,11 @@ public class LanguageTextInputField : MonoBehaviour
                 LanguageClassToolsEditor.SaveAdjustRect(ref script.adjustRectList);
                 EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
                 LanguageClassToolsEditor.LoadDataFromFile(ref IDs); // Reload data after import.
+                script.wasImported = true; // Set the flag to indicate settings were imported.
             }
 
             // Button to save settings.
+            GUI.enabled = script.wasImported; // Enable the button only if settings were previously imported.
             if (GUILayout.Button("Save Settings"))
             {
                 // Check if the ID has been saved and show a confirmation dialog.
@@ -65,6 +67,7 @@ public class LanguageTextInputField : MonoBehaviour
                     AddLanguageSaveID(script); // Add language save ID based on the script settings.
                 }
             }
+            GUI.enabled = true; // Re-enable the GUI after the button.
 
             // Inspector fields for TextComponent and Placeholder.
             EditorGUILayout.PropertyField(serializedObject.FindProperty("textComponent"));
@@ -409,14 +412,10 @@ public class LanguageTextInputField : MonoBehaviour
     [Space(10)]
     public string jsonNameInBuild = "/LanguageFileSave.json"; // Path to the JSON file for language selection in the build.
     public string folderNameInBuild = "/StreamingAssets/Language/"; // Folder containing language files in the build.
+    [HideInInspector] public bool wasImported; // Flag to track whether settings were imported.
 
     private bool foundID; // Flag to track if the language text option ID has been found.
     private bool isQuaternionFoldout; // Flag to control quaternion foldout in the inspector.
-
-    private void Start()
-    {
-        LanguageUpdate(); // Update the language text.
-    }
 
     private void OnEnable()
     {

@@ -156,11 +156,6 @@ public class LanguageCreateFile : MonoBehaviour
     [SerializeField] private string fileExtension = ".txt"; // The extension of the file to be created.
     [SerializeField] private List<string> fileLines = new() { "Test Language" }; // The list of lines for the file to be created.
 
-    private void Start()
-    {
-        LanguageUpdate(); // Update the language when the script starts.
-    }
-
     private void OnEnable()
     {
         LanguageUpdate(); // Update the language when the GameObject is enabled.

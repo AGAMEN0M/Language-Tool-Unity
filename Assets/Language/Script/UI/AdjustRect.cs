@@ -46,9 +46,11 @@ public class AdjustRect : MonoBehaviour
                 script.SavaRectTransform(); // Save RectTransform settings.
                 EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene()); // Mark scene as dirty.
                 LanguageClassToolsEditor.LoadDataFromFile(ref IDs); // Load data from file.
+                script.wasImported = true; // Set the flag to indicate settings were imported.
             }
 
             // Button to save settings.
+            GUI.enabled = script.wasImported; // Enable the button only if settings were previously imported.
             if (GUILayout.Button("Save Settings"))
             {
                 bool shouldSave = true;
@@ -65,6 +67,7 @@ public class AdjustRect : MonoBehaviour
                     AddLanguageSaveID(script); // Add language save ID.
                 }
             }
+            GUI.enabled = true; // Re-enable the GUI after the button.
 
             // Display property fields for RectTransform and ID.
             EditorGUILayout.PropertyField(serializedObject.FindProperty("rectTransform"));
@@ -206,14 +209,10 @@ public class AdjustRect : MonoBehaviour
     [Space(10)]
     public string jsonNameInBuild = "/LanguageFileSave.json"; // Path to the JSON file for language selection in the build.
     public string folderNameInBuild = "/StreamingAssets/Language/"; // Folder containing language files in the build.
+    [HideInInspector] public bool wasImported; // Flag to track whether settings were imported.
 
     private bool foundID; // Flag to track if the language text option ID has been found.
     private bool isQuaternionFoldout; // Flag to control the foldout state for Quaternion settings.
-
-    private void Start()
-    {
-        LanguageUpdate(); // Update the language text.
-    }
 
     private void OnEnable()
     {

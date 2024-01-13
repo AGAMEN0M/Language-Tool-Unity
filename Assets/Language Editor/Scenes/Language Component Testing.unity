@@ -1800,6 +1800,7 @@ MonoBehaviour:
   folderNameInUnity: /StreamingAssets/Language/
   jsonNameInBuild: /LanguageFileSave.json
   folderNameInBuild: /StreamingAssets/Language/
+  wasImported: 0
 --- !u!1 &528430754574112723
 GameObject:
   m_ObjectHideFlags: 0
@@ -7684,6 +7685,7 @@ MonoBehaviour:
   folderNameInUnity: /StreamingAssets/Language/
   jsonNameInBuild: /LanguageFileSave.json
   folderNameInBuild: /StreamingAssets/Language/
+  wasImported: 0
 --- !u!114 &7544739182519894995
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7895,6 +7897,7 @@ MonoBehaviour:
   folderNameInUnity: /StreamingAssets/Language/
   jsonNameInBuild: /LanguageFileSave.json
   folderNameInBuild: /StreamingAssets/Language/
+  wasImported: 0
 --- !u!222 &8313836046869469433
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -9845,6 +9848,7 @@ MonoBehaviour:
   folderNameInUnity: /StreamingAssets/Language/
   jsonNameInBuild: /LanguageFileSave.json
   folderNameInBuild: /StreamingAssets/Language/
+  wasImported: 0
 --- !u!222 &8927966316092774617
 CanvasRenderer:
   m_ObjectHideFlags: 0

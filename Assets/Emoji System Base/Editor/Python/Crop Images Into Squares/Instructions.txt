@@ -1,0 +1,16 @@
+In Command Prompt
+
+Install the Pillow library:
+pip install pillow
+
+Run the script:
+python crop_image.py
+
+Enter the image path:
+Example: C:\"image path"\"Image name".png
+
+Enter the size of the square:
+Example: 100
+
+Enter the destination folder name:
+Example: New Folder

@@ -3,19 +3,19 @@ A tool that helps you translate your games and facilitates translation by fans.
 
 # Download
 
-[Language - Package v0.1.2](https://drive.google.com/file/d/1ue_XmncLP4HHmiDdKCL_2Fyt4ueR4sQd/view?usp=drive_link)
+[Language - Package v0.2.1](https://drive.google.com/file/d/1RUTfBq5GlCzPdVj9BcvObezV_0tb8JiS/view?usp=drive_link)
  / 
-[Documentation](https://drive.google.com/file/d/1Z1igf67DxBTndUzoyg8WEsvBZD_qY7OA/view?usp=drive_link)
+[Documentation](https://drive.google.com/file/d/1Ty0IO9LePrkGbPb56svr_SdkoQYQEY0O/view?usp=drive_link)
 
-[Language Editor - Package v0.1.2](https://drive.google.com/file/d/1DbKUkq6D21bW3J5iAS73CeIxOrOZIOlR/view?usp=drive_link)
+[Language Editor - Package v0.2.1](https://drive.google.com/file/d/1zYkxyUD7nJXkjvGEBeaMHSdGP06FrHCB/view?usp=drive_link)
  / 
 [Language Editor Build](https://agamen0m.itch.io/language-editor)
  / 
-[Documentation](https://drive.google.com/file/d/1a9RfFo4ty6n0IniQIxkJODeNz8qKcTGc/view?usp=drive_link)
+[Documentation](https://drive.google.com/file/d/1PK8Oz5STDSTnuDBL8nTY-6mzzq4zHDww/view?usp=drive_link)
 
-[Emoji System Base - Package v0.0.7](https://drive.google.com/file/d/1dsDenHjyS2duj-vB3dCxnS6pmZKBJWdQ/view?usp=drive_link)
+[Emoji System Base - Package v0.0.8](https://drive.google.com/file/d/1GEouy_Yv2_GiXp2St0_xmngeOvIT-ljX/view?usp=drive_link)
  / 
-[Documentation](https://drive.google.com/file/d/1oYllz8Mk2A0RaPL4JP0QmgeEpkcHwadY/view?usp=drive_link)
+[Documentation](https://drive.google.com/file/d/1jdED-WiqhjnWvP6nzhYaP69jY3MQx16b/view?usp=drive_link)
 
 # Description
 
@@ -28,4 +28,4 @@ If you have suggestions for improvements and bug fixes, please share them with m
 # Old Versions
 [Old Versions - Package](https://drive.google.com/drive/folders/1UbaXN1CLPWE2EcxWLda-fKRn7uHVhgoz?usp=drive_link)
 
-Current version in Git v2.0
+Current version in Git v2.1
