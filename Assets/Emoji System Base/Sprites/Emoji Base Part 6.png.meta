@@ -1,0 +1,4012 @@
+fileFormatVersion: 2
+guid: a2108966c3545e042b1f6829d76d9d14
+TextureImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 138
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Windows Store Apps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Server
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Smileys - (5)_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 2201
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7e36e55cea0730a47825f35b652f3586
+      internalID: -477003576
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_1
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 2201
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6c3b1ff209cf37e4486c893dfb4b2fde
+      internalID: -213873115
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_2
+      rect:
+        serializedVersion: 2
+        x: 276
+        y: 2201
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6630e315f873ba8469d00801452ceead
+      internalID: -2125327573
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_3
+      rect:
+        serializedVersion: 2
+        x: 414
+        y: 2201
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0a54748b2eaca8644b618905b98367b2
+      internalID: -1524743411
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_4
+      rect:
+        serializedVersion: 2
+        x: 552
+        y: 2201
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 60f42de971744cb448273dd3d975bcdf
+      internalID: 203432080
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_5
+      rect:
+        serializedVersion: 2
+        x: 690
+        y: 2201
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f5b0780c75d2d834ead9720d81387f67
+      internalID: -1376013878
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_6
+      rect:
+        serializedVersion: 2
+        x: 828
+        y: 2201
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7143004fc0c9066438c685a0bac2561c
+      internalID: 1988300723
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_7
+      rect:
+        serializedVersion: 2
+        x: 966
+        y: 2201
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4cd8bef2554211d4c8656a0af1b1fa40
+      internalID: 2135634226
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_8
+      rect:
+        serializedVersion: 2
+        x: 1104
+        y: 2201
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0508e2b4b5a60eb46b1e8800d3c6a445
+      internalID: -1554434792
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_9
+      rect:
+        serializedVersion: 2
+        x: 1242
+        y: 2201
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d28ddbc72d27ed44fab8b74fe448cbee
+      internalID: -2078757634
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_10
+      rect:
+        serializedVersion: 2
+        x: 1380
+        y: 2201
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6b5efd71463b8464d8683d3c4a3917aa
+      internalID: -1703103817
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_11
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 2063
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5b9e35782fb57fa4e9ef1c1730abb380
+      internalID: -1072635738
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_12
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 2063
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 93109d78982803246b3cc92913495fd6
+      internalID: -1348045325
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_13
+      rect:
+        serializedVersion: 2
+        x: 276
+        y: 2063
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3ff4cb99086ffa34ab087b8612267de6
+      internalID: 1445921468
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_14
+      rect:
+        serializedVersion: 2
+        x: 414
+        y: 2063
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 21dd84fbd5cc9d547976f1961dd61587
+      internalID: 900095869
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_15
+      rect:
+        serializedVersion: 2
+        x: 552
+        y: 2063
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 40196701c5cb993469a7208bc1e95054
+      internalID: 1486622810
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_16
+      rect:
+        serializedVersion: 2
+        x: 690
+        y: 2063
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 573e821c0acfba343a7f96fe95669c81
+      internalID: 1495538687
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_17
+      rect:
+        serializedVersion: 2
+        x: 828
+        y: 2063
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f569cbfd499f6d1449c600f96627efaf
+      internalID: 617542949
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_18
+      rect:
+        serializedVersion: 2
+        x: 966
+        y: 2063
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 205d6223f4206c94fa40918677d04d26
+      internalID: 1912203537
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_19
+      rect:
+        serializedVersion: 2
+        x: 1104
+        y: 2063
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 678c0ff75178df442a7c553b876cf378
+      internalID: 997309841
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_20
+      rect:
+        serializedVersion: 2
+        x: 1242
+        y: 2063
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 97e4df9458194f145b341212089baf42
+      internalID: 1811034897
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_21
+      rect:
+        serializedVersion: 2
+        x: 1380
+        y: 2063
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fb69431b199310442b76527baf3a138a
+      internalID: 1636197394
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_22
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1925
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d9513da5f619c2b49b58575d15172710
+      internalID: 2145628586
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_23
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 1925
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1515b8fd652e11648894c3b6b83fe0a5
+      internalID: -788316528
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_24
+      rect:
+        serializedVersion: 2
+        x: 276
+        y: 1925
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 43c064894b9a6944684a25974590ee56
+      internalID: 1292539658
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_25
+      rect:
+        serializedVersion: 2
+        x: 414
+        y: 1925
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9f6f3bf3ea732704d9a5c605f360bd88
+      internalID: 2077439445
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_26
+      rect:
+        serializedVersion: 2
+        x: 552
+        y: 1925
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2695e02ac4e694b47ae2760d8972c297
+      internalID: 1289324765
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_27
+      rect:
+        serializedVersion: 2
+        x: 690
+        y: 1925
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b91e75f1fb9160b47baefe739fb077e9
+      internalID: 1314792850
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_28
+      rect:
+        serializedVersion: 2
+        x: 828
+        y: 1925
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a5f417157f19bc346a460ee631442568
+      internalID: 1075322312
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_29
+      rect:
+        serializedVersion: 2
+        x: 966
+        y: 1925
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8c4a51b71d751d44c9574c4437468974
+      internalID: 83849366
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_30
+      rect:
+        serializedVersion: 2
+        x: 1104
+        y: 1925
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 69a01c093a009a248a92b5c1f37523a0
+      internalID: 1142093762
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_31
+      rect:
+        serializedVersion: 2
+        x: 1242
+        y: 1925
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5d024b1b081452549905a0448979eb83
+      internalID: 311985196
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_32
+      rect:
+        serializedVersion: 2
+        x: 1380
+        y: 1925
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e509868376b9ea84a9d0454d5e2fc407
+      internalID: 1589293486
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_33
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1787
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fd61a0e96fc5834479d9c39834089a70
+      internalID: -1866961347
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_34
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 1787
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8ee3f4fee77e8e449b362d55710a10aa
+      internalID: -416922548
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_35
+      rect:
+        serializedVersion: 2
+        x: 276
+        y: 1787
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ec017fc7bbc2b3f4d88b149e877dd986
+      internalID: -21729172
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_36
+      rect:
+        serializedVersion: 2
+        x: 414
+        y: 1787
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6f145e92896abc942b74cf882b92b306
+      internalID: 138186718
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_37
+      rect:
+        serializedVersion: 2
+        x: 552
+        y: 1787
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 59a484992e5bd9c45806d16512558d35
+      internalID: -221223413
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_38
+      rect:
+        serializedVersion: 2
+        x: 690
+        y: 1787
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dec8319c73ae473419f70820560fbbbf
+      internalID: -1321361106
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_39
+      rect:
+        serializedVersion: 2
+        x: 828
+        y: 1787
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1bc5608e5973379449c93fe60f598216
+      internalID: 1911774044
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_40
+      rect:
+        serializedVersion: 2
+        x: 966
+        y: 1787
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ef6adc81b9fd0494bb9d8f25c0f5bff8
+      internalID: 1926314230
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_41
+      rect:
+        serializedVersion: 2
+        x: 1104
+        y: 1787
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: db8d70b28cf30bb4c9edd1fa63adbf8c
+      internalID: 1599910459
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_42
+      rect:
+        serializedVersion: 2
+        x: 1242
+        y: 1787
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4b185523e4a111443aa46489b0684968
+      internalID: 357051718
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_43
+      rect:
+        serializedVersion: 2
+        x: 1380
+        y: 1787
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 43142178c5e792348a121f452f512ddf
+      internalID: -2000605822
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_44
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1649
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5c9ecb53b4d3401418270b060ba829a6
+      internalID: -1447134505
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_45
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 1649
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7d6218497f9c7f64c92f7e7c0740f2db
+      internalID: 829580992
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_46
+      rect:
+        serializedVersion: 2
+        x: 276
+        y: 1649
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 440b143e30e606c46bb0190a3fa9fd6b
+      internalID: 1640651882
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_47
+      rect:
+        serializedVersion: 2
+        x: 414
+        y: 1649
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: eab0ede48df1b4f4b8d30cc79c084203
+      internalID: 820243280
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_48
+      rect:
+        serializedVersion: 2
+        x: 552
+        y: 1649
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1101721fdaf01e94c805c39eb435c88f
+      internalID: -1802438713
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_49
+      rect:
+        serializedVersion: 2
+        x: 690
+        y: 1649
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3bcfdae69f368c94eb6d38ddff832c02
+      internalID: 959287543
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_50
+      rect:
+        serializedVersion: 2
+        x: 828
+        y: 1649
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: af4200a6bb6fd1e43bded9d2c93bbe76
+      internalID: -428022766
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_51
+      rect:
+        serializedVersion: 2
+        x: 966
+        y: 1649
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7ed3b36aa6a67ba47a4c58dfad4db51e
+      internalID: 1115934504
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_52
+      rect:
+        serializedVersion: 2
+        x: 1104
+        y: 1649
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d1dece050f3f2b443b09598bb27283ff
+      internalID: -652387163
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_53
+      rect:
+        serializedVersion: 2
+        x: 1242
+        y: 1649
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3d4e99f1b2d420341ae3b742accd6d4f
+      internalID: -1889758173
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_54
+      rect:
+        serializedVersion: 2
+        x: 1380
+        y: 1649
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b814ce751ac9e284cba5a789c03d60b9
+      internalID: -527779602
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_55
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1511
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ea6970c6fe5b7ef4db71b913a96ece8b
+      internalID: 765715810
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_56
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 1511
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 00050c5f94d03c744a4921f785e32546
+      internalID: -641271675
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_57
+      rect:
+        serializedVersion: 2
+        x: 276
+        y: 1511
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cb13caab7ad2e464485792b8a1373709
+      internalID: -1492141131
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_58
+      rect:
+        serializedVersion: 2
+        x: 414
+        y: 1511
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 02cb79d661ac63943a1e6038e5f04dfe
+      internalID: -1308530649
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_59
+      rect:
+        serializedVersion: 2
+        x: 552
+        y: 1511
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e7c3d043fafa712418613ff8cb773fd9
+      internalID: -1351439848
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_60
+      rect:
+        serializedVersion: 2
+        x: 690
+        y: 1511
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b21d5d0215f80474daadb2cb33367922
+      internalID: 71547004
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_61
+      rect:
+        serializedVersion: 2
+        x: 828
+        y: 1511
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 264ae4540ae08cc4c81ec7a99b667762
+      internalID: -845549249
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_62
+      rect:
+        serializedVersion: 2
+        x: 966
+        y: 1511
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 549b678310eb80547a3acc161a7bcb23
+      internalID: 405996634
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_63
+      rect:
+        serializedVersion: 2
+        x: 1104
+        y: 1511
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 17963b45920c94f47b745a476652daa7
+      internalID: -1840775951
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_64
+      rect:
+        serializedVersion: 2
+        x: 1242
+        y: 1511
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5b2a9daba995aa346a24579d90825fba
+      internalID: 1547414780
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_65
+      rect:
+        serializedVersion: 2
+        x: 1380
+        y: 1511
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ea60c37aaaf61084282f2189794e4af3
+      internalID: 1599814113
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_66
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1373
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b7de7fb93aadf3847ace46142c60f1fd
+      internalID: 369681421
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_67
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 1373
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 044f4109e8fdd624b8f28efbff521ce7
+      internalID: -1824905818
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_68
+      rect:
+        serializedVersion: 2
+        x: 276
+        y: 1373
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dc007970784a899469b4bb77add0d1d0
+      internalID: -490907174
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_69
+      rect:
+        serializedVersion: 2
+        x: 414
+        y: 1373
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8ef770703a95711418b74402b5b91f3c
+      internalID: -4100403
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_70
+      rect:
+        serializedVersion: 2
+        x: 552
+        y: 1373
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: eff01355fe0e6ec49b5edab050a41467
+      internalID: 1644723161
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_71
+      rect:
+        serializedVersion: 2
+        x: 690
+        y: 1373
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 039a4744de92c714597f5997f7bdd620
+      internalID: -962109309
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_72
+      rect:
+        serializedVersion: 2
+        x: 828
+        y: 1373
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e395aa9e5e01f554c9b1852193e5e31b
+      internalID: 413230854
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_73
+      rect:
+        serializedVersion: 2
+        x: 966
+        y: 1373
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f0f4228256f68b742885438ab59a4b48
+      internalID: -606447833
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_74
+      rect:
+        serializedVersion: 2
+        x: 1104
+        y: 1373
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dc7caa76000f23044a1602eb5e066f0c
+      internalID: -945019560
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_75
+      rect:
+        serializedVersion: 2
+        x: 1242
+        y: 1373
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7e75c7bc4680fa54c832fa1e483f7da3
+      internalID: -16340137
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_76
+      rect:
+        serializedVersion: 2
+        x: 1380
+        y: 1373
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ce7f7b5f2c58321468a9b58561ebeacd
+      internalID: 1818788150
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_77
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1235
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4ba43c3c56eb43c4aa13f2a0618f6f9a
+      internalID: 276434349
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_78
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 1235
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ed36caa875da9d34cba934de29d6b42c
+      internalID: 1920970623
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_79
+      rect:
+        serializedVersion: 2
+        x: 276
+        y: 1235
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 846c5d08a94e00f4eb3454b70afe0ed2
+      internalID: 960004612
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_80
+      rect:
+        serializedVersion: 2
+        x: 414
+        y: 1235
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 97224a6fe58f514438b16db9a5041190
+      internalID: -1027074858
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_81
+      rect:
+        serializedVersion: 2
+        x: 552
+        y: 1235
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 71d852b32b550504fbafcaec4815b70b
+      internalID: -538260554
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_82
+      rect:
+        serializedVersion: 2
+        x: 690
+        y: 1235
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 822b06c4139c76d4bb032d6e2445b0cc
+      internalID: 193297668
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_83
+      rect:
+        serializedVersion: 2
+        x: 828
+        y: 1235
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0120c0bd62086ec4b9b5782b0a696d94
+      internalID: 322509185
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_84
+      rect:
+        serializedVersion: 2
+        x: 966
+        y: 1235
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 496fe7c3e06408f40863ebb1396c11f9
+      internalID: 975409161
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_85
+      rect:
+        serializedVersion: 2
+        x: 1104
+        y: 1235
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4dfdfd40783a3bf4499459e80aa3f771
+      internalID: -279311625
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_86
+      rect:
+        serializedVersion: 2
+        x: 1242
+        y: 1235
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 31c87cd2f3c1a8446acac70f99178b49
+      internalID: -1560342481
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_87
+      rect:
+        serializedVersion: 2
+        x: 1380
+        y: 1235
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 73a79eb0557985343a753ec927b24817
+      internalID: -2131794669
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_88
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1097
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 00263c2614702f64aa8b4e78a47aa4a4
+      internalID: -1199388687
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_89
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 1097
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 962fdcb9232396547829913f872cca42
+      internalID: -455046156
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_90
+      rect:
+        serializedVersion: 2
+        x: 276
+        y: 1097
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6a9c6d8a3bda0694295dfd597ce2d974
+      internalID: 2068089960
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_91
+      rect:
+        serializedVersion: 2
+        x: 414
+        y: 1097
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 37a693f32fb8c3b40a0e283e8905a04c
+      internalID: -1242137003
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_92
+      rect:
+        serializedVersion: 2
+        x: 552
+        y: 1097
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6a28829ef15938547b43d8f621d43565
+      internalID: 1391934992
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_93
+      rect:
+        serializedVersion: 2
+        x: 690
+        y: 1097
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 10d1eca68375bfa43ab7c3168764d5b3
+      internalID: -1658639470
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_94
+      rect:
+        serializedVersion: 2
+        x: 828
+        y: 1097
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cde6fb8014a3dbe439dc2e797f9b7bdc
+      internalID: 118572069
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_95
+      rect:
+        serializedVersion: 2
+        x: 966
+        y: 1097
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1a93930ccc016ad4fac3fb087b864e34
+      internalID: 1462531181
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_96
+      rect:
+        serializedVersion: 2
+        x: 1104
+        y: 1097
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 030d31a8e21f9f8429d56ea3f00eed31
+      internalID: 1779473227
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_97
+      rect:
+        serializedVersion: 2
+        x: 1242
+        y: 1097
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 392b5474038f91d4693b7efc4bb11270
+      internalID: -328726115
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_98
+      rect:
+        serializedVersion: 2
+        x: 1380
+        y: 1097
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cfd6a6de292d2b6499fcb64480ec2941
+      internalID: 735287899
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_99
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 959
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4b2fcd36fd5f82a49a4a22caab4da577
+      internalID: 1046537508
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_100
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 959
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0dfa26d51ccbe27498befadc8552373f
+      internalID: 926486876
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_101
+      rect:
+        serializedVersion: 2
+        x: 276
+        y: 959
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7d1f83b893df4db40bb2609984bf6083
+      internalID: -873176934
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_102
+      rect:
+        serializedVersion: 2
+        x: 414
+        y: 959
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bc0ad4e7077805449bc35daa666f58b3
+      internalID: 1753119076
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_103
+      rect:
+        serializedVersion: 2
+        x: 552
+        y: 959
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ed825983b318b804faa6e84582a71806
+      internalID: -931409706
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_104
+      rect:
+        serializedVersion: 2
+        x: 690
+        y: 959
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f79b92c6d22d38143b913af734b42ead
+      internalID: 1316846258
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_105
+      rect:
+        serializedVersion: 2
+        x: 828
+        y: 959
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b88f7e7a40315c442b071d9607c5ce06
+      internalID: -476034583
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_106
+      rect:
+        serializedVersion: 2
+        x: 966
+        y: 959
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bb67077d919c7a946a58053bedfd240d
+      internalID: 1047951542
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_107
+      rect:
+        serializedVersion: 2
+        x: 1104
+        y: 959
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fea766c64f28ed644a3cb52a51e46a86
+      internalID: 2105805718
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_108
+      rect:
+        serializedVersion: 2
+        x: 1242
+        y: 959
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b2f8487cabcdc684a8cee601213aed0e
+      internalID: -415760947
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_109
+      rect:
+        serializedVersion: 2
+        x: 1380
+        y: 959
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: db6b5c67a6399cc449cc2d8a1a7eb62f
+      internalID: 2098750406
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_110
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 821
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dadf5cc5994b8ca459041a034570dddc
+      internalID: -1542775403
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_111
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 821
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 558c438992ff1fc48b4994ae11aa0d07
+      internalID: -437523535
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_112
+      rect:
+        serializedVersion: 2
+        x: 276
+        y: 821
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 81ef6fdbf4f310d4c9681c7349ef4422
+      internalID: 954846015
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_113
+      rect:
+        serializedVersion: 2
+        x: 414
+        y: 821
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: da422c8263a32ca4ea3208acc91a8a3b
+      internalID: -690085723
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_114
+      rect:
+        serializedVersion: 2
+        x: 552
+        y: 821
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d6649dc52a5069b4e9b9db372c53a381
+      internalID: -220573761
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_115
+      rect:
+        serializedVersion: 2
+        x: 690
+        y: 821
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e74e746b227c5ba4484f48834314c6fd
+      internalID: 1391696900
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_116
+      rect:
+        serializedVersion: 2
+        x: 828
+        y: 821
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 13d4bc2ec20ff104bafc46799063c922
+      internalID: 794071863
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_117
+      rect:
+        serializedVersion: 2
+        x: 966
+        y: 821
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cb3f7d9300314ee4282dfb9e85502ee4
+      internalID: -1405434786
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_118
+      rect:
+        serializedVersion: 2
+        x: 1104
+        y: 821
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b66030066d210c3429cad2a664b447f3
+      internalID: -864116915
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_119
+      rect:
+        serializedVersion: 2
+        x: 1242
+        y: 821
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 128dec88634081544819043a6767d8c2
+      internalID: -490508183
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_120
+      rect:
+        serializedVersion: 2
+        x: 1380
+        y: 821
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0a2c1e09ea7bb2a48832f20b762c7d30
+      internalID: 714354369
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_121
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 683
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d5d7d15780589d84a9500d9fadc3e19d
+      internalID: -1969175199
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_122
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 683
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c101af57803d81d4d9453e8de45c0773
+      internalID: 1811814971
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_123
+      rect:
+        serializedVersion: 2
+        x: 276
+        y: 683
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cb5361b83bf5e2a4d9206038abde9335
+      internalID: 1720909036
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_124
+      rect:
+        serializedVersion: 2
+        x: 414
+        y: 683
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 198342f5aead3594db0846ca013430ae
+      internalID: -939146386
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_125
+      rect:
+        serializedVersion: 2
+        x: 552
+        y: 683
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8c10dd3381388c347962cf6114421253
+      internalID: -960821638
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_126
+      rect:
+        serializedVersion: 2
+        x: 690
+        y: 683
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1b016a09b68bff34b807374bd5eb46a3
+      internalID: 698639692
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_127
+      rect:
+        serializedVersion: 2
+        x: 828
+        y: 683
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 49e3318a18480334090be5da16aaf5f2
+      internalID: -1415379460
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_128
+      rect:
+        serializedVersion: 2
+        x: 966
+        y: 683
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6520662b85d904c4c9b4b5be2a4068f5
+      internalID: -318273272
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_129
+      rect:
+        serializedVersion: 2
+        x: 1104
+        y: 683
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e9e840edfce6fd94097dd4a00177ea85
+      internalID: -310662287
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_130
+      rect:
+        serializedVersion: 2
+        x: 1242
+        y: 683
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4d9b64e5231ef844ca614c73ad10692e
+      internalID: 361646448
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_131
+      rect:
+        serializedVersion: 2
+        x: 1380
+        y: 683
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 313c4a2da7bc9be41916804713002c16
+      internalID: -1862689943
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_132
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 545
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b3dcd0af75b18524a808d5b7b41d752e
+      internalID: -1012009007
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_133
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 545
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e7e445a54c95a8c4c9dfe81f52a7efc5
+      internalID: -1352067765
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_134
+      rect:
+        serializedVersion: 2
+        x: 276
+        y: 545
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 189993983021b72488b9f337219080f9
+      internalID: 1073282612
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_135
+      rect:
+        serializedVersion: 2
+        x: 414
+        y: 545
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 58303b6640b1eeb4b9dc076ffab1617f
+      internalID: 1558729085
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_136
+      rect:
+        serializedVersion: 2
+        x: 552
+        y: 545
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 61ba5f39d7907a14c8e99bfe3f390048
+      internalID: 882657276
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_137
+      rect:
+        serializedVersion: 2
+        x: 690
+        y: 545
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 942c8292baa79aa4c912134f5788944d
+      internalID: 2138353063
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_138
+      rect:
+        serializedVersion: 2
+        x: 828
+        y: 545
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b1c54e08d3f8fd54aad92690189fc7ec
+      internalID: 444183057
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_139
+      rect:
+        serializedVersion: 2
+        x: 966
+        y: 545
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: acd01fb3ab8c9a24bb16861ea31ee7d6
+      internalID: 167181437
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_140
+      rect:
+        serializedVersion: 2
+        x: 1104
+        y: 545
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6a794a85b52885e4aba314c75d98fe7a
+      internalID: -538228646
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_141
+      rect:
+        serializedVersion: 2
+        x: 1242
+        y: 545
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4f43f631c3bbe084390349f629e831b8
+      internalID: 455737341
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_142
+      rect:
+        serializedVersion: 2
+        x: 1380
+        y: 545
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f5b9f24db5925a74eaad0f5af53b3053
+      internalID: -128007343
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_143
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 407
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7dee36b3830b4db41a821b53db54716f
+      internalID: -1732972381
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_144
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 407
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0350982098f3a8d4da4d06d909641a9a
+      internalID: 1454398072
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_145
+      rect:
+        serializedVersion: 2
+        x: 276
+        y: 407
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e088322c50051b448bb6c7c972ad9045
+      internalID: 2142151620
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_146
+      rect:
+        serializedVersion: 2
+        x: 414
+        y: 407
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4e902c5f2c60b7948822714f0f9e7b3d
+      internalID: -210895058
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_147
+      rect:
+        serializedVersion: 2
+        x: 552
+        y: 407
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fa9759f73b0b8ee49aa96df1a2724793
+      internalID: 1533047631
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_148
+      rect:
+        serializedVersion: 2
+        x: 690
+        y: 407
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 47b463965b12d6a458827459b6fabb9f
+      internalID: 903253587
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_149
+      rect:
+        serializedVersion: 2
+        x: 828
+        y: 407
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 38b636f99b360ca428b5cf0645c5b48e
+      internalID: 1651156448
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_150
+      rect:
+        serializedVersion: 2
+        x: 966
+        y: 407
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4f18313f8e1e766409d26ea36c6cbca7
+      internalID: -406438438
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_151
+      rect:
+        serializedVersion: 2
+        x: 1104
+        y: 407
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8a71a5a3ce88fdb4f8626a78ef09bdf9
+      internalID: 1521807521
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_152
+      rect:
+        serializedVersion: 2
+        x: 1242
+        y: 407
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 227bcc752d277ed41bfd5355e2f89dda
+      internalID: 1589058571
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_153
+      rect:
+        serializedVersion: 2
+        x: 1380
+        y: 407
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 88a9a3afc06857642ac2c3e210dad3c7
+      internalID: 958280639
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_154
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 269
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d927e4e9fae75f945811d093df3ef21a
+      internalID: -9521182
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_155
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 269
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0dc024cd92eafb545b5eb6828c78e0ef
+      internalID: 1783934168
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_156
+      rect:
+        serializedVersion: 2
+        x: 276
+        y: 269
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7ac400e3dd34e3042b5c31bd6438eb92
+      internalID: -48164886
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_157
+      rect:
+        serializedVersion: 2
+        x: 414
+        y: 269
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 97396c1147f813347be7e7288d1e3dba
+      internalID: -226087046
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_158
+      rect:
+        serializedVersion: 2
+        x: 552
+        y: 269
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f2dbc946fa53fb142abbbf443ec20ccd
+      internalID: 671805829
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_159
+      rect:
+        serializedVersion: 2
+        x: 690
+        y: 269
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0159b38602663d84cbde84f29f3c419b
+      internalID: 875161829
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_160
+      rect:
+        serializedVersion: 2
+        x: 828
+        y: 269
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0ec6e919c77e06f4099fd9b831741027
+      internalID: -707541025
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_161
+      rect:
+        serializedVersion: 2
+        x: 966
+        y: 269
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0b63205f92a7c54478bb11d276ba595d
+      internalID: 1481485693
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_162
+      rect:
+        serializedVersion: 2
+        x: 1104
+        y: 269
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 117cd83aceb71474ea678116d1d6b164
+      internalID: -2060173270
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_163
+      rect:
+        serializedVersion: 2
+        x: 1242
+        y: 269
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9babb7a8f054c73439309a0e0cfa5756
+      internalID: -1705924355
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_164
+      rect:
+        serializedVersion: 2
+        x: 1380
+        y: 269
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6b0b0c754a2f031448c5ab6e33ab619c
+      internalID: -1375130259
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_165
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 131
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d0333c905a513e84a996dbab3b214bca
+      internalID: 598835069
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_166
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 131
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 579cc268ae68f7c4b8ba9dcec0bdc873
+      internalID: 1146075336
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_167
+      rect:
+        serializedVersion: 2
+        x: 276
+        y: 131
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fe7898f6f4fe8484bb4aa39505a5d5be
+      internalID: -974139573
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_168
+      rect:
+        serializedVersion: 2
+        x: 414
+        y: 131
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d4668a2992351344bb2d372f2c931b81
+      internalID: 1675535869
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_169
+      rect:
+        serializedVersion: 2
+        x: 552
+        y: 131
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 47542f3c4f00d6d4db7aad0faf1e2010
+      internalID: 390130163
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_170
+      rect:
+        serializedVersion: 2
+        x: 690
+        y: 131
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6a4a1defb68ffb64e841d8e95bc5fa30
+      internalID: 1233170998
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_171
+      rect:
+        serializedVersion: 2
+        x: 828
+        y: 131
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8b2bd5ce64e576445a6cd235a8788f59
+      internalID: -1174322995
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_172
+      rect:
+        serializedVersion: 2
+        x: 966
+        y: 131
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f7d7b18b784c8e44bad03f1fed90a855
+      internalID: -109108643
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_173
+      rect:
+        serializedVersion: 2
+        x: 1104
+        y: 131
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dd65fc76055037249b442916ed3dfe52
+      internalID: -217549790
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_174
+      rect:
+        serializedVersion: 2
+        x: 1242
+        y: 131
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3daf021fa61a08944a986be5b7d464c9
+      internalID: 603868418
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Smileys - (5)_175
+      rect:
+        serializedVersion: 2
+        x: 1380
+        y: 131
+        width: 138
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 870d3b77ffb03e54eb921eedb5611736
+      internalID: -1472580070
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    nameFileIdTable:
+      Smileys - (5)_0: -477003576
+      Smileys - (5)_1: -213873115
+      Smileys - (5)_10: -1703103817
+      Smileys - (5)_100: 926486876
+      Smileys - (5)_101: -873176934
+      Smileys - (5)_102: 1753119076
+      Smileys - (5)_103: -931409706
+      Smileys - (5)_104: 1316846258
+      Smileys - (5)_105: -476034583
+      Smileys - (5)_106: 1047951542
+      Smileys - (5)_107: 2105805718
+      Smileys - (5)_108: -415760947
+      Smileys - (5)_109: 2098750406
+      Smileys - (5)_11: -1072635738
+      Smileys - (5)_110: -1542775403
+      Smileys - (5)_111: -437523535
+      Smileys - (5)_112: 954846015
+      Smileys - (5)_113: -690085723
+      Smileys - (5)_114: -220573761
+      Smileys - (5)_115: 1391696900
+      Smileys - (5)_116: 794071863
+      Smileys - (5)_117: -1405434786
+      Smileys - (5)_118: -864116915
+      Smileys - (5)_119: -490508183
+      Smileys - (5)_12: -1348045325
+      Smileys - (5)_120: 714354369
+      Smileys - (5)_121: -1969175199
+      Smileys - (5)_122: 1811814971
+      Smileys - (5)_123: 1720909036
+      Smileys - (5)_124: -939146386
+      Smileys - (5)_125: -960821638
+      Smileys - (5)_126: 698639692
+      Smileys - (5)_127: -1415379460
+      Smileys - (5)_128: -318273272
+      Smileys - (5)_129: -310662287
+      Smileys - (5)_13: 1445921468
+      Smileys - (5)_130: 361646448
+      Smileys - (5)_131: -1862689943
+      Smileys - (5)_132: -1012009007
+      Smileys - (5)_133: -1352067765
+      Smileys - (5)_134: 1073282612
+      Smileys - (5)_135: 1558729085
+      Smileys - (5)_136: 882657276
+      Smileys - (5)_137: 2138353063
+      Smileys - (5)_138: 444183057
+      Smileys - (5)_139: 167181437
+      Smileys - (5)_14: 900095869
+      Smileys - (5)_140: -538228646
+      Smileys - (5)_141: 455737341
+      Smileys - (5)_142: -128007343
+      Smileys - (5)_143: -1732972381
+      Smileys - (5)_144: 1454398072
+      Smileys - (5)_145: 2142151620
+      Smileys - (5)_146: -210895058
+      Smileys - (5)_147: 1533047631
+      Smileys - (5)_148: 903253587
+      Smileys - (5)_149: 1651156448
+      Smileys - (5)_15: 1486622810
+      Smileys - (5)_150: -406438438
+      Smileys - (5)_151: 1521807521
+      Smileys - (5)_152: 1589058571
+      Smileys - (5)_153: 958280639
+      Smileys - (5)_154: -9521182
+      Smileys - (5)_155: 1783934168
+      Smileys - (5)_156: -48164886
+      Smileys - (5)_157: -226087046
+      Smileys - (5)_158: 671805829
+      Smileys - (5)_159: 875161829
+      Smileys - (5)_16: 1495538687
+      Smileys - (5)_160: -707541025
+      Smileys - (5)_161: 1481485693
+      Smileys - (5)_162: -2060173270
+      Smileys - (5)_163: -1705924355
+      Smileys - (5)_164: -1375130259
+      Smileys - (5)_165: 598835069
+      Smileys - (5)_166: 1146075336
+      Smileys - (5)_167: -974139573
+      Smileys - (5)_168: 1675535869
+      Smileys - (5)_169: 390130163
+      Smileys - (5)_17: 617542949
+      Smileys - (5)_170: 1233170998
+      Smileys - (5)_171: -1174322995
+      Smileys - (5)_172: -109108643
+      Smileys - (5)_173: -217549790
+      Smileys - (5)_174: 603868418
+      Smileys - (5)_175: -1472580070
+      Smileys - (5)_18: 1912203537
+      Smileys - (5)_19: 997309841
+      Smileys - (5)_2: -2125327573
+      Smileys - (5)_20: 1811034897
+      Smileys - (5)_21: 1636197394
+      Smileys - (5)_22: 2145628586
+      Smileys - (5)_23: -788316528
+      Smileys - (5)_24: 1292539658
+      Smileys - (5)_25: 2077439445
+      Smileys - (5)_26: 1289324765
+      Smileys - (5)_27: 1314792850
+      Smileys - (5)_28: 1075322312
+      Smileys - (5)_29: 83849366
+      Smileys - (5)_3: -1524743411
+      Smileys - (5)_30: 1142093762
+      Smileys - (5)_31: 311985196
+      Smileys - (5)_32: 1589293486
+      Smileys - (5)_33: -1866961347
+      Smileys - (5)_34: -416922548
+      Smileys - (5)_35: -21729172
+      Smileys - (5)_36: 138186718
+      Smileys - (5)_37: -221223413
+      Smileys - (5)_38: -1321361106
+      Smileys - (5)_39: 1911774044
+      Smileys - (5)_4: 203432080
+      Smileys - (5)_40: 1926314230
+      Smileys - (5)_41: 1599910459
+      Smileys - (5)_42: 357051718
+      Smileys - (5)_43: -2000605822
+      Smileys - (5)_44: -1447134505
+      Smileys - (5)_45: 829580992
+      Smileys - (5)_46: 1640651882
+      Smileys - (5)_47: 820243280
+      Smileys - (5)_48: -1802438713
+      Smileys - (5)_49: 959287543
+      Smileys - (5)_5: -1376013878
+      Smileys - (5)_50: -428022766
+      Smileys - (5)_51: 1115934504
+      Smileys - (5)_52: -652387163
+      Smileys - (5)_53: -1889758173
+      Smileys - (5)_54: -527779602
+      Smileys - (5)_55: 765715810
+      Smileys - (5)_56: -641271675
+      Smileys - (5)_57: -1492141131
+      Smileys - (5)_58: -1308530649
+      Smileys - (5)_59: -1351439848
+      Smileys - (5)_6: 1988300723
+      Smileys - (5)_60: 71547004
+      Smileys - (5)_61: -845549249
+      Smileys - (5)_62: 405996634
+      Smileys - (5)_63: -1840775951
+      Smileys - (5)_64: 1547414780
+      Smileys - (5)_65: 1599814113
+      Smileys - (5)_66: 369681421
+      Smileys - (5)_67: -1824905818
+      Smileys - (5)_68: -490907174
+      Smileys - (5)_69: -4100403
+      Smileys - (5)_7: 2135634226
+      Smileys - (5)_70: 1644723161
+      Smileys - (5)_71: -962109309
+      Smileys - (5)_72: 413230854
+      Smileys - (5)_73: -606447833
+      Smileys - (5)_74: -945019560
+      Smileys - (5)_75: -16340137
+      Smileys - (5)_76: 1818788150
+      Smileys - (5)_77: 276434349
+      Smileys - (5)_78: 1920970623
+      Smileys - (5)_79: 960004612
+      Smileys - (5)_8: -1554434792
+      Smileys - (5)_80: -1027074858
+      Smileys - (5)_81: -538260554
+      Smileys - (5)_82: 193297668
+      Smileys - (5)_83: 322509185
+      Smileys - (5)_84: 975409161
+      Smileys - (5)_85: -279311625
+      Smileys - (5)_86: -1560342481
+      Smileys - (5)_87: -2131794669
+      Smileys - (5)_88: -1199388687
+      Smileys - (5)_89: -455046156
+      Smileys - (5)_9: -2078757634
+      Smileys - (5)_90: 2068089960
+      Smileys - (5)_91: -1242137003
+      Smileys - (5)_92: 1391934992
+      Smileys - (5)_93: -1658639470
+      Smileys - (5)_94: 118572069
+      Smileys - (5)_95: 1462531181
+      Smileys - (5)_96: 1779473227
+      Smileys - (5)_97: -328726115
+      Smileys - (5)_98: 735287899
+      Smileys - (5)_99: 1046537508
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
