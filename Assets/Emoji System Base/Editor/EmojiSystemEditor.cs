@@ -1,3 +1,15 @@
+/*
+ * ---------------------------------------------------------------------------
+ * Description: The EmojiSystemEditor script is a custom Unity editor window that allows
+ *              users to manage and edit emoji sprite assets. It provides functionality for
+ *              adjusting glyph metrics and applying these changes to both SpriteAsset and 
+ *              TMP_SpriteAsset types.
+ *              Users can also apply these changes to all relevant objects in the scene.
+ *              Additionally, the script integrates with Python for image processing tasks such as cropping sprites.
+ * Author: Lucas Gomes Cecchini
+ * Pseudonym: AGAMENOM
+ * ---------------------------------------------------------------------------
+*/
 using UnityEngine.SceneManagement;
 using UnityEngine.TextCore.Text;
 using UnityEngine.TextCore;

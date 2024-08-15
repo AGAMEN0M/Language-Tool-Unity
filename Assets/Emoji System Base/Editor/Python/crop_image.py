@@ -1,3 +1,11 @@
+# ---------------------------------------------------------------------------
+# Description: The crop_image.py script processes an image file by cutting it
+#              into smaller square segments of a specified size and saving these
+#              segments to a designated folder. It uses the Python Imaging Library (PIL)
+#              to handle image manipulation.
+# Author: Lucas Gomes Cecchini
+# Pseudonym: AGAMENOM
+# ---------------------------------------------------------------------------
 import sys
 import os
 from PIL import Image
