@@ -1,8 +1,2 @@
 # Auto detect text files and perform LF normalization
 * text=auto
-Language[[:space:]]Editor[[:space:]]View/LanguageEditor_Data/sharedassets0.asset filter=lfs diff=lfs merge=lfs -text
-Assets/Language/Fonts/DengXian/TextMesh[[:space:]]Pro/Dengb[[:space:]]SDF.asset filter=lfs diff=lfs merge=lfs -text
-Assets/Language/Fonts/DengXian/TextMesh[[:space:]]Pro/Deng[[:space:]]SDF.asset filter=lfs diff=lfs merge=lfs -text
-Assets/Language/Fonts/DengXian/TextMesh[[:space:]]Pro/Dengl[[:space:]]SDF.asset filter=lfs diff=lfs merge=lfs -text
-Language[[:space:]]Editor[[:space:]]View/LanguageEditor_Data/sharedassets0.assets.resS filter=lfs diff=lfs merge=lfs -text
-Unity[[:space:]]Package/Language[[:space:]]-[[:space:]]by[[:space:]]Lucas_AGAMENOM.unitypackage filter=lfs diff=lfs merge=lfs -text

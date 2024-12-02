@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 2a704ff5f69db7c4c813a9aa03f449a8
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - fontListData: {fileID: 11400000, guid: 3b3be2ae93bfe1e4a844e3dc3e1429d8, type: 2}
+  - fontListDataTMP: {fileID: 11400000, guid: 846025e876e546c4ca0fb5fc251a64ca, type: 2}
+  - errorLanguageTool: {fileID: 6335816281301816604, guid: 1a2f5d6f36bf6bd47908cc25046bf230, type: 3}
+  executionOrder: 0
+  icon: {fileID: 2800000, guid: 4e95dfad517ce2d429c435ebbff45082, type: 3}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

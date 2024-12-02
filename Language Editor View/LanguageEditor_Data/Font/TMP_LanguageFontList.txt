@@ -1,9 +1,0 @@
-LiberationSans SDF
-LiberationSans SDF - Fallback
-times new roman bold italic SDF
-times new roman bold SDF
-times new roman italic SDF
-times new roman SDF
-Deng SDF
-Dengb SDF
-Dengl SDF

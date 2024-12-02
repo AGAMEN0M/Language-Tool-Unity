@@ -1,2 +1,0 @@
-Give an explanation of how the script works, talking about each variable and method and Usage
-

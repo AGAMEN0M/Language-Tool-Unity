@@ -1,0 +1,12 @@
+Give an explanation of how the script works, talking about each variable and method and Usage. without using csharp
+
+
+
+/*
+ * ---------------------------------------------------------------------------
+ * Description: [Add a short description of the script here.]
+ * Author: Lucas Gomes Cecchini
+ * Pseudonym: AGAMENOM
+ * ---------------------------------------------------------------------------
+*/
+
