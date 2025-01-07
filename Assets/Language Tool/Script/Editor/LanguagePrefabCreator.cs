@@ -57,7 +57,7 @@ public static class LanguagePrefabCreator
         if (isUI)
         {
             #pragma warning disable UNT0007
-            canvasObject = Object.FindObjectOfType<Canvas>() ?? CreateUICanvas(); // Find an existing Canvas or create a new one.
+            canvasObject = Object.FindAnyObjectByType<Canvas>() ?? CreateUICanvas(); // Find an existing Canvas or create a new one.
             #pragma warning restore UNT0007
         }
 
