@@ -1,3 +1,15 @@
+/*
+ * ---------------------------------------------------------------------------
+ * Description: This script offers utility functions for working with tab-separated value (TSV) tables in Unity. 
+ *              It allows loading, saving, modifying, and accessing cell data in a table format, with methods for 
+ *              adding and removing rows or columns. The tables are represented as arrays of VerticalTable objects, 
+ *              where each object contains a row of tab-separated values. The script also provides text conversion 
+ *              functions to handle special tokens for formatting.
+ * Author: Lucas Gomes Cecchini
+ * Pseudonym: AGAMENOM
+ * ---------------------------------------------------------------------------
+*/
+
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;

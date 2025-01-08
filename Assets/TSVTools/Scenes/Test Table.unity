@@ -227,7 +227,7 @@ GameObject:
   - component: {fileID: 1064311107}
   - component: {fileID: 1064311106}
   m_Layer: 0
-  m_Name: '[Example Tab Table Usage]'
+  m_Name: '[Test Table]'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
