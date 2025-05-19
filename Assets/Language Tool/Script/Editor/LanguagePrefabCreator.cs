@@ -1,220 +1,202 @@
 /*
  * ---------------------------------------------------------------------------
- * Description: A static class that provides methods to create and configure 
- *              various language-related UI and 3D prefabs in Unity. This script includes 
- *              functionality to automatically create a UI Canvas and Event System when 
- *              generating UI prefabs, ensuring proper setup for event handling and UI 
- *              management. It also registers undo actions for easy modification tracking 
- *              within the Unity Editor. Prefabs can be instantiated for audio sources, 
- *              language scripts, buttons, images, text fields, and other UI components, 
- *              streamlining the prefab creation process for language tools.
+ * Description: This static class provides utility methods for instantiating and configuring 
+ *              language-related prefabs in Unity, both in 3D and UI contexts. It includes 
+ *              automatic setup of a UI Canvas and Event System when needed, and supports 
+ *              instantiating prefabs like language managers, buttons, toggles, input fields, 
+ *              and more. Undo registration and prefab unpacking are handled to integrate 
+ *              seamlessly into Unity's editor workflow.
+ * 
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
 */
 
 using UnityEngine.EventSystems;
-using LanguageTools.Editor;
 using UnityEngine.UI;
 using UnityEngine;
 using UnityEditor;
 
+using static LanguageTools.Editor.LanguageEditorUtilities;
+
 public static class LanguagePrefabCreator
 {
-    // Creates a new UI Canvas object with necessary components.
+    /// <summary>
+    /// Creates a new Canvas with all required UI components and an EventSystem.
+    /// </summary>
     private static Canvas CreateUICanvas()
     {
-        GameObject newCanvasObject = new("Canvas"); // Create a new GameObject for the Canvas.
-        var canvasObject = newCanvasObject.AddComponent<Canvas>(); // Add the Canvas component to the GameObject.
+        // Create a new GameObject for the Canvas.
+        GameObject canvasGO = new("Canvas");
 
-        // Add CanvasScaler and GraphicRaycaster components for UI scaling and event handling.
-        newCanvasObject.AddComponent<CanvasScaler>();
-        newCanvasObject.AddComponent<GraphicRaycaster>();
+        // Add necessary UI components to the Canvas.
+        var canvas = canvasGO.AddComponent<Canvas>();
+        canvasGO.AddComponent<CanvasScaler>();
+        canvasGO.AddComponent<GraphicRaycaster>();
 
-        canvasObject.renderMode = RenderMode.ScreenSpaceOverlay; // Set the render mode to ScreenSpaceOverlay for standard UI display.
-        canvasObject.gameObject.layer = LayerMask.NameToLayer("UI"); // Set the layer to UI for proper rendering.
+        // Configure canvas rendering settings.
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.gameObject.layer = LayerMask.NameToLayer("UI");
+        canvas.sortingOrder = 0;
+        canvas.targetDisplay = 0;
 
-        // Set sorting order for UI elements.
-        canvasObject.sortingOrder = 0;
-        canvasObject.targetDisplay = 0;
+        // Create and configure the EventSystem.
+        GameObject eventSystemGO = new("EventSystem");
+        eventSystemGO.AddComponent<EventSystem>();
+        eventSystemGO.AddComponent<StandaloneInputModule>();
 
-        // Create an Event System for managing input events in the UI.
-        GameObject eventSystemObject = new("EventSystem");
-        eventSystemObject.AddComponent<EventSystem>();
-        eventSystemObject.AddComponent<StandaloneInputModule>();
+        // Register both objects for Undo in the editor.
+        Undo.RegisterCreatedObjectUndo(canvasGO, "Create Canvas");
+        Undo.RegisterCreatedObjectUndo(eventSystemGO, "Create EventSystem");
 
-        // Register the creation of the Canvas and Event System objects for Undo functionality.
-        Undo.RegisterCreatedObjectUndo(newCanvasObject, "Create Canvas");
-        Undo.RegisterCreatedObjectUndo(eventSystemObject, "Create EventSystem");
-
-        return canvasObject; // Return the created Canvas.
+        // Return the created Canvas component.
+        return canvas;
     }
 
-    // Creates and configures a prefab based on the specified file name and parent GameObject.
+    /// <summary>
+    /// Instantiates and configures a prefab under the given parent.
+    /// </summary>
+    /// <param name="fileName">Name of the prefab to find and instantiate.</param>
+    /// <param name="selectedGameObject">The parent GameObject.</param>
+    /// <param name="isUI">Whether the prefab is UI-based and requires a Canvas.</param>
     private static void CreateAndConfigurePrefab(string fileName, GameObject selectedGameObject, bool isUI = false)
     {
-        Canvas canvasObject = null; // Initialize canvasObject for UI prefabs.
-        if (isUI)
+        #pragma warning disable
+        #pragma warning disable UNT0007
+        // Try to find an existing Canvas or create a new one if it's a UI prefab.
+        var canvas = isUI ? Object.FindAnyObjectByType<Canvas>() ?? CreateUICanvas() : null;
+        #pragma warning restore UNT0007
+        #pragma warning restore
+
+        // Load the prefab by name from the asset database.
+        var prefab = FindPrefabByName(fileName);
+        if (prefab == null)
         {
-            #pragma warning disable UNT0007
-            canvasObject = Object.FindAnyObjectByType<Canvas>() ?? CreateUICanvas(); // Find an existing Canvas or create a new one.
-            #pragma warning restore UNT0007
+            Debug.LogError($"Prefab not found: {fileName}.prefab. Ensure it exists in the project.");
+            return;
         }
 
-        // Find the original prefab by its name.
-        GameObject originalPrefab = LanguageEditorUtilities.FindPrefabByName(fileName);
-        if (originalPrefab == null)
-        {
-            Debug.LogError($"Prefab not found: {fileName}.prefab. Please check if the prefab exists in the project and the name is correct.");
-            return; // Exit if the prefab is not found.
-        }
+        // Determine the parent transform for the new instance.
+        var parent = selectedGameObject != null ? selectedGameObject.transform : (isUI ? canvas.transform : null);
 
-        // Determine the parent transform for the new GameObject based on the provided arguments.
-        Transform parentTransform = selectedGameObject != null ? selectedGameObject.transform : (isUI ? canvasObject.transform : null);
-        // Instantiate the prefab as a child of the determined parent transform.
-        GameObject newGameObject = PrefabUtility.InstantiatePrefab(originalPrefab, parentTransform) as GameObject;
+        // Instantiate the prefab as a child of the selected parent.
+        var instance = PrefabUtility.InstantiatePrefab(prefab, parent) as GameObject;
 
-        FinalizePrefabSetup(fileName, newGameObject); // Finalize the setup for the newly created prefab.
+        // Finalize the setup for the newly created instance.
+        FinalizePrefabSetup(fileName, instance);
     }
 
-    // Finalizes the setup for the newly created prefab.
+    /// <summary>
+    /// Finalizes the setup of a newly created prefab: unpack, register undo, and trigger rename.
+    /// </summary>
+    /// <param name="fileName">The original prefab's name.</param>
+    /// <param name="newGameObject">The instantiated prefab GameObject.</param>
     private static void FinalizePrefabSetup(string fileName, GameObject newGameObject)
     {
-        if (newGameObject == null) return; // Exit if the new GameObject is null.
+        if (newGameObject == null) return;
 
-        Undo.RegisterCreatedObjectUndo(newGameObject, $"Create {fileName}"); // Register the new GameObject for Undo functionality.
+        // Allow undo for the creation of the object.
+        Undo.RegisterCreatedObjectUndo(newGameObject, $"Create {fileName}");
 
-        // Unpack the prefab instance to allow for modifications.
+        // Fully unpack the prefab so it's editable as a regular GameObject.
         PrefabUtility.UnpackPrefabInstance(newGameObject, PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
 
-        Selection.activeGameObject = newGameObject; // Select the new GameObject in the hierarchy.
+        // Select the newly created object in the hierarchy.
+        Selection.activeGameObject = newGameObject;
 
-        // Delay the focus event to allow for user interaction after creation.
+        // Automatically trigger rename mode for the selected object after the frame.
         EditorApplication.delayCall += () =>
         {
             if (Selection.activeGameObject == newGameObject)
             {
-                // Trigger the rename event for the new GameObject.
-                EditorWindow.focusedWindow.SendEvent(new Event { keyCode = KeyCode.F2, type = EventType.KeyDown });
+                EditorWindow.focusedWindow.SendEvent(new()
+                {
+                    keyCode = KeyCode.F2,
+                    type = EventType.KeyDown
+                });
             }
         };
     }
 
-    // 3D Object Menu Items.
+    // ---------------------------- 3D Prefab Menu ----------------------------
 
-    [MenuItem("GameObject/Language/3D Object/Audio Source (LT)")]
-    public static void CreateAudioSourcePrefab()
-    {
-        CreateAndConfigurePrefab("Audio Source (LT)", Selection.activeGameObject);
-    }
+    /// <summary>Creates a Language Create File (LT) prefab.</summary>
+    [MenuItem("GameObject/Language/3D Object/Language Create File (LT)", false, 1)]
+    public static void CreateLanguageFilePrefab() => CreateAndConfigurePrefab("Language Create File (LT)", Selection.activeGameObject);
 
-    [MenuItem("GameObject/Language/3D Object/Language Create File (LT)")]
-    public static void CreateLanguageFilePrefab()
-    {
-        CreateAndConfigurePrefab("Language Create File (LT)", Selection.activeGameObject);
-    }
+    /// <summary>Creates a Language Script (LT) prefab.</summary>
+    [MenuItem("GameObject/Language/3D Object/Language Script (LT)", false, 2)]
+    public static void CreateLanguageScriptPrefab() => CreateAndConfigurePrefab("Language Script (LT)", Selection.activeGameObject);
 
-    [MenuItem("GameObject/Language/3D Object/Language Script (LT)")]
-    public static void CreateLanguageScriptPrefab()
-    {
-        CreateAndConfigurePrefab("Language Script (LT)", Selection.activeGameObject);
-    }
+    /// <summary>Creates an Audio Source (LT) prefab.</summary>
+    [MenuItem("GameObject/Language/3D Object/Audio Source (LT)", false, 3)]
+    public static void CreateAudioSourcePrefab() => CreateAndConfigurePrefab("Audio Source (LT)", Selection.activeGameObject);
 
-    [MenuItem("GameObject/Language/3D Object/New Text (LT) [Legacy]")]
-    public static void CreateLegacyTextPrefab()
-    {
-        CreateAndConfigurePrefab("New Text (LT) [Legacy]", Selection.activeGameObject);
-    }
+    /// <summary>Creates a Legacy Text (LT) prefab.</summary>
+    [MenuItem("GameObject/Language/3D Object/New Text (LT) [Legacy]", false, 4)]
+    public static void CreateLegacyTextPrefab() => CreateAndConfigurePrefab("New Text (LT) [Legacy]", Selection.activeGameObject);
 
-    [MenuItem("GameObject/Language/3D Object/New Text (LT) [TMP]")]
-    public static void CreateTMPTextPrefab()
-    {
-        CreateAndConfigurePrefab("New Text (LT) [TMP]", Selection.activeGameObject);
-    }
+    /// <summary>Creates a TMP Text (LT) prefab.</summary>
+    [MenuItem("GameObject/Language/3D Object/New Text (LT) [TMP]", false, 5)]
+    public static void CreateTMPTextPrefab() => CreateAndConfigurePrefab("New Text (LT) [TMP]", Selection.activeGameObject);
 
-    // UI Menu Items.
+    // ---------------------------- UI Prefab Menu ----------------------------
 
-    [MenuItem("GameObject/Language/UI/Image (LT)")]
-    public static void CreateImagePrefab()
-    {
-        CreateAndConfigurePrefab("Image (LT)", Selection.activeGameObject, true);
-    }
+    /// <summary>Creates a RawImage (LT) UI prefab.</summary>
+    [MenuItem("GameObject/Language/UI/RawImage (LT)", false, 1)]
+    public static void CreateRawImagePrefab() => CreateAndConfigurePrefab("RawImage (LT)", Selection.activeGameObject, true);
 
-    [MenuItem("GameObject/Language/UI/RawImage (LT)")]
-    public static void CreateRawImagePrefab()
-    {
-        CreateAndConfigurePrefab("RawImage (LT)", Selection.activeGameObject, true);
-    }
+    /// <summary>Creates an Image (LT) UI prefab.</summary>
+    [MenuItem("GameObject/Language/UI/Image (LT)", false, 2)]
+    public static void CreateImagePrefab() => CreateAndConfigurePrefab("Image (LT)", Selection.activeGameObject, true);
 
-    [MenuItem("GameObject/Language/UI/Legacy/Language Manager (LT) [Legacy]")]
-    public static void CreateLanguageManagerPrefab()
-    {
-        CreateAndConfigurePrefab("Language Manager (LT) [Legacy]", Selection.activeGameObject, true);
-    }
+    /// <summary>Creates a TMP Language Manager UI prefab.</summary>
+    [MenuItem("GameObject/Language/UI/Language Manager (LT) [TMP]", false, 3)]
+    public static void CreateTMPLanguageManagerPrefab() => CreateAndConfigurePrefab("Language Manager (LT) [TMP]", Selection.activeGameObject, true);
 
-    [MenuItem("GameObject/Language/UI/Language Manager (LT) [TMP]")]
-    public static void CreateTMPLanguageManagerPrefab()
-    {
-        CreateAndConfigurePrefab("Language Manager (LT) [TMP]", Selection.activeGameObject, true);
-    }
+    /// <summary>Creates a TMP Dropdown UI prefab.</summary>
+    [MenuItem("GameObject/Language/UI/Dropdown (LT) [TMP]", false, 4)]
+    public static void CreateTMPDropdownPrefab() => CreateAndConfigurePrefab("Dropdown (LT) [TMP]", Selection.activeGameObject, true);
 
-    [MenuItem("GameObject/Language/UI/Legacy/Button (LT) [Legacy]")]
-    public static void CreateButtonPrefab()
-    {
-        CreateAndConfigurePrefab("Button (LT) [Legacy]", Selection.activeGameObject, true);
-    }
+    /// <summary>Creates a TMP InputField UI prefab.</summary>
+    [MenuItem("GameObject/Language/UI/InputField (LT) [TMP]", false, 5)]
+    public static void CreateTMPInputFieldPrefab() => CreateAndConfigurePrefab("InputField (LT) [TMP]", Selection.activeGameObject, true);
 
-    [MenuItem("GameObject/Language/UI/Button (LT) [TMP]")]
-    public static void CreateTMPButtonPrefab()
-    {
-        CreateAndConfigurePrefab("Button (LT) [TMP]", Selection.activeGameObject, true);
-    }
+    /// <summary>Creates a TMP Toggle UI prefab.</summary>
+    [MenuItem("GameObject/Language/UI/Toggle (LT) [TMP]", false, 6)]
+    public static void CreateTMPTogglePrefab() => CreateAndConfigurePrefab("Toggle (LT) [TMP]", Selection.activeGameObject, true);
 
-    [MenuItem("GameObject/Language/UI/Legacy/Dropdown (LT) [Legacy]")]
-    public static void CreateDropdownPrefab()
-    {
-        CreateAndConfigurePrefab("Dropdown (LT) [Legacy]", Selection.activeGameObject, true);
-    }
+    /// <summary>Creates a TMP Button UI prefab.</summary>
+    [MenuItem("GameObject/Language/UI/Button (LT) [TMP]", false, 7)]
+    public static void CreateTMPButtonPrefab() => CreateAndConfigurePrefab("Button (LT) [TMP]", Selection.activeGameObject, true);
 
-    [MenuItem("GameObject/Language/UI/Dropdown (LT) [TMP]")]
-    public static void CreateTMPDropdownPrefab()
-    {
-        CreateAndConfigurePrefab("Dropdown (LT) [TMP]", Selection.activeGameObject, true);
-    }
+    /// <summary>Creates a TMP Text UI prefab.</summary>
+    [MenuItem("GameObject/Language/UI/Text (LT) [TMP]", false, 8)]
+    public static void CreateTMPTextUIPrefab() => CreateAndConfigurePrefab("Text (LT) [TMP]", Selection.activeGameObject, true);
 
-    [MenuItem("GameObject/Language/UI/Legacy/InputField (LT) [Legacy]")]
-    public static void CreateInputFieldPrefab()
-    {
-        CreateAndConfigurePrefab("InputField (LT) [Legacy]", Selection.activeGameObject, true);
-    }
+    // ---------------------------- UI Legacy Prefab Menu ----------------------------
 
-    [MenuItem("GameObject/Language/UI/InputField (LT) [TMP]")]
-    public static void CreateTMPInputFieldPrefab()
-    {
-        CreateAndConfigurePrefab("InputField (LT) [TMP]", Selection.activeGameObject, true);
-    }
+    /// <summary>Creates a Legacy Language Manager UI prefab.</summary>
+    [MenuItem("GameObject/Language/UI/Legacy/Language Manager (LT) [Legacy]", false, 1)]
+    public static void CreateLanguageManagerPrefab() => CreateAndConfigurePrefab("Language Manager (LT) [Legacy]", Selection.activeGameObject, true);
 
-    [MenuItem("GameObject/Language/UI/Legacy/Text (LT) [Legacy]")]
-    public static void CreateTextUIPrefab()
-    {
-        CreateAndConfigurePrefab("Text (LT) [Legacy]", Selection.activeGameObject, true);
-    }
+    /// <summary>Creates a Legacy Dropdown UI prefab.</summary>
+    [MenuItem("GameObject/Language/UI/Legacy/Dropdown (LT) [Legacy]", false, 2)]
+    public static void CreateDropdownPrefab() => CreateAndConfigurePrefab("Dropdown (LT) [Legacy]", Selection.activeGameObject, true);
 
-    [MenuItem("GameObject/Language/UI/Text (LT) [TMP]")]
-    public static void CreateTMPTextUIPrefab()
-    {
-        CreateAndConfigurePrefab("Text (LT) [TMP]", Selection.activeGameObject, true);
-    }
+    /// <summary>Creates a Legacy InputField UI prefab.</summary>
+    [MenuItem("GameObject/Language/UI/Legacy/InputField (LT) [Legacy]", false, 3)]
+    public static void CreateInputFieldPrefab() => CreateAndConfigurePrefab("InputField (LT) [Legacy]", Selection.activeGameObject, true);
 
-    [MenuItem("GameObject/Language/UI/Legacy/Toggle (LT) [Legacy]")]
-    public static void CreateTogglePrefab()
-    {
-        CreateAndConfigurePrefab("Toggle (LT) [Legacy]", Selection.activeGameObject, true);
-    }
+    /// <summary>Creates a Legacy Toggle UI prefab.</summary>
+    [MenuItem("GameObject/Language/UI/Legacy/Toggle (LT) [Legacy]", false, 4)]
+    public static void CreateTogglePrefab() => CreateAndConfigurePrefab("Toggle (LT) [Legacy]", Selection.activeGameObject, true);
 
-    [MenuItem("GameObject/Language/UI/Toggle (LT) [TMP]")]
-    public static void CreateTMPTogglePrefab()
-    {
-        CreateAndConfigurePrefab("Toggle (LT) [TMP]", Selection.activeGameObject, true);
-    }
+    /// <summary>Creates a Legacy Button UI prefab.</summary>
+    [MenuItem("GameObject/Language/UI/Legacy/Button (LT) [Legacy]", false, 5)]
+    public static void CreateButtonPrefab() => CreateAndConfigurePrefab("Button (LT) [Legacy]", Selection.activeGameObject, true);
+
+    /// <summary>Creates a Legacy Text UI prefab.</summary>
+    [MenuItem("GameObject/Language/UI/Legacy/Text (LT) [Legacy]", false, 6)]
+    public static void CreateTextUIPrefab() => CreateAndConfigurePrefab("Text (LT) [Legacy]", Selection.activeGameObject, true);
 }

@@ -10,12 +10,12 @@ GameObject:
   m_Component:
   - component: {fileID: 4985324685705977242}
   - component: {fileID: 4646768510833850552}
-  - component: {fileID: 8636456694181923254}
   - component: {fileID: 6593669124653725138}
+  - component: {fileID: 8636456694181923254}
   m_Layer: 5
   m_Name: Image (LT)
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 2800000, guid: b185fe4193a0544439c0a0ac86b70d0c, type: 3}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -46,6 +46,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4328864089955270382}
   m_CullTransparentMesh: 1
+--- !u!114 &6593669124653725138
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4328864089955270382}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5159bd711cfa378459935611c7eb5eaf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fileName: Example.png
+  useImage: 1
+  image: {fileID: 8636456694181923254}
+  imageTexture: {fileID: 0}
+  spriteTexture: {fileID: 0}
 --- !u!114 &8636456694181923254
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -76,20 +93,3 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &6593669124653725138
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4328864089955270382}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5159bd711cfa378459935611c7eb5eaf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  image: {fileID: 8636456694181923254}
-  fileName: Example.png
-  selectedFile: 
-  saveFile: 
-  filePath: 

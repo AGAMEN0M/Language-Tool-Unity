@@ -1,144 +1,123 @@
 /*
  * ---------------------------------------------------------------------------
- * Description: This component handles the localization of legacy UI Text 
- *              components based on the selected language. It updates the text and 
- *              associated properties such as alignment and font size according to 
- *              the localization settings.
+ * Description: Localizes UnityEngine.UI.Text components using the LanguageTools
+ *              system. Automatically updates the text, font, font size, and
+ *              alignment according to the active language configuration.
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
 */
 
-using LanguageTools.Legacy;
 using UnityEngine.UI;
 using LanguageTools;
 using UnityEngine;
 
 #if UNITY_EDITOR
-using LanguageTools.Editor;
+using static LanguageTools.Editor.LanguageEditorUtilities;
 using UnityEditor;
 #endif
 
-// This component handles the localization of legacy UI Text components based on the selected language.
+using static LanguageTools.LanguageFileManager;
+using static LanguageTools.Legacy.FontAndAlignmentUtility;
+
 [AddComponentMenu("Language/UI/Legacy/Language Text (Legacy)")]
 public class LanguageText : MonoBehaviour
 {
-    [Header("Settings")]
-    public Text text; // Reference to the UI Text component that will display the localized text.
-    public int iD = -7; // The ID used to reference the specific line of text in the language file.
-    [Tooltip("Disable Text if Necessary.")]
-    [SerializeField] private bool translateText = true; // Option to disable translation if necessary.
+    [Header("UI Components")]
+    public Text textComponent; // Reference to the Text component that will be localized.
+    [SerializeField] private bool translateText = true; // Determines whether the component should automatically translate the text content.
     [Space(10)]
-    [Header("Automatic Information")]
-    [SerializeField] private string selectedFile; // The selected language file path.
-    [Space(5)]
-    [SerializeField] private string saveFile; // Path to the save file that stores user preferences.
+    [IDExists] public int iD = -7; // Identifier used to retrieve localized strings and metadata from language files.
 
-    // Subscribes to the OnLanguageUpdate event when the object is enabled.
+    private LanguageSettingsData languageData; // Cached instance of the loaded language configuration.
+
+    /// <summary>
+    /// Subscribes to the language update event and immediately applies localization.
+    /// </summary>
     private void OnEnable()
     {
-        LanguageManagerDelegate.OnLanguageUpdate += LanguageUpdate; // Subscribe to language updates.
-        LanguageUpdate(); // Perform an initial update when enabled.
+        LanguageManagerDelegate.OnLanguageUpdate += LanguageUpdate;
+        LanguageUpdate();
     }
 
-    // Unsubscribes from the OnLanguageUpdate event when the object is disabled.
-    private void OnDisable()
-    {
-        LanguageManagerDelegate.OnLanguageUpdate -= LanguageUpdate; // Unsubscribe from language updates.
-    }
+    /// <summary>
+    /// Unsubscribes from the language update event.
+    /// </summary>
+    private void OnDisable() => LanguageManagerDelegate.OnLanguageUpdate -= LanguageUpdate;
 
-    // Updates the language settings and applies the localized text to the UI Text component.
+    /// <summary>
+    /// Applies localized text, font, alignment, and font size to the Text component.
+    /// </summary>
     public void LanguageUpdate()
     {
-        saveFile = LanguageFileManager.GetSaveFilePath(); // Retrieve the path to the save file.
-        string line = LanguageFileManager.GetLocalizedLineByID(iD, saveFile, ref selectedFile); // Get the localized line of text by ID.
-        ProcessLine(line); // Process and apply the localized line.
-    }
+        // Check if the UI Text component is assigned before applying changes.
+        if (textComponent == null)
+        {
+            Debug.LogError("LanguageText: Text component is not assigned.", this);
+            return;
+        }
 
-    // Processes the retrieved line of text and updates the UI Text component's properties (text, alignment, font, etc.).
-    private void ProcessLine(string line)
-    {
-        // If translation is enabled, update the text component with the localized text inside the curly braces.
-        if (translateText) text.text = LanguageFileManager.ExtractTextBetweenBraces(line);
+        // Load the language data asset from resources or configuration.
+        languageData = LoadLanguageSettings();
+        if (languageData == null)
+        {
+            Debug.LogError("LanguageText: Failed to load LanguageSettingsData.", this);
+            return;
+        }
 
-        // Extract properties such as alignment, font size, and font index from the remaining line.
-        string lineWithoutCurlyBraces = LanguageFileManager.RemoveTextBetweenBraces(line);
-        int alignment = LanguageFileManager.ExtractIntValue(lineWithoutCurlyBraces, "Ali:");
-        int fontSize = LanguageFileManager.ExtractIntValue(lineWithoutCurlyBraces, "S:");
-        int fontListIndex = LanguageFileManager.ExtractIntValue(lineWithoutCurlyBraces, "Font:");
+        // Update text content if translation is enabled.
+        if (translateText)
+        {
+            var translated = GetIDText(languageData.idData, iD);
+            if (!string.IsNullOrEmpty(translated)) textComponent.text = translated;
+        }
 
-        // Update the alignment of the text component if a valid alignment is found.
-        if (alignment != 0) text.alignment = FontAndAlignmentUtility.ConvertToTextAnchor(alignment);
-
-        // Update the font size if a valid size is found.
-        if (fontSize != 0) text.fontSize = fontSize;
-
-        // Update the font if a valid font index is found.
-        if (fontListIndex != 0) text.font = FontAndAlignmentUtility.GetFontByIndex(fontListIndex);
+        // Apply alignment, font size, and font using metadata from language files.
+        var meta = GetIDMeta(languageData.idMetaData, iD);
+        if (meta.alignment != 0) textComponent.alignment = ConvertToTextAnchor(meta.alignment);
+        if (meta.fontSize != 0) textComponent.fontSize = meta.fontSize;
+        if (meta.fontListIndex != 0) textComponent.font = GetFontByIndex(meta.fontListIndex);
     }
 }
 
 #if UNITY_EDITOR
-// Custom editor for the LanguageText component in the Unity editor.
+/// <summary>
+/// Custom editor for the LanguageText component.
+/// </summary>
+[CanEditMultipleObjects]
 [CustomEditor(typeof(LanguageText))]
 public class LanguageTextEditor : Editor
 {
-    // Overrides the default Inspector GUI with custom fields and buttons.
+    /// <summary>
+    /// Draws the custom Inspector interface for LanguageText.
+    /// </summary>
     public override void OnInspectorGUI()
     {
-        serializedObject.Update(); // Update the serialized properties of the object.
-        var script = (LanguageText)target; // Reference to the target LanguageText script.
-        LanguageEditorUtilities.DrawReadOnlyMonoScriptField(target); // Draw a read-only field for the script reference.
+        serializedObject.Update();
+        var script = (LanguageText)target;
+
+        using (new EditorGUI.DisabledScope(targets.Length > 1))
+        {
+            // Button to import the current Text component settings into the language editor.
+            if (GUILayout.Button("Import Settings", CreateCustomButtonStyle(15), GUILayout.Height(30)))
+            {
+                if (IsIDInLanguageList(script.iD) && !EditorUtility.DisplayDialog("Replace ID", "An ID with this number is already saved. Do you want to replace it?", "Yes", "No"))
+                    return;
+
+                // Extract properties from the assigned Text component.
+                string text = script.textComponent.text;
+                int alignment = ConvertToAlignmentCode(script.textComponent.alignment);
+                int fontSize = script.textComponent.fontSize;
+                int fontListIndex = GetFontIndex(script.textComponent.font);
+
+                // Open the editor window with the retrieved component values.
+                OpenEditorWindowWithComponent(script.iD, 1, text, alignment, fontSize, fontListIndex);
+            }
+        }
 
         EditorGUILayout.Space(5);
-
-        // Button to import the settings for the text component.
-        if (GUILayout.Button("Import Settings", LanguageEditorUtilities.CreateCustomButtonStyle(15), GUILayout.Height(30)))
-        {
-            // Check if the current ID is already saved in the language list.
-            if (LanguageEditorUtilities.IsIDInLanguageList(script.iD))
-            {
-                // Ask the user if they want to replace the existing ID with the new one.
-                if (!EditorUtility.DisplayDialog("Replace ID", "An ID with this number is already saved. Do you want to replace it?", "Yes", "No"))
-                {
-                    return; // Exit if the user chooses not to replace the ID.
-                }
-            }
-
-            // Get the text, alignment, font size, and font index from the current Text component.
-            string text = script.text.text;
-            int alignment = FontAndAlignmentUtility.ConvertToAlignmentCode(script.text.alignment);
-            int fontSize = script.text.fontSize;
-            int fontListIndex = FontAndAlignmentUtility.GetFontIndex(script.text.font);
-
-            // Open the editor window to modify these settings.
-            LanguageEditorUtilities.OpenEditorWindowWithComponent(script.iD, 1, text, alignment, fontSize, fontListIndex, true, true, true, true);
-        }
-
-        // Highlight the text field in red if it is not assigned.
-        GUI.color = script.text == null ? Color.red : Color.white;
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("text"));
-        GUI.color = Color.white;
-
-        // Display a warning if the current ID is already saved in the language list.
-        if (LanguageEditorUtilities.IsIDInLanguageList(script.iD))
-        {
-            GUI.color = Color.yellow;
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("iD"));
-            EditorGUILayout.HelpBox("There is an ID with this number Saved!", MessageType.Warning);
-            GUI.color = Color.white;
-        }
-        else
-        {
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("iD"));
-        }
-
-        // Fields for enabling/disabling translation, and for displaying the selected and saved file paths.
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("translateText"));
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("selectedFile"));
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("saveFile"));
-
-        serializedObject.ApplyModifiedProperties(); // Apply any modified properties.
+        DrawDefaultInspector();
+        serializedObject.ApplyModifiedProperties();
     }
 }
 #endif

@@ -1,69 +1,76 @@
 /*
  * ---------------------------------------------------------------------------
- * Description: This ScriptableObject holds language settings data, including
- *              paths for language files, default language settings, and font information 
- *              for localization purposes in Unity applications.
+ * Description: ScriptableObject that stores localization settings for Unity projects.
+ *              Includes folder paths, default language, font configuration, culture,
+ *              available languages, and metadata for text and canvas localization.
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
 */
 
+using System.Collections.Generic;
+using LanguageTools;
 using UnityEngine;
 using System.Linq;
 
 #if UNITY_EDITOR
-using LanguageTools;
 using UnityEditor;
 #endif
 
-// ScriptableObject to hold language settings data.
+/// <summary>
+/// Stores localization settings and data for supported languages and culture-specific text rendering.
+/// Used by localization tools and runtime language loading systems.
+/// </summary>
 public class LanguageSettingsData : ScriptableObject
 {
     [Header("Archives Location")]
-    public string saveNameInUnity = "Editor/LanguageSave"; // Path to the JSON file for selected file in Unity Editor.
-    [Space(5)]
-    public string saveNameInBuild = "LanguageSave"; // Path to the JSON file for selected file in the build.
-    [Space(5)]
-    public string folderName = "Language"; // Folder containing language files.
+    public string folderName = "Languages"; // Directory containing the language files.
     [Space(10)]
     [Header("Default Language")]
-    public string defaultLanguage = "English"; // Default language to be used.
+    public string defaultLanguage = "en"; // Default language used when no user preference is stored.
     [Space(10)]
     [Header("Font List Data")]
-    public LanguageFontListData fontListData; // Holds information about fonts.
-    public LanguageFontListDataTMP fontListDataTMP; // Holds information about TextMeshPro fonts.
+    public LanguageFontListData fontListData; // Stores the list of fonts used for standard Unity UI elements.
+    public LanguageFontListDataTMP fontListDataTMP; // Stores the list of TMP fonts used for TextMeshPro UI elements.
     [Space(10)]
     [Header("Canvas Log")]
-    public GameObject errorLanguageTool; // Field to reference a GameObject.
+    public GameObject errorLanguageTool; // UI prefab shown when language loading or configuration fails.
+    [Space(10)]
+    [Header("Extracted Data")]
+    public string selectedCulture; // The current language culture selected by the player (e.g., "en-US").
+    public List<LanguageAvailable> availableLanguages = new(); // All languages defined and optionally available in the build.
+    public List<IdData> idData = new(); // Text elements for dynamic localization in non-canvas components.
+    public List<IdMetaData> idMetaData = new(); // Additional information or attributes related to each localized ID (e.g., font size or tags).
+    public List<IdData> idCanvasData = new(); // Text elements specifically used within Unity Canvas UI components.
 }
 
 #if UNITY_EDITOR
+/// <summary>
+/// Provides a menu option to quickly open the LanguageSettingsData asset in the Unity Editor.
+/// </summary>
 public class LanguageSettingsEditor
 {
-    [MenuItem("Window/Language/Language Settings")]
+    [MenuItem("Window/Language/Language Settings", false, 2029)]
     public static void OpenLanguageSettingsData()
     {
-        // Retrieve the LanguageSettingsData object using a custom tool or method.
+        // Attempt to load the LanguageSettingsData ScriptableObject from resources.
         var settingsData = LanguageFileManager.LoadLanguageSettings();
-
-        // If the settings data is found, open it in Unity's Property Editor.
-        if (settingsData != null)
+        if (settingsData == null)
         {
-            // Attempt to find an existing open window of the Property Editor.
-            EditorWindow existingWindow = Resources.FindObjectsOfTypeAll<EditorWindow>().FirstOrDefault(window => window.titleContent.text == settingsData.name);
+            Debug.LogError("Failed to load LanguageSettingsData. Ensure the ScriptableObject exists.");
+            return;
+        }
 
-            if (existingWindow != null)
-            {
-                existingWindow.Focus(); // If the window is already open, focus on it.
-            }
-            else
-            {
-                EditorUtility.OpenPropertyEditor(settingsData); // If not, open a new Property Editor window.
-            }
+        // Check if the editor window for the asset is already open.
+        var existingWindow = Resources.FindObjectsOfTypeAll<EditorWindow>().FirstOrDefault(window => window.titleContent.text == settingsData.name);
+
+        if (existingWindow != null)
+        {
+            existingWindow.Focus(); // Focus the existing window if found.
         }
         else
         {
-            Debug.LogError("Failed to find or load LanguageSettingsData. Ensure that the ScriptableObject exists and is properly referenced.");
+            EditorUtility.OpenPropertyEditor(settingsData); // Otherwise, open the ScriptableObject in the default property editor.
         }
     }
 }

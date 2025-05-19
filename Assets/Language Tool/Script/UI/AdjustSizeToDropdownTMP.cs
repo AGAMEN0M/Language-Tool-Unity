@@ -1,14 +1,13 @@
 /*
  * ---------------------------------------------------------------------------
- * Description: This component adjusts the size of a UI element based on the 
- *              dimensions of a Dropdown menu in Unity. It dynamically modifies the 
- *              width of the UI element to ensure it fits well within the Canvas, 
- *              taking into account text line breaks and defined margins. The fit direction 
- *              can be set to Left or Right, allowing for flexible UI layouts.
+ * Description: Dynamically adjusts a UI element's width to fit its Dropdown content.
+ *              This component uses TextMeshPro elements to detect line breaks and
+ *              adapts the UI layout accordingly. It ensures proper alignment inside
+ *              the Canvas by changing its fit direction when content overflows.
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
-*/
+ */
 
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,155 +17,115 @@ using TMPro;
 public class AdjustSizeToDropdownTMP : MonoBehaviour
 {
     [Header("Settings")]
-    [SerializeField] private float manualSizeAdjustment; // Manual size adjustment value for the UI element.
-    [SerializeField] private int sizeMultiplier = 10; // Multiplier used for adjusting the size dynamically.
-    [SerializeField] private float margin = 1.0f; // Margin to add extra spacing between the UI element and canvas boundaries.
+    [SerializeField] private float manualSizeAdjustment; // Additional manual adjustment applied to the width.
+    [SerializeField] private int sizeMultiplier = 10; // Value added when text breaks into multiple lines.
+    [SerializeField] private float margin = 1.0f; // Canvas boundary margin to prevent clipping.
     [Space(5)]
-    [SerializeField] private FitDirection fitDirection = FitDirection.Right; // Fit direction (Left or Right) for the UI element.
+    [SerializeField] private FitDirection fitDirection = FitDirection.Right; // Default fit direction.
     [Space(10)]
     [Header("Automatic Settings")]
-    [SerializeField] private RectTransform parentRect; // Reference to the RectTransform of the UI element.
-    [SerializeField] private RectTransform canvasRectTransform; // Reference to the RectTransform of the Canvas.
-    [SerializeField] private float canvasWidth; // Width of the canvas.
-    [SerializeField] private float objectWidth; // Width of the UI element.
-    [SerializeField] private List<BrokenTextsTMP> textList; // List of Text components and their line break status.
-    [SerializeField] private bool textIsBroken; // Flag indicating if text breaks into multiple lines.
-    [SerializeField] private float sizeAdjustment; // Adjustment value for UI element size.
+    [SerializeField] private RectTransform parentRect; // Target RectTransform for size adjustments.
+    [SerializeField] private RectTransform canvasRectTransform; // Canvas RectTransform used for boundary checks.
+    [SerializeField] private float canvasWidth; // Cached canvas width.
+    [SerializeField] private float objectWidth; // Cached UI object width.
+    [SerializeField] private List<BrokenTextsTMP> textList; // List of TMP_Text components and their line status.
+    [SerializeField] private bool textIsBroken; // Indicates if any text component wrapped lines.
+    [SerializeField] private float sizeAdjustment; // Dynamic size adjustment based on wrapping.
 
-    // Enum to represent the fit direction (Left or Right) for the UI element.
-    public enum FitDirection
-    {
-        Left,
-        Right
-    }
+    public enum FitDirection { Left, Right } // Enum for fit direction.
 
+    /// <summary>
+    /// Initializes component references and gathers child TMP_Text objects for line check.
+    /// </summary>
     private void Start()
     {
-        parentRect = GetComponent<RectTransform>(); // Get the RectTransform of the UI element.
+        parentRect = GetComponent<RectTransform>(); // Fetch RectTransform of the current UI element.
 
-        Canvas highestCanvas = null;
-        Transform currentTransform = transform.parent;
-
-        // Traverse up the parent hierarchy to find the highest-level Canvas component that contains the UI element.
-        while (currentTransform != null)
+        // Traverse up the hierarchy to find the parent Canvas RectTransform.
+        var current = transform.parent;
+        while (current != null)
         {
-            if (currentTransform.TryGetComponent<Canvas>(out var canvasComponent))
+            if (current.TryGetComponent(out Canvas canvasComponent))
             {
-                highestCanvas = canvasComponent;
+                canvasRectTransform = canvasComponent.GetComponent<RectTransform>();
+                break;
             }
-
-            currentTransform = currentTransform.parent;
+            current = current.parent;
         }
 
-        // Set the RectTransform of the Canvas that contains the UI element.
-        if (highestCanvas != null)
+        if (canvasRectTransform == null)
         {
-            canvasRectTransform = highestCanvas.GetComponent<RectTransform>();
-        }
-        else
-        {
-            Debug.LogError("The object is not contained in a Canvas or does not have a Canvas in the hierarchy."); // If no Canvas is found, log an error.
-        }
-
-        var textComponents = GetComponentsInChildren<TMP_Text>(); // Get all Texts in the hierarchy.
-
-        // Initialize the list of Text components within the UI element.
-        foreach (TMP_Text text in textComponents)
-        {
-            text.overflowMode = TextOverflowModes.Overflow;
-            BrokenTextsTMP newText = new() { itemLabel = text, brokenText = false };
-            textList.Add(newText);
-        }
-    }
-
-    private void Update()
-    {
-        // Get the width of the canvas and the current width of the UI element.
-        canvasWidth = canvasRectTransform.rect.width;
-        objectWidth = parentRect.rect.width;
-
-        // If no Text components are found, log a warning and return.
-        if (textList == null && textList.Count == 0)
-        {
-            Debug.LogWarning("No Text objects found in the children.");
+            Debug.LogError("AdjustSizeToDropdownTMP: No Canvas found in hierarchy.", this);
             return;
         }
 
-        // Calculate the preferred width of the largest Text component inside the UI element.
-        CheckTheLineBreak();
-        textIsBroken = false;
-
-        foreach (BrokenTextsTMP item in textList)
+        // Populate list with all TMP_Text components and initialize overflow mode.
+        foreach (var text in GetComponentsInChildren<TMP_Text>())
         {
-            if (item.brokenText)
-            {
-                textIsBroken = true;
-                break;
-            }
+            text.overflowMode = TextOverflowModes.Overflow;
+            textList.Add(new BrokenTextsTMP { itemLabel = text, brokenText = false });
+        }
+    }
+
+    /// <summary>
+    /// Monitors and adjusts UI element size based on text content and canvas boundaries.
+    /// </summary>
+    private void Update()
+    {
+        if (textList == null || textList.Count == 0)
+        {
+            Debug.LogWarning("No Text objects found in the children.", this);
+            return;
         }
 
-        // Increase the size adjustment if text breaks into multiple lines.
-        if (textIsBroken)
+        // Cache canvas and object width each frame.
+        canvasWidth = canvasRectTransform.rect.width;
+        objectWidth = parentRect.rect.width;
+
+        // Determine if text wraps and update size accordingly.
+        CheckLineBreaks();
+        textIsBroken = textList.Exists(t => t.brokenText);
+        sizeAdjustment += textIsBroken ? sizeMultiplier : 0f;
+
+        float adjustment = sizeAdjustment + manualSizeAdjustment;
+
+        // Apply offset based on the current fit direction.
+        parentRect.offsetMin = new Vector2(fitDirection == FitDirection.Left ? -adjustment : 0f, parentRect.offsetMin.y);
+        parentRect.offsetMax = new Vector2(fitDirection == FitDirection.Right ? adjustment : 0f, parentRect.offsetMax.y);
+
+        // Convert local UI position to canvas space.
+        Vector2 relativePos = canvasRectTransform.InverseTransformPoint(parentRect.position);
+
+        // Reposition based on overflow beyond canvas edges.
+        if (relativePos.x + objectWidth / 2 + margin > canvasWidth / 2)
         {
-            sizeAdjustment += sizeMultiplier;
-        }
-
-        // Variables to store the left and right width, and left and right adjustments.
-        float leftAdjustment = 0f;
-        float rightAdjustment = 0f;
-
-        // Based on the chosen fitDirection, calculate the left or right adjustments for the UI element's width.
-        if (fitDirection == FitDirection.Left)
-        {
-            leftAdjustment = sizeAdjustment + manualSizeAdjustment;
-        }
-        else if (fitDirection == FitDirection.Right)
-        {
-            rightAdjustment = sizeAdjustment + manualSizeAdjustment;
-        }
-
-        // Apply the calculated adjustments to the UI element's offsetMin and offsetMax to resize it.
-        parentRect.offsetMin = new Vector2(-leftAdjustment, parentRect.offsetMin.y);
-        parentRect.offsetMax = new Vector2(rightAdjustment, parentRect.offsetMax.y);
-
-        Vector2 objectPosition = canvasRectTransform.InverseTransformPoint(parentRect.position); // Calculate the position of the UI element relative to the canvas.
-
-        // Check if the UI element goes beyond the canvas boundaries and update the fitDirection accordingly.
-        if (objectPosition.x + objectWidth / 2 + margin > canvasWidth / 2)
-        {
-            Debug.Log("The object is coming out to the right of the Canvas!");
+            Debug.Log("The object is coming out to the right of the Canvas!", this);
             fitDirection = FitDirection.Left;
         }
 
-        if (objectPosition.x - objectWidth / 2 - margin < -canvasWidth / 2)
+        if (relativePos.x - objectWidth / 2 - margin < -canvasWidth / 2)
         {
-            Debug.Log("The object is coming out to the left of the Canvas!");
+            Debug.Log("The object is coming out to the left of the Canvas!", this);
             fitDirection = FitDirection.Right;
         }
     }
 
-    // Check if any Text component breaks into multiple lines.
-    private void CheckTheLineBreak()
+    /// <summary>
+    /// Checks whether any child text component wraps to a new line.
+    /// </summary>
+    private void CheckLineBreaks()
     {
-        foreach (BrokenTextsTMP item in textList)
+        foreach (var item in textList)
         {
-            // Check if the current Text component breaks into multiple lines.
-            if (item.itemLabel.textInfo.lineCount > 1)
-            {
-                item.brokenText = true; // Set the brokenText flag to true if the text breaks into multiple lines.
-                Debug.LogWarning("Text broken into multiple lines!");
-            }
-            else
-            {
-                item.brokenText = false; // Set the brokenText flag to false if the text does not break into multiple lines.
-            }
+            item.brokenText = item.itemLabel.textInfo.lineCount > 1;
+            if (item.brokenText) Debug.LogWarning("AdjustSizeToDropdownTMP: Text wrapped to multiple lines.", this);
         }
     }
 
     [System.Serializable]
     private class BrokenTextsTMP
     {
-        public TMP_Text itemLabel; // Reference to the Text component.
-        public bool brokenText; // Flag indicating if the text breaks into multiple lines.
+        public TMP_Text itemLabel; // Reference to the TMP_Text component.
+        public bool brokenText; // Indicates if the text wraps to a second line.
     }
 }

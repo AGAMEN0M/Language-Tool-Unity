@@ -10,12 +10,12 @@ GameObject:
   m_Component:
   - component: {fileID: 3511210538988893987}
   - component: {fileID: 1927206277325517909}
-  - component: {fileID: 7106836840816860779}
   - component: {fileID: 1270437045642158334}
+  - component: {fileID: 7106836840816860779}
   m_Layer: 5
-  m_Name: Text (LT) [TMP]
+  m_Name: 'Text (LT) [TMP]'
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 2800000, guid: 4c25087e362105a4ab16807832905585, type: 3}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -46,6 +46,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2431657409412573083}
   m_CullTransparentMesh: 1
+--- !u!114 &1270437045642158334
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2431657409412573083}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70040d21e70624843bc7dc623715bfd1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  textComponent: {fileID: 7106836840816860779}
+  translateText: 1
+  iD: -7
 --- !u!114 &7106836840816860779
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -109,15 +124,17 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -135,20 +152,3 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &1270437045642158334
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2431657409412573083}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70040d21e70624843bc7dc623715bfd1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  text: {fileID: 7106836840816860779}
-  iD: -7
-  translateText: 1
-  selectedFile: 
-  saveFile: 

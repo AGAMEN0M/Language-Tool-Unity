@@ -1,137 +1,118 @@
 /*
  * ---------------------------------------------------------------------------
- * Description: This script handles the translation and rendering of localized 
- *              text for TextMesh Pro objects, enabling easy localization in Unity.
+ * Description: Enables automatic translation and localization for TextMeshPro
+ *              components using LanguageTools. Dynamically updates text, font,
+ *              and font size based on selected language settings.
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
 */
 
-using LanguageTools.TMP;
 using LanguageTools;
 using UnityEngine;
 using TMPro;
 
 #if UNITY_EDITOR
-using LanguageTools.Editor;
+using static LanguageTools.Editor.LanguageEditorUtilities;
 using UnityEditor;
 #endif
 
-// This component handles the translation and text rendering for TextMesh Pro (TMP) objects.
+using static LanguageTools.LanguageFileManager;
+using static LanguageTools.TMP.FontAndAlignmentUtilityTMP;
+
 [AddComponentMenu("Language/3D Object/TextMesh Pro/Language TextMesh (TMP)")]
 public class LanguageTextMeshTMP : MonoBehaviour
 {
-    [Header("Settings")]
-    public TMP_Text text; // The TMP_Text component that will display the localized text.
-    public int iD = -10; // The ID used to retrieve the localized text from the file.
-    [Tooltip("Disable Text if Necessary.")]
-    [SerializeField] private bool translateText = true; // A flag to enable or disable text translation.
+    [Header("TextMesh Component")]
+    public TMP_Text textComponent; // Reference to the TMP component whose content will be localized.
+    [SerializeField] private bool translateText = true; // Determines whether this component should translate its text content.
     [Space(10)]
-    [Header("Automatic Information")]
-    [SerializeField] private string selectedFile; // Stores the path of the selected language file.
-    [Space(5)]
-    [SerializeField] private string saveFile; // Stores the path to the save file.
+    [IDExists] public int iD = -10; // Localization key ID used to fetch translated text and metadata.
 
-    // Subscribes to the language update event when the object is enabled.
+    private LanguageSettingsData languageData; // Cached language data loaded at runtime.
+
+    /// <summary>
+    /// Subscribes to language update events and immediately applies localization.
+    /// </summary>
     private void OnEnable()
     {
-        LanguageManagerDelegate.OnLanguageUpdate += LanguageUpdate; // Subscribe to language updates.
-        LanguageUpdate(); // Perform an initial update when enabled.
+        LanguageManagerDelegate.OnLanguageUpdate += LanguageUpdate; // Register to receive language update notifications.
+        LanguageUpdate(); // Apply language data as soon as the object is enabled.
     }
 
-    // Unsubscribes from the language update event when the object is disabled.
-    private void OnDisable()
-    {
-        LanguageManagerDelegate.OnLanguageUpdate -= LanguageUpdate; // Unsubscribe from language updates.
-    }
+    /// <summary>
+    /// Unsubscribes from language update events when disabled.
+    /// </summary>
+    private void OnDisable() => LanguageManagerDelegate.OnLanguageUpdate -= LanguageUpdate;
 
-    // Updates the text and formatting based on the current language settings.
+    /// <summary>
+    /// Updates text content, font size, and font reference based on current language settings.
+    /// </summary>
     public void LanguageUpdate()
     {
-        saveFile = LanguageFileManager.GetSaveFilePath(); // Retrieve the path to the save file.
-        string line = LanguageFileManager.GetLocalizedLineByID(iD, saveFile, ref selectedFile); // Fetch the localized line by ID.
-        ProcessLine(line); // Process and apply the line's content to the TMP_Text component.
-    }
-
-    // Processes the localized line, extracting the text, font size, and font to apply to the TMP_Text component.
-    private void ProcessLine(string line)
-    {
-        if (translateText)
+        // Ensure the TMP_Text reference is valid.
+        if (textComponent == null)
         {
-            text.text = LanguageFileManager.ExtractTextBetweenBraces(line); // Extract the text within curly braces for translation.
+            Debug.LogError("LanguageTextMeshTMP: TextMesh component is not assigned.", this);
+            return;
         }
 
-        // Extract additional information such as font size and font index.
-        string lineWithoutCurlyBraces = LanguageFileManager.RemoveTextBetweenBraces(line); // Remove the text within braces.
-        int fontSize = LanguageFileManager.ExtractIntValue(lineWithoutCurlyBraces, "S:"); // Extract the font size.
-        int fontListIndex = LanguageFileManager.ExtractIntValue(lineWithoutCurlyBraces, "Font:"); // Extract the font index.
+        // Load the active language configuration.
+        languageData = LoadLanguageSettings();
+        if (languageData == null)
+        {
+            Debug.LogError("LanguageTextMeshTMP: Failed to load LanguageSettingsData.", this);
+            return;
+        }
 
-        // Apply the extracted font size and font type if valid values are found.
-        if (fontSize != 0) text.fontSize = fontSize;
-        if (fontListIndex != 0) text.font = FontAndAlignmentUtilityTMP.GetFontByIndex(fontListIndex);
+        // Apply translated text from localization table.
+        if (translateText)
+        {
+            var translated = GetIDText(languageData.idData, iD);
+            if (!string.IsNullOrEmpty(translated)) textComponent.text = translated;
+        }
+
+        // Apply font metadata if available.
+        var meta = GetIDMeta(languageData.idMetaData, iD);
+        if (meta.fontSize != 0) textComponent.fontSize = meta.fontSize;
+        if (meta.fontListIndex != 0) textComponent.font = GetFontByIndex(meta.fontListIndex);
     }
 }
 
 #if UNITY_EDITOR
-// Custom editor for the LanguageTextMeshTMP component in the Unity editor.
+[CanEditMultipleObjects]
 [CustomEditor(typeof(LanguageTextMeshTMP))]
 public class LanguageTextMeshTMPEditor : Editor
 {
-    // Overrides the default Inspector GUI with custom fields and buttons.
     public override void OnInspectorGUI()
     {
-        serializedObject.Update(); // Update the serialized properties of the object.
-        var script = (LanguageTextMeshTMP)target; // Reference to the target script.
-        LanguageEditorUtilities.DrawReadOnlyMonoScriptField(target); // Draw the read-only field for the script reference.
+        serializedObject.Update();
+        var script = (LanguageTextMeshTMP)target;
+
+        // Disable the import button if multiple objects are selected.
+        using (new EditorGUI.DisabledScope(targets.Length > 1))
+        {
+            // Draw "Import Settings" button with custom style and height.
+            if (GUILayout.Button("Import Settings", CreateCustomButtonStyle(15), GUILayout.Height(30)))
+            {
+                // If the ID already exists, confirm overwrite with the user.
+                if (IsIDInLanguageList(script.iD) && !EditorUtility.DisplayDialog("Replace ID", "An ID with this number is already saved. Do you want to replace it?", "Yes", "No"))
+                    return;
+
+                // Gather current TextMesh settings to be saved.
+                string text = script.textComponent.text;
+                int fontSize = (int)script.textComponent.fontSize;
+                int fontListIndex = GetFontIndex(script.textComponent.font);
+
+                // Open the custom language editor window with extracted data.
+                OpenEditorWindowWithComponent(script.iD, 2, text, 0, fontSize, fontListIndex);
+            }
+        }
 
         EditorGUILayout.Space(5);
 
-        // Button to import and apply the text and font settings for the TextMeshPro component.
-        if (GUILayout.Button("Import Settings", LanguageEditorUtilities.CreateCustomButtonStyle(15), GUILayout.Height(30)))
-        {
-            // Check if the ID is already saved.
-            if (LanguageEditorUtilities.IsIDInLanguageList(script.iD))
-            {
-                // Prompt the user to confirm if they want to replace the saved ID.
-                if (!EditorUtility.DisplayDialog("Replace ID", "An ID with this number is already saved. Do you want to replace it?", "Yes", "No"))
-                {
-                    return; // Exit if the user chooses not to replace the ID.
-                }
-            }
-
-            // Retrieve the current text, font size, and font index from the TMP_Text component.
-            string text = script.text.text;
-            int fontSize = (int)script.text.fontSize;
-            int fontListIndex = FontAndAlignmentUtilityTMP.GetFontIndex(script.text.font);
-
-            // Open the editor window with the component settings for modification.
-            LanguageEditorUtilities.OpenEditorWindowWithComponent(script.iD, 2, text, 0, fontSize, fontListIndex, true, false, true, true);
-        }
-
-        // Display a warning if the TMP_Text component is missing.
-        GUI.color = script.text == null ? Color.red : Color.white;
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("text")); // Field for assigning the TMP_Text component.
-        GUI.color = Color.white;
-
-        // If the ID is already saved, display a warning and highlight the ID field.
-        if (LanguageEditorUtilities.IsIDInLanguageList(script.iD))
-        {
-            GUI.color = Color.yellow;
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("iD")); // Field for assigning the text ID.
-            EditorGUILayout.HelpBox("There is an ID with this number Saved!", MessageType.Warning); // Warning message if the ID already exists.
-            GUI.color = Color.white;
-        }
-        else
-        {
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("iD")); // Field for assigning the text ID.
-        }
-
-        // Other fields for additional settings.
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("translateText")); // Field for enabling or disabling text translation.
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("selectedFile")); // Field showing the selected file.
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("saveFile")); // Field showing the path to the save file.
-
-        serializedObject.ApplyModifiedProperties(); // Apply any modified properties.
+        DrawDefaultInspector();
+        serializedObject.ApplyModifiedProperties();
     }
 }
 #endif

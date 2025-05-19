@@ -1,14 +1,9 @@
 /*
  * ---------------------------------------------------------------------------
- * Description: A Unity editor utility that converts various UI and 3D 
- *              components into LanguageTool compatible versions. It scans the selected 
- *              GameObject in the hierarchy for components such as Button, Toggle, 
- *              Dropdown, InputField, Text, TMP_Dropdown, TMP_InputField, TMP_Text, 
- *              Image, RawImage, TextMesh, MeshRenderer, and AudioSource. If a component 
- *              is found, it performs the conversion, adding a new compatible component 
- *              while preserving the original functionality. The script ensures that 
- *              duplicate conversions are avoided by checking for existing LanguageTool 
- *              components, and logs success or error messages accordingly.
+ * Description: Unity editor tool that converts standard UI and 3D components
+ *              (e.g., Text, Image, TMP components) into LanguageTool-compatible
+ *              components. Ensures no duplicates are added, handles Undo
+ *              registration, and logs conversion results for user feedback.
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
@@ -16,373 +11,320 @@
 
 using System.Collections.Generic;
 using UnityEngine.UI;
+using LanguageTools;
 using UnityEngine;
 using UnityEditor;
 using TMPro;
 
 public class ComponentConverter
 {
-    [MenuItem("GameObject/Language/Converter to Language Tool")]
+    private static int callCount = 0; // Tracks the number of times the conversion method has been called during a multi-object selection.
+    private static int expectedCalls = 0; // Stores the expected number of calls to ensure conversion is only triggered once per selection.
+
+    /// <summary>
+    /// Entry point to convert selected GameObjects' components into LanguageTool-compatible components.
+    /// </summary>
+    [MenuItem("GameObject/Language/Converter to Language Tool", false, 3)]
     public static void ConvertComponents()
     {
-        GameObject selectedObject = Selection.activeGameObject; // Get the currently selected GameObject in the hierarchy.
+        var selectedObjects = Selection.gameObjects;
 
-        // Check if a GameObject is selected.
-        if (selectedObject != null)
-        {
-            // Retrieve UI components from the selected GameObject.
-            var buttonComponent = selectedObject.GetComponent<Button>();
-            var toggleComponent = selectedObject.GetComponent<Toggle>();
-            var dropdownComponent = selectedObject.GetComponent<Dropdown>();
-            var inputFieldComponent = selectedObject.GetComponent<InputField>();
-            var textComponent = selectedObject.GetComponent<Text>();
-            var dropdownComponentTMP = selectedObject.GetComponent<TMP_Dropdown>();
-            var inputFieldComponentTMP = selectedObject.GetComponent<TMP_InputField>();
-            var textComponentTMP = selectedObject.GetComponent<TMP_Text>();
-            var imageComponent = selectedObject.GetComponent<Image>();
-            var rawImage = selectedObject.GetComponent<RawImage>();
+        // Set expected call count only on first method call.
+        if (callCount == 0) expectedCalls = selectedObjects.Length;
 
-            // Retrieve 3D components from the selected GameObject.
-            var textMesh = selectedObject.GetComponent<TextMesh>();
-            var meshRenderer = selectedObject.GetComponent<MeshRenderer>();
-            var audioSource = selectedObject.GetComponent<AudioSource>();
+        callCount++;
+        if (callCount < expectedCalls) return; // Defer execution until all expected calls are made.
+        callCount = 0; // Reset for next conversion session.
 
-            // Convert each component if it exists.
-            if (buttonComponent != null) ConvertButton(buttonComponent);
-            if (toggleComponent != null) ConvertToggle(toggleComponent);
-            if (dropdownComponent != null) ConvertDropdown(dropdownComponent);
-            if (inputFieldComponent != null) ConvertInputField(inputFieldComponent);
-            if (textComponent != null) ConvertText(textComponent);
-            if (dropdownComponentTMP != null) ConvertTMPDropdown(dropdownComponentTMP);
-            if (inputFieldComponentTMP != null) ConvertTMPInputField(inputFieldComponentTMP);
-            if (rawImage != null) ConvertRawImage(rawImage);
-            if (textMesh != null) ConvertTextMesh(textMesh);
-            if (audioSource != null) ConvertAudioSource(audioSource);
-
-            // Convert Image component only if no other UI components requiring conversion are present.
-            if (imageComponent != null && buttonComponent == null && inputFieldComponent == null && inputFieldComponentTMP == null && dropdownComponent == null && dropdownComponentTMP == null)
-            {
-                ConvertImage(imageComponent);
-            }
-
-            // Convert TMP_Text based on the presence of a MeshRenderer.
-            if (textComponentTMP != null && meshRenderer == null)
-            {
-                ConvertTMPText(textComponentTMP);
-            }
-
-            if (textComponentTMP != null && meshRenderer != null)
-            {
-                ConvertMeshRenderer(meshRenderer, textComponentTMP);
-            }
-        }
-        else
+        if (selectedObjects.Length == 0)
         {
             Debug.LogError("No GameObject selected. Please select a GameObject in the hierarchy to convert.");
+            return;
+        }
+
+        foreach (var obj in selectedObjects) ObjectAnalysis(obj);
+    }
+
+    /// <summary>
+    /// Analyzes the selected GameObject and applies component conversion if applicable.
+    /// </summary>
+    /// <param name="selectedObject">The GameObject to be analyzed.</param>
+    private static void ObjectAnalysis(GameObject selectedObject)
+    {
+        if (selectedObject == null) return;
+
+        // Check for and convert various supported UI components.
+        if (selectedObject.TryGetComponent(out Text text)) ConvertText(text);
+        if (selectedObject.TryGetComponent(out Button button)) ConvertButton(button);
+        if (selectedObject.TryGetComponent(out Toggle toggle)) ConvertToggle(toggle);
+        if (selectedObject.TryGetComponent(out RawImage rawImage)) ConvertRawImage(rawImage);
+        if (selectedObject.TryGetComponent(out TextMesh textMesh)) ConvertTextMesh(textMesh);
+        if (selectedObject.TryGetComponent(out Dropdown dropdown)) ConvertDropdown(dropdown);
+        if (selectedObject.TryGetComponent(out InputField inputField)) ConvertInputField(inputField);
+        if (selectedObject.TryGetComponent(out AudioSource audioSource)) ConvertAudioSource(audioSource);
+        if (selectedObject.TryGetComponent(out TMP_Dropdown tmpDropdown)) ConvertTMPDropdown(tmpDropdown);
+        if (selectedObject.TryGetComponent(out TMP_InputField tmpInputField)) ConvertTMPInputField(tmpInputField);
+
+        // Fallback for Image and TMP_Text/MeshRenderer if no specialized components were found.
+        if (button == null && inputField == null && tmpInputField == null && dropdown == null && tmpDropdown == null)
+        {
+            if (selectedObject.TryGetComponent(out Image image)) ConvertImage(image);
+
+            var tmpText = selectedObject.GetComponent<TMP_Text>();
+            var meshRenderer = selectedObject.GetComponent<MeshRenderer>();
+
+            // Decide whether to convert TMP_Text or MeshRenderer + TMP_Text.
+            if (tmpText != null && meshRenderer == null) ConvertTMPText(tmpText);
+            else if (tmpText != null) ConvertMeshRenderer(meshRenderer, tmpText);
         }
     }
 
-    // Convert the Button component to a LanguageTool compatible version.
-    private static void ConvertButton(Button button)
-    {
-        ConvertTextComponent(button, () =>
-        {
-            Debug.LogError("The Button has no text to convert.", button.gameObject);
-        });
-    }
+    /// <summary>
+    /// Converts a Button by converting its child Text or TMP_Text.
+    /// </summary>
+    private static void ConvertButton(Button button) => ConvertTextComponent(button, () => Debug.LogError("The Button has no text to convert.", button.gameObject));
 
-    // Convert the Toggle component to a LanguageTool compatible version.
-    private static void ConvertToggle(Toggle toggle)
-    {
-        ConvertTextComponent(toggle, () =>
-        {
-            Debug.LogError("The Toggle has no text to convert.", toggle.gameObject);
-        });
-    }
+    /// <summary>
+    /// Converts a Toggle by converting its child Text or TMP_Text.
+    /// </summary>
+    private static void ConvertToggle(Toggle toggle) => ConvertTextComponent(toggle, () => Debug.LogError("The Toggle has no text to convert.", toggle.gameObject));
 
-    // Generic method to convert any UI component that has a text representation.
+    /// <summary>
+    /// Converts any UI component that may have a child Text or TMP_Text.
+    /// </summary>
     private static void ConvertTextComponent<T>(T uiComponent, System.Action logError) where T : Component
     {
-        // Get Text or TMP_Text component from the children of the UI component.
-        Text textComponent = uiComponent.GetComponentInChildren<Text>();
-        TMP_Text tmpTextComponent = uiComponent.GetComponentInChildren<TMP_Text>();
-
-        // Convert the text component if found.
-        if (textComponent != null)
-        {
-            ConvertText(textComponent);
-        }
-        else if (tmpTextComponent != null)
-        {
-            ConvertTMPText(tmpTextComponent);
-        }
-        else
-        {
-            logError(); // Log error if no text component is found.
-        }
+        // Try converting a child Text or TMP_Text.
+        if (uiComponent.GetComponentInChildren<Text>() is Text text) ConvertText(text);
+        else if (uiComponent.GetComponentInChildren<TMP_Text>() is TMP_Text tmp) ConvertTMPText(tmp);
+        else logError(); // Log if neither text type was found.
     }
 
-    // Convert the Dropdown component to a LanguageTool compatible version.
-    private static void ConvertDropdown(Dropdown dropdown)
-    {
-        // Check if the LanguageDropdown component is already attached to the GameObject.
-        if (dropdown.TryGetComponent<LanguageDropdown>(out _))
-        {
-            Debug.LogError("The selected object already has the LanguageDropdown component!", dropdown.gameObject);
-            return; // Exit if already converted.
-        }
-
-        // Check if the AdjustSizeToDropdown component is already attached to the template.
-        if (dropdown.template.TryGetComponent<AdjustSizeToDropdown>(out _))
-        {
-            Debug.LogError("The selected object already has the AdjustSizeToDropdown component!", dropdown.template.gameObject);
-            return; // Exit if already converted.
-        }
-
-        // Add AdjustSizeToDropdown component to the dropdown template.
-        Undo.AddComponent<AdjustSizeToDropdown>(dropdown.template.gameObject);
-
-        // Create a new LanguageDropdown component and assign the dropdown.
-        LanguageDropdown LanguageDropdownComponent = Undo.AddComponent<LanguageDropdown>(dropdown.gameObject);
-        LanguageDropdownComponent.dropdown = dropdown;
-
-        // Create a list of LanguageOptions from the dropdown options.
-        List<LanguageOptions> optionsList = new();
-        foreach (var option in dropdown.options)
-        {
-            optionsList.Add(new LanguageOptions
-            {
-                text = option.text,
-                sprite = option.image
-            });
-        }
-        LanguageDropdownComponent.options = optionsList; // Assign options to the LanguageDropdown component.
-
-        // Register the undo action for creating the LanguageDropdown component.
-        Undo.RegisterCreatedObjectUndo(LanguageDropdownComponent, "Add LanguageDropdown");
-
-        Debug.Log("Dropdown converted.", dropdown.gameObject); // Log success message.
-    }
-
-    // Convert the InputField component to a LanguageTool compatible version.
-    private static void ConvertInputField(InputField inputField)
-    {
-        // Check if the LanguageTextInputField component is already attached to the GameObject.
-        if (inputField.TryGetComponent<LanguageTextInputField>(out _))
-        {
-            Debug.LogError("The selected object already has the LanguageTextInputField component!", inputField.gameObject);
-            return; // Exit if already converted.
-        }
-
-        // Create a new LanguageTextInputField component and assign the inputField.
-        LanguageTextInputField LanguageTextInputFieldComponent = Undo.AddComponent<LanguageTextInputField>(inputField.gameObject);
-        LanguageTextInputFieldComponent.inputField = inputField;
-
-        // Register the undo action for creating the LanguageTextInputField component.
-        Undo.RegisterCreatedObjectUndo(LanguageTextInputFieldComponent, "Add LanguageTextInputField");
-
-        Debug.Log("InputField converted.", inputField.gameObject); // Log success message.
-    }
-
-    // Convert the Text component to a LanguageTool compatible version.
+    /// <summary>
+    /// Converts a standard Unity Text component to LanguageText.
+    /// </summary>
     private static void ConvertText(Text text)
     {
-        // Check if the LanguageText component is already attached to the GameObject.
         if (text.TryGetComponent<LanguageText>(out _))
         {
             Debug.LogError("The selected object already has the LanguageText component!", text.gameObject);
-            return; // Exit if already converted.
+            return;
         }
 
-        // Create a new LanguageText component and assign the Text component.
-        LanguageText languageTextComponent = Undo.AddComponent<LanguageText>(text.gameObject);
-        languageTextComponent.text = text;
+        // Add LanguageText component and assign reference.
+        var component = Undo.AddComponent<LanguageText>(text.gameObject);
+        component.textComponent = text;
 
-        // Register the undo action for creating the LanguageText component.
-        Undo.RegisterCreatedObjectUndo(languageTextComponent, "Add LanguageText");
-
-        Debug.Log("Text converted.", text.gameObject); // Log success message.
+        Undo.RegisterCreatedObjectUndo(component, "Add LanguageText");
+        Debug.Log("Text converted.", text.gameObject);
     }
 
-    // Convert the TMP_Dropdown component to a LanguageTool compatible version.
-    private static void ConvertTMPDropdown(TMP_Dropdown tmpDropdown)
-    {
-        // Check if the LanguageDropdownTMP component is already attached to the GameObject.
-        if (tmpDropdown.TryGetComponent<LanguageDropdownTMP>(out _))
-        {
-            Debug.LogError("The selected object already has the LanguageDropdownTMP component!", tmpDropdown.gameObject);
-            return; // Exit if already converted.
-        }
-
-        // Check if the AdjustSizeToDropdownTMP component is already attached to the template.
-        if (tmpDropdown.template.TryGetComponent<AdjustSizeToDropdownTMP>(out _))
-        {
-            Debug.LogError("The selected object already has the AdjustSizeToDropdownTMP component!", tmpDropdown.template.gameObject);
-            return; // Exit if already converted.
-        }
-
-        // Add AdjustSizeToDropdownTMP component to the dropdown template.
-        Undo.AddComponent<AdjustSizeToDropdownTMP>(tmpDropdown.template.gameObject);
-
-        // Create a new LanguageDropdownTMP component and assign the TMP_Dropdown.
-        LanguageDropdownTMP LanguageDropdownComponent = Undo.AddComponent<LanguageDropdownTMP>(tmpDropdown.gameObject);
-        LanguageDropdownComponent.dropdown = tmpDropdown;
-
-        // Create a list of LanguageOptions from the TMP_Dropdown options.
-        List<LanguageOptions> optionsList = new();
-        foreach (var option in tmpDropdown.options)
-        {
-            optionsList.Add(new LanguageOptions
-            {
-                text = option.text,
-                sprite = option.image
-            });
-        }
-        LanguageDropdownComponent.options = optionsList; // Assign options to the LanguageDropdownTMP component.
-
-        // Register the undo action for creating the LanguageDropdownTMP component.
-        Undo.RegisterCreatedObjectUndo(LanguageDropdownComponent, "Add LanguageDropdownTMP");
-
-        Debug.Log("TMP_Dropdown converted.", tmpDropdown.gameObject); // Log success message.
-    }
-
-    // Convert the TMP_InputField component to a LanguageTool compatible version.
-    private static void ConvertTMPInputField(TMP_InputField tmpInputField)
-    {
-        // Check if the LanguageTextInputFieldTMP component is already attached to the GameObject.
-        if (tmpInputField.TryGetComponent<LanguageTextInputFieldTMP>(out _))
-        {
-            Debug.LogError("The selected object already has the LanguageTextInputFieldTMP component!", tmpInputField.gameObject);
-            return; // Exit if already converted.
-        }
-
-        // Create a new LanguageTextInputFieldTMP component and assign the TMP_InputField.
-        var LanguageTextInputFieldComponent = Undo.AddComponent<LanguageTextInputFieldTMP>(tmpInputField.gameObject);
-        LanguageTextInputFieldComponent.inputField = tmpInputField;
-
-        // Register the undo action for creating the LanguageTextInputFieldTMP component.
-        Undo.RegisterCreatedObjectUndo(LanguageTextInputFieldComponent, "Add LanguageTextInputFieldTMP");
-
-        Debug.Log("TMP_InputField converted.", tmpInputField.gameObject); // Log success message.
-    }
-
-    // Convert the TMP_Text component to a LanguageTool compatible version.
-    private static void ConvertTMPText(TMP_Text tmpText)
-    {
-        // Check if the LanguageTextTMP component is already attached to the GameObject.
-        if (tmpText.TryGetComponent<LanguageTextTMP>(out _))
-        {
-            Debug.LogError("The selected object already has the LanguageTextTMP component!", tmpText.gameObject);
-            return; // Exit if already converted.
-        }
-
-        // Create a new LanguageTextTMP component and assign the TMP_Text component.
-        LanguageTextTMP languageTextComponent = Undo.AddComponent<LanguageTextTMP>(tmpText.gameObject);
-        languageTextComponent.text = tmpText;
-
-        // Register the undo action for creating the LanguageTextTMP component.
-        Undo.RegisterCreatedObjectUndo(languageTextComponent, "Add LanguageTextTMP");
-
-        Debug.Log("TMP_Text converted.", tmpText.gameObject); // Log success message.
-    }
-
-    // Convert the Image component to a LanguageTool compatible version.
+    /// <summary>
+    /// Converts an Image component to LanguageImage.
+    /// </summary>
     private static void ConvertImage(Image image)
     {
-        // Check if the LanguageImage component is already attached to the GameObject.
         if (image.TryGetComponent<LanguageImage>(out _))
         {
             Debug.LogError("The selected object already has the LanguageImage component!", image.gameObject);
-            return; // Exit if already converted.
+            return;
         }
 
-        // Create a new LanguageImage component and assign the Image component.
-        LanguageImage languageImageComponent = Undo.AddComponent<LanguageImage>(image.gameObject);
-        languageImageComponent.image = image;
+        // Add LanguageImage component and assign reference.
+        var component = Undo.AddComponent<LanguageImage>(image.gameObject);
+        component.image = image;
 
-        // Register the undo action for creating the LanguageImage component.
-        Undo.RegisterCreatedObjectUndo(languageImageComponent, "Add LanguageImage");
-
-        Debug.Log("Image converted.", image.gameObject); // Log success message.
+        Undo.RegisterCreatedObjectUndo(component, "Add LanguageImage");
+        Debug.Log("Image converted.", image.gameObject);
     }
 
-    // Convert the RawImage component to a LanguageTool compatible version.
+    /// <summary>
+    /// Converts a RawImage component to LanguageRawImage.
+    /// </summary>
     private static void ConvertRawImage(RawImage rawImage)
     {
-        // Check if the LanguageRawImage component is already attached to the GameObject.
         if (rawImage.TryGetComponent<LanguageRawImage>(out _))
         {
             Debug.LogError("The selected object already has the LanguageRawImage component!", rawImage.gameObject);
-            return; // Exit if already converted.
+            return;
         }
 
-        // Create a new LanguageRawImage component and assign the RawImage component.
-        LanguageRawImage languageRawImageComponent = Undo.AddComponent<LanguageRawImage>(rawImage.gameObject);
-        languageRawImageComponent.rawImage = rawImage;
+        var component = Undo.AddComponent<LanguageRawImage>(rawImage.gameObject);
+        component.rawImage = rawImage;
 
-        // Register the undo action for creating the LanguageRawImage component.
-        Undo.RegisterCreatedObjectUndo(languageRawImageComponent, "Add LanguageRawImage");
-
-        Debug.Log("RawImage converted.", rawImage.gameObject); // Log success message.
+        Undo.RegisterCreatedObjectUndo(component, "Add LanguageRawImage");
+        Debug.Log("RawImage converted.", rawImage.gameObject);
     }
 
-    // Convert the TextMesh component to a LanguageTool compatible version.
+    /// <summary>
+    /// Converts a Dropdown component to LanguageDropdown and adds AdjustSizeToDropdown.
+    /// </summary>
+    private static void ConvertDropdown(Dropdown dropdown)
+    {
+        if (dropdown.TryGetComponent<LanguageDropdown>(out _))
+        {
+            Debug.LogError("The selected object already has the LanguageDropdown component!", dropdown.gameObject);
+            return;
+        }
+
+        if (dropdown.template.TryGetComponent<AdjustSizeToDropdown>(out _))
+        {
+            Debug.LogError("The selected object already has the AdjustSizeToDropdown component!", dropdown.template.gameObject);
+            return;
+        }
+
+        // Add sizing helper to template object.
+        Undo.AddComponent<AdjustSizeToDropdown>(dropdown.template.gameObject);
+        var component = Undo.AddComponent<LanguageDropdown>(dropdown.gameObject);
+        component.dropdown = dropdown;
+
+        // Convert each dropdown option to LanguageOptions.
+        List<LanguageOptions> optionsList = new();
+        foreach (var option in dropdown.options)
+            optionsList.Add(new() { text = option.text, sprite = option.image });
+
+        component.options = optionsList;
+
+        Undo.RegisterCreatedObjectUndo(component, "Add LanguageDropdown");
+        Debug.Log("Dropdown converted.", dropdown.gameObject);
+    }
+
+    /// <summary>
+    /// Converts a TMP_Dropdown to LanguageDropdownTMP and adds AdjustSizeToDropdownTMP.
+    /// </summary>
+    private static void ConvertTMPDropdown(TMP_Dropdown tmpDropdown)
+    {
+        if (tmpDropdown.TryGetComponent<LanguageDropdownTMP>(out _))
+        {
+            Debug.LogError("The selected object already has the LanguageDropdownTMP component!", tmpDropdown.gameObject);
+            return;
+        }
+
+        if (tmpDropdown.template.TryGetComponent<AdjustSizeToDropdownTMP>(out _))
+        {
+            Debug.LogError("The selected object already has the AdjustSizeToDropdownTMP component!", tmpDropdown.template.gameObject);
+            return;
+        }
+
+        Undo.AddComponent<AdjustSizeToDropdownTMP>(tmpDropdown.template.gameObject);
+        var component = Undo.AddComponent<LanguageDropdownTMP>(tmpDropdown.gameObject);
+        component.dropdown = tmpDropdown;
+
+        List<LanguageOptions> optionsList = new();
+        foreach (var option in tmpDropdown.options)
+            optionsList.Add(new() { text = option.text, sprite = option.image });
+
+        component.options = optionsList;
+
+        Undo.RegisterCreatedObjectUndo(component, "Add LanguageDropdownTMP");
+        Debug.Log("TMP_Dropdown converted.", tmpDropdown.gameObject);
+    }
+
+    /// <summary>
+    /// Converts an InputField to LanguageTextInputField.
+    /// </summary>
+    private static void ConvertInputField(InputField inputField)
+    {
+        if (inputField.TryGetComponent<LanguageTextInputField>(out _))
+        {
+            Debug.LogError("The selected object already has the LanguageTextInputField component!", inputField.gameObject);
+            return;
+        }
+
+        var component = Undo.AddComponent<LanguageTextInputField>(inputField.gameObject);
+        component.inputField = inputField;
+
+        Undo.RegisterCreatedObjectUndo(component, "Add LanguageTextInputField");
+        Debug.Log("InputField converted.", inputField.gameObject);
+    }
+
+    /// <summary>
+    /// Converts a TMP_InputField to LanguageTextInputFieldTMP.
+    /// </summary>
+    private static void ConvertTMPInputField(TMP_InputField tmpInputField)
+    {
+        if (tmpInputField.TryGetComponent<LanguageTextInputFieldTMP>(out _))
+        {
+            Debug.LogError("The selected object already has the LanguageTextInputFieldTMP component!", tmpInputField.gameObject);
+            return;
+        }
+
+        var component = Undo.AddComponent<LanguageTextInputFieldTMP>(tmpInputField.gameObject);
+        component.inputField = tmpInputField;
+
+        Undo.RegisterCreatedObjectUndo(component, "Add LanguageTextInputFieldTMP");
+        Debug.Log("TMP_InputField converted.", tmpInputField.gameObject);
+    }
+
+    /// <summary>
+    /// Converts a TMP_Text to LanguageTextTMP.
+    /// </summary>
+    private static void ConvertTMPText(TMP_Text tmpText)
+    {
+        if (tmpText.TryGetComponent<LanguageTextTMP>(out _))
+        {
+            Debug.LogError("The selected object already has the LanguageTextTMP component!", tmpText.gameObject);
+            return;
+        }
+
+        var component = Undo.AddComponent<LanguageTextTMP>(tmpText.gameObject);
+        component.textComponent = tmpText;
+
+        Undo.RegisterCreatedObjectUndo(component, "Add LanguageTextTMP");
+        Debug.Log("TMP_Text converted.", tmpText.gameObject);
+    }
+
+    /// <summary>
+    /// Converts a TextMesh to LanguageTextMesh.
+    /// </summary>
     private static void ConvertTextMesh(TextMesh textMesh)
     {
-        // Check if the LanguageTextMesh component is already attached to the GameObject.
         if (textMesh.TryGetComponent<LanguageTextMesh>(out _))
         {
             Debug.LogError("The selected object already has the LanguageTextMesh component!", textMesh.gameObject);
-            return; // Exit if already converted.
+            return;
         }
 
-        // Create a new LanguageTextMesh component and assign the TextMesh component.
-        LanguageTextMesh languageTextComponent = Undo.AddComponent<LanguageTextMesh>(textMesh.gameObject);
-        languageTextComponent.text = textMesh;
+        var component = Undo.AddComponent<LanguageTextMesh>(textMesh.gameObject);
+        component.textComponent = textMesh;
 
-        // Register the undo action for creating the LanguageTextMesh component.
-        Undo.RegisterCreatedObjectUndo(languageTextComponent, "Add LanguageTextMesh");
-
-        Debug.Log("TextMesh converted.", textMesh.gameObject); // Log success message.
+        Undo.RegisterCreatedObjectUndo(component, "Add LanguageTextMesh");
+        Debug.Log("TextMesh converted.", textMesh.gameObject);
     }
 
-    // Convert the MeshRenderer component with associated TMP_Text to a LanguageTool compatible version.
+    /// <summary>
+    /// Converts a MeshRenderer paired with a TMP_Text to LanguageTextMeshTMP.
+    /// </summary>
     private static void ConvertMeshRenderer(MeshRenderer meshRenderer, TMP_Text textComponent)
     {
-        // Check if the LanguageTextMeshTMP component is already attached to the GameObject.
         if (meshRenderer.TryGetComponent<LanguageTextMeshTMP>(out _))
         {
             Debug.LogError("The selected object already has the LanguageTextMeshTMP component!", meshRenderer.gameObject);
-            return; // Exit if already converted.
+            return;
         }
 
-        // Create a new LanguageTextMeshTMP component and assign the TMP_Text component.
-        LanguageTextMeshTMP languageTextComponent = Undo.AddComponent<LanguageTextMeshTMP>(meshRenderer.gameObject);
-        languageTextComponent.text = textComponent;
+        var component = Undo.AddComponent<LanguageTextMeshTMP>(meshRenderer.gameObject);
+        component.textComponent = textComponent;
 
-        // Register the undo action for creating the LanguageTextMeshTMP component.
-        Undo.RegisterCreatedObjectUndo(languageTextComponent, "Add LanguageTextMeshTMP");
-
-        Debug.Log("TMP_TextMesh converted.", meshRenderer.gameObject); // Log success message.
+        Undo.RegisterCreatedObjectUndo(component, "Add LanguageTextMeshTMP");
+        Debug.Log("TMP_TextMesh converted.", meshRenderer.gameObject);
     }
 
-    // Convert the AudioSource component to a LanguageTool compatible version.
+    /// <summary>
+    /// Converts an AudioSource to LanguageAudioPlayer.
+    /// </summary>
     private static void ConvertAudioSource(AudioSource audioSource)
     {
-        // Check if the LanguageAudioPlayer component is already attached to the GameObject.
         if (audioSource.TryGetComponent<LanguageAudioPlayer>(out _))
         {
             Debug.LogError("The selected object already has the LanguageAudioPlayer component!", audioSource.gameObject);
-            return; // Exit if already converted.
+            return;
         }
 
-        // Create a new LanguageAudioPlayer component and assign the AudioSource component.
-        LanguageAudioPlayer languageAudioPlayerComponent = Undo.AddComponent<LanguageAudioPlayer>(audioSource.gameObject);
-        languageAudioPlayerComponent.audioSource = audioSource;
+        var component = Undo.AddComponent<LanguageAudioPlayer>(audioSource.gameObject);
+        component.audioSource = audioSource;
 
-        // Register the undo action for creating the LanguageAudioPlayer component.
-        Undo.RegisterCreatedObjectUndo(languageAudioPlayerComponent, "Add LanguageAudioPlayer");
-
-        Debug.Log("AudioSource converted.", audioSource.gameObject); // Log success message.
+        Undo.RegisterCreatedObjectUndo(component, "Add LanguageAudioPlayer");
+        Debug.Log("AudioSource converted.", audioSource.gameObject);
     }
 }

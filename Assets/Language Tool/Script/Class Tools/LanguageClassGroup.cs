@@ -1,8 +1,9 @@
 /*
  * ---------------------------------------------------------------------------
- * Description: This script defines data structures for managing language 
- *              settings and canvas state in the application. It includes classes for 
- *              saving language options, script texts, and canvas configurations.
+ * Description: Defines data structures used for handling language localization
+ *              and UI canvas configurations within the application. It includes
+ *              serializable classes for saving language IDs, canvas states,
+ *              user-defined translations, and Unity UI settings.
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
@@ -12,144 +13,258 @@ using System.Collections.Generic;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using UnityEngine;
-using System;
 
-[System.Serializable]
-public class LanguageSaveData
+namespace LanguageTools
 {
-    public string selectedFile; // Stores the filename of the selected language file.
-    public string selectedLanguage; // Stores the name of the selected language.
-}
+    /// <summary>
+    /// Represents a language option available for selection.
+    /// </summary>
+    [System.Serializable]
+    public class LanguageAvailable
+    {
+        public string culture; // Culture code (e.g., "en-US").
+        public string name; // Display name of the language.
+        public bool isAvailable; // Whether the language is currently available for use.
+        public int columnIndex; // Column index in the localization table.
+    }
 
-[System.Serializable]
-public class LanguageOptions
-{
-    public string text; // Text representation of the language option.
-    public Sprite sprite; // Associated image (sprite) for the language option.
-    public int iD; // Unique identifier for the language option.
-}
+    /// <summary>
+    /// Stores an ID and its associated localized text.
+    /// </summary>
+    [System.Serializable]
+    public class IdData
+    {
+        public int iD; // Unique identifier for the text entry.
+        public string text; // Localized text string.
+    }
 
-[System.Serializable]
-public class ScriptText
-{
-    public string text; // Text content for the script.
-    public int iD; // Unique identifier for the script.
-    [Space(10)]
-    public UnityEvent<string> targetScripts; // Unity event triggered by the script, passing a string parameter.
-}
+    /// <summary>
+    /// Holds metadata settings related to a specific ID.
+    /// </summary>
+    [System.Serializable]
+    public class IdMetaData
+    {
+        [Header("Custom ID")]
+        public int iD; // Unique identifier for the text metadata.
+        [Space(5)]
+        [Header("Text Settings")]
+        public int alignment; // Text alignment setting.
+        public int fontSize; // Font size setting.
+        public int fontListIndex; // Index for selecting font from a predefined list.
+        public int componentType; // Type of component using this metadata (e.g., Text, TMP, etc.).
+    }
 
-[System.Serializable]
-public class LanguageLines
-{
-    public string text; // Text content for a language line.
-    public bool translateText; // Determines whether the text should be translated.
-    public int iD; // Unique identifier for the language line.
-}
+    /// <summary>
+    /// Represents the serialized state of a UI GameObject in a canvas.
+    /// </summary>
+    [System.Serializable]
+    public class CanvasDataList
+    {
+        [Header("Game Object Settings")]
+        public string gameObjectName; // Name of the UI GameObject.
+        public bool gameObjectEnable; // Whether the GameObject is enabled.
+        [Space(10)]
+        public RectTransform rectTransform; // Reference to the RectTransform component.
+        public int instanceID; // Unique instance ID of the GameObject.
+        [Space(5)]
+        public Quaternion localRotation; // Local rotation of the GameObject.
+        public Vector3 localPosition; // Local position of the GameObject.
+        public Vector3 localScale; // Local scale of the GameObject.
+        [Space(5)]
+        public Vector2 anchorMin; // Minimum anchor point.
+        public Vector2 anchorMax; // Maximum anchor point.
+        public Vector2 anchoredPosition; // Anchored position within the parent.
+        public Vector2 sizeDelta; // Size delta of the RectTransform.
+        public Vector2 pivot; // Pivot point of the RectTransform.
+    }
 
-[System.Serializable]
-public class LanguageFileData
-{
-    public string fileName; // The name of the language file.
-    public string computerLanguage; // The name of the programming or system language used.
-    public bool firstTime; // Boolean flag indicating if it's the first time this language file is being used.
-    public int idIndex; // Index to track the current ID used for components in the language file.
-    public List<LanguageComponentSave> componentSave; // List of components saved in the language file.
-    public List<CanvasSave> canvasSave; // List of canvas elements saved in the language file.
-}
+    /// <summary>
+    /// Container for saving the entire canvas structure and configuration.
+    /// </summary>
+    [System.Serializable]
+    public class CanvasStructure
+    {
+        [Header("Canvas Structure")]
+        public string canvasName; // Name of the canvas.
+        public CanvasLayers[] canvasLayers; // Array of canvas layers.
+        [Space(10)]
+        public RectTransformData rectTransform; // Layout data of the canvas RectTransform.
+        [Space(10)]
+        public CanvasData canvas; // Serialized data for the Canvas component.
+        [Space(10)]
+        public CanvasScalerData canvasScaler; // Serialized data for the CanvasScaler component.
+        [Space(10)]
+        public GraphicRaycasterData graphicRaycaster; // Serialized data for the GraphicRaycaster component.
+    }
 
-[System.Serializable]
-public class LanguageComponentSave
-{
-    [Header("Custom ID")]
-    public int iD; // Unique identifier for the language component.
-    [Space(5)]
-    [Header("Text Settings")]
-    [Multiline] public string text; // The text content of the language component (supports multiline).
-    public int alignment; // The alignment setting of the text in the language component.
-    public int fontSize; // The font size of the text.
-    public int fontListIndex; // Index pointing to the font used in the component.
-    [HideInInspector] public int componentType; // The type of component (e.g., text, dropdown, etc.).
-    [HideInInspector] public bool textWrite; // Determines if the text should be written to the language file.
-    [HideInInspector] public bool alignmentWrite; // Determines if the alignment should be written to the language file.
-    [HideInInspector] public bool fontSizeWrite; // Determines if the font size should be written to the language file.
-    [HideInInspector] public bool fontListIndexWrite; // Determines if the font index should be written to the language file.
-}
+    /// <summary>
+    /// Represents a group of objects and layout data within a canvas layer.
+    /// </summary>
+    [System.Serializable]
+    public class CanvasLayers
+    {
+        public string[] CanvasObjectsLayers; // Names of objects in the canvas layer.
+        public RectTransformData[] rectTransforms; // Layout data for each object.
+    }
 
-[Serializable]
-public class ExcelData
-{
-    public string language; // The language this data corresponds to.
-    public List<KeyValuePair<int, string>> lines; // List of key-value pairs, where the key is the unique ID and the value is the text in the language.
-}
+    /// <summary>
+    /// Serialized structure representing a RectTransform's layout properties.
+    /// </summary>
+    [System.Serializable]
+    public class RectTransformData
+    {
+        [Header("RectTransform")]
+        public Quaternion localRotation; // Local rotation of the RectTransform.
+        public Vector3 localPosition; // Local position of the RectTransform.
+        public Vector3 localScale; // Local scale of the RectTransform.
+        [Space(5)]
+        public Vector2 anchorMin; // Minimum anchor point.
+        public Vector2 anchorMax; // Maximum anchor point.
+        public Vector2 anchoredPosition; // Anchored position within the parent.
+        public Vector2 sizeDelta; // Size delta of the RectTransform.
+        public Vector2 pivot; // Pivot point of the RectTransform.
+    }
 
-[Serializable]
-public class ExcelTableData
-{
-    public List<string> filesData; // A list containing the names of files in the Excel table.
-}
+    /// <summary>
+    /// Contains properties related to the Canvas component.
+    /// </summary>
+    [System.Serializable]
+    public class CanvasData
+    {
+        [Header("Canvas")]
+        public RenderMode renderMode; // Mode in which the canvas is rendered.
+        public float planeDistance; // Distance of the canvas plane from the camera.
+        public bool pixelPerfect; // Enables pixel-perfect rendering.
+        public bool overrideSorting; // Whether to override sorting behavior.
+        public bool overridePixelPerfect; // Overrides global pixel-perfect settings.
+        public float sortingBucketNormalizedSize; // Normalized size for sorting bucket.
+        public bool vertexColorAlwaysGammaSpace; // Forces vertex color to be in gamma space.
+        public AdditionalCanvasShaderChannels additionalShaderChannels; // Additional shader channels.
+        public StandaloneRenderResize updateRectTransformForStandalone; // Controls resizing on standalone platforms.
+    }
 
-[System.Serializable]
-public class CanvasSave
-{
-    public int canvasID; // Unique identifier for the canvas.
-    public string json; // JSON string representing the saved state of the canvas.
-}
+    /// <summary>
+    /// Contains properties related to the CanvasScaler component.
+    /// </summary>
+    [System.Serializable]
+    public class CanvasScalerData
+    {
+        [Header("Canvas Scaler")]
+        public CanvasScaler.ScaleMode uiScaleMode; // UI scaling mode.
+        public float referencePixelsPerUnit; // Reference pixels per unit.
+        public float scaleFactor; // Scale factor for the canvas.
+        public Vector2 referenceResolution; // Reference resolution for UI scaling.
+        public CanvasScaler.ScreenMatchMode screenMatchMode; // Mode to match screen size.
+        public float matchWidthOrHeight; // Weight of width vs. height in scaling.
+        public CanvasScaler.Unit physicalUnit; // Unit used for physical sizes.
+        public float fallbackScreenDPI; // Fallback DPI when screen DPI is unavailable.
+        public float defaultSpriteDPI; // Default DPI for sprites.
+        public float dynamicPixelsPerUnit; // Dynamic pixels per unit setting.
+        public bool presetInfoIsWorld; // Indicates if the preset info is for world space.
+    }
 
-[System.Serializable]
-public class CanvasDataSave
-{
-    public CanvasData canvasData; // Stores information about the canvas itself.
-    public List<CanvasDataList> savedCanvasData; // List of data corresponding to each canvas in the hierarchy.
-}
+    /// <summary>
+    /// Contains properties related to the GraphicRaycaster component.
+    /// </summary>
+    [System.Serializable]
+    public class GraphicRaycasterData
+    {
+        [Header("Graphic Raycaster")]
+        public bool ignoreReversedGraphics; // Whether to ignore graphics facing away.
+        public GraphicRaycaster.BlockingObjects blockingObjects; // Types of objects that can block raycasts.
+        public LayerMask blockingMask; // Layer mask used for raycast blocking.
+    }
 
-[System.Serializable]
-public class CanvasData
-{
-    [Header("Canvas")]
-    public string canvasName; // The name of the canvas.
-    public string[] canvasHierarchy; // Array representing the hierarchy of objects within the canvas.
-    [Space(10)]
-    public Quaternion localRotation; // Rotation of the canvas in local space.
-    public Vector3 localPosition; // Position of the canvas in local space.
-    public Vector3 localScale; // Scale of the canvas in local space.
-    [Space(5)]
-    public Vector2 anchorMin; // Minimum anchor point for the RectTransform of the canvas.
-    public Vector2 anchorMax; // Maximum anchor point for the RectTransform of the canvas.
-    public Vector2 anchoredPosition; // Position of the canvas in its anchored space.
-    public Vector2 sizeDelta; // The size of the RectTransform.
-    public Vector2 pivot; // Pivot point of the RectTransform.
+    /// <summary>
+    /// Represents a selectable language option including its visual and ID.
+    /// </summary>
+    [System.Serializable]
+    public class LanguageOptions
+    {
+        public string text; // Display text of the language option.
+        public Sprite sprite; // Icon representing the language.
+        [IDExists] public int iD; // ID associated with the language.
+    }
 
-    [Header("Canvas Scaler")]
-    public CanvasScaler.ScaleMode uiScaleMode; // UI scaling mode for the canvas.
-    public float referencePixelsPerUnit; // Reference pixels per unit for the canvas scaler.
-    public float scaleFactor; // Scaling factor for the canvas.
-    public Vector2 referenceResolution; // Resolution reference for scaling the canvas.
-    public CanvasScaler.ScreenMatchMode screenMatchMode; // Screen match mode to determine how to scale the UI based on screen size.
-    public float matchWidthOrHeight; // Determines whether to match width or height during scaling.
-    public CanvasScaler.Unit physicalUnit; // Physical unit setting for the canvas scaler.
-    public float fallbackScreenDPI; // Fallback DPI for the screen.
-    public float defaultSpriteDPI; // Default DPI for sprites.
-    public float dynamicPixelsPerUnit; // Dynamic pixels per unit setting for canvas scaling.
-    public bool presetInfoIsWorld; // Indicates whether the canvas preset is using world space or screen space.
-}
+    /// <summary>
+    /// Holds script text content and an associated UnityEvent.
+    /// </summary>
+    [System.Serializable]
+    public class ScriptText
+    {
+        [IDExists] public int iD; // Unique identifier for the text.
+        [TextArea] public string text; // Script content text.
+        [Space(5)]
+        public UnityEvent<string> targetScripts; // Event triggered with the text.
+    }
 
-[System.Serializable]
-public class CanvasDataList
-{
-    [Header("Game Object Settings")]
-    public string gameObjectName; // The name of the GameObject associated with the canvas element.
-    public bool gameObjectEnable; // Flag indicating if the GameObject is enabled or disabled.
-    [Space(10)]
-    public RectTransform rectTransform; // The RectTransform associated with the GameObject.
-    public int instanceID; // Instance ID of the GameObject.
-    [Space(5)]
-    public Quaternion localRotation; // Local rotation of the GameObject.
-    public Vector3 localPosition; // Local position of the GameObject.
-    public Vector3 localScale; // Local scale of the GameObject.
-    [Space(5)]
-    public Vector2 anchorMin; // Minimum anchor point for the RectTransform of the GameObject.
-    public Vector2 anchorMax; // Maximum anchor point for the RectTransform of the GameObject.
-    public Vector2 anchoredPosition; // Position of the GameObject in its anchored space.
-    public Vector2 sizeDelta; // The size of the RectTransform.
-    public Vector2 pivot; // Pivot point of the RectTransform.
+    /// <summary>
+    /// Represents a localized line of text that can be optionally translated.
+    /// </summary>
+    [System.Serializable]
+    public class LanguageLines
+    {
+        [IDExists] public int iD; // Unique identifier for the line.
+        public string text; // Line text.
+        public bool translateText; // Whether this line should be translated.
+    }
+
+    /// <summary>
+    /// Represents language component data for editing and saving.
+    /// </summary>
+    [System.Serializable]
+    public class LanguageForEditingSave
+    {
+        [Header("Custom ID")]
+        public int iD; // Unique ID for the component text.
+        [Header("Text Settings")]
+        [Multiline] public string text; // Editable text content.
+        public int alignment; // Text alignment index.
+        public int fontSize; // Font size.
+        public int fontListIndex; // Index of font from list.
+        [Header("Other Systems")]
+        public string textContext; // Context of where the text is used.
+        public int componentType; // Type of component this text is bound to.
+    }
+
+    /// <summary>
+    /// Represents a canvas element's saved data including context and state.
+    /// </summary>
+    [System.Serializable]
+    public class CanvasForEditingSave
+    {
+        [Header("Custom ID")]
+        public int canvasID; // ID of the canvas item.
+        [Header("Canvas Settings")]
+        public string textContext; // Contextual label for canvas usage.
+        public string json; // Serialized canvas state in JSON.
+    }
+
+    /// <summary>
+    /// Root object for language file data used in the Language File Manager window.
+    /// </summary>
+    [System.Serializable]
+    public class LanguageFileManagerWindowData
+    {
+        public string languageForEditing; // Language currently being edited.
+        public List<LanguageForEditingSave> componentSave; // Saved language components.
+        public List<CanvasForEditingSave> canvasSave; // Saved canvas states.
+        public List<LanguageAvailable> availableLanguages; // List of available languages.
+        public bool firstTime; // Whether this is the first-time setup.
+        public int idIndex; // Index for assigning new IDs.
+        public bool showTextData; // UI toggle for showing text data.
+        public bool showCanvasData; // UI toggle for showing canvas data.
+        public bool fileIsSaved; // Whether the file is currently saved.
+    }
+
+    /// <summary>
+    /// Data used for managing a language ID, including context and text.
+    /// </summary>
+    [System.Serializable]
+    public class ManagerLanguageIdData
+    {
+        public int iD; // Unique ID for the managed text.
+        public string text; // Localized or reference text.
+        public string textContext; // Contextual info about the text usage.
+    }
 }

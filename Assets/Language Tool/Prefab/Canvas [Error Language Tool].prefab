@@ -1349,9 +1349,9 @@ GameObject:
   - component: {fileID: 5022991170408818975}
   - component: {fileID: 3259059527334237212}
   m_Layer: 5
-  m_Name: Canvas [Error Language Tool]
+  m_Name: 'Canvas [Error Language Tool]'
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 2800000, guid: 46f8ed01823972145bebb5da9ca071f3, type: 3}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1

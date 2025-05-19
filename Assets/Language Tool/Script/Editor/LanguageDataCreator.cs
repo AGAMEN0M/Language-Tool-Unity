@@ -1,12 +1,12 @@
 /*
  * ---------------------------------------------------------------------------
- * Description: A class for creating and managing a LanguageSettingsData 
- *              asset in the Unity project. It provides a menu option to create a new 
- *              Language Data asset within the Assets/Resources folder. The script checks 
- *              for the existence of the asset and prompts the user to replace it if it 
- *              already exists. Additionally, it includes an automatic initializer that 
- *              ensures the Language Data asset is created on project load if it doesn't 
- *              already exist, streamlining the setup for language management tools in Unity.
+ * Description: This script defines tools for creating and ensuring the presence of a 
+ *              LanguageSettingsData asset in a Unity project. It provides a menu option 
+ *              to manually generate this asset under Assets/Resources, including a prompt 
+ *              to overwrite if one already exists. Additionally, it includes an automatic 
+ *              initializer that creates the asset on project load if it's missing, helping 
+ *              streamline the setup for localization systems.
+ * 
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
@@ -16,56 +16,61 @@ using UnityEditor;
 using UnityEngine;
 using System.IO;
 
+/// <summary>
+/// Provides a Unity Editor menu option to create the LanguageSettingsData asset in the Resources folder.
+/// </summary>
 public class LanguageDataCreator
 {
-    [MenuItem("Assets/Create/Language/Language Data")]
+    /// <summary>
+    /// Creates a LanguageSettingsData asset in the Resources folder. Prompts the user if it already exists.
+    /// </summary>
+    [MenuItem("Assets/Create/Language/Language Data", false, 1)]
     public static void CreateLanguageDataAsset()
     {
-        // Specify the path where the asset will be saved.
-        string resourcesFolderPath = "Assets/Resources";
-        string languageDataAssetPath = $"{resourcesFolderPath}/Language Data.asset";
+        const string folder = "Assets/Resources";
+        string assetPath = $"{folder}/Language Data.asset";
 
-        // Check if the Resources folder exists; if not, create it.
-        if (!AssetDatabase.IsValidFolder(resourcesFolderPath)) AssetDatabase.CreateFolder("Assets", "Resources");
+        // Create the Resources folder if it doesn't exist.
+        if (!AssetDatabase.IsValidFolder(folder)) AssetDatabase.CreateFolder("Assets", "Resources");
 
-        // Check if an asset with the same name already exists.
-        if (AssetDatabase.LoadAssetAtPath<LanguageSettingsData>(languageDataAssetPath) != null)
+        // Prompt to overwrite the existing asset, if it exists.
+        if (AssetDatabase.LoadAssetAtPath<LanguageSettingsData>(assetPath) != null &&
+            !EditorUtility.DisplayDialog(
+                "Replace File",
+                "There is already a 'Language Data'. Do you want to replace it?",
+                "Yes","No"))
         {
-            // Display a dialog to confirm replacing the existing asset.
-            if (!EditorUtility.DisplayDialog("Replace File", "There is already a 'Language Data'. Do you want to replace it?", "Yes", "No"))
-            {
-                return;
-            }
+            return;
         }
 
-        // Create an instance of LanguageSettingsData and save it as an asset.
+        // Create and register the asset.
         var asset = ScriptableObject.CreateInstance<LanguageSettingsData>();
-        AssetDatabase.CreateAsset(asset, languageDataAssetPath);
+        AssetDatabase.CreateAsset(asset, assetPath);
         EditorUtility.SetDirty(asset);
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
 
-        // Focus on the Project window in the Unity Editor and select the created asset.
+        // Highlight the new asset in the Project window.
         EditorUtility.FocusProjectWindow();
         Selection.activeObject = asset;
     }
 }
 
+/// <summary>
+/// Automatically creates the LanguageSettingsData asset on project load if it doesn't exist.
+/// </summary>
 [InitializeOnLoad]
 public static class LanguageDataAutoInitializer
 {
+    // Static constructor runs on editor load.
     static LanguageDataAutoInitializer()
     {
         EditorApplication.delayCall += () =>
         {
-            // Specify the path where the asset should be checked.
-            string assetPath = "Assets/Resources/Language Data.asset";
+            const string assetPath = "Assets/Resources/Language Data.asset";
 
-            // Check if the asset already exists; if not, create it.
-            if (!File.Exists(assetPath))
-            {
-                LanguageDataCreator.CreateLanguageDataAsset();
-            }
+            // Create the asset only if it doesn't already exist on disk.
+            if (!File.Exists(assetPath)) LanguageDataCreator.CreateLanguageDataAsset();
         };
     }
 }

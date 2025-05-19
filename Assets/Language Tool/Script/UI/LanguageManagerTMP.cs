@@ -1,166 +1,109 @@
 /*
  * ---------------------------------------------------------------------------
- * Description: This component manages language selection using a 
- *              TMP_Dropdown. It loads available language files, allows the user 
- *              to select a language, and saves the selected language for future 
- *              sessions. It also updates the application's language based on 
- *              the user's choice.
+ * Description: This component integrates with a TMP_Dropdown to allow users to 
+ *              select a language at runtime. It loads available languages from 
+ *              LanguageSettingsData, populates the dropdown, applies the selected 
+ *              language, and saves the choice for future sessions. It also triggers 
+ *              a language update across the system.
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
 */
 
-using System.Globalization;
+using System.Collections.Generic;
 using LanguageTools;
 using UnityEngine;
-using System.IO;
 using TMPro;
+
+using static LanguageTools.LanguageFileManager;
 
 [AddComponentMenu("Language/UI/TextMesh Pro/Language Manager (TMP)")]
 public class LanguageManagerTMP : MonoBehaviour
 {
-    [Header("Settings")]
-    [SerializeField] private TMP_Dropdown dropdown; // Dropdown for selecting language.
-    [Space(10)]
-    [Header("Automatic Information")]
-    [SerializeField] private string systemLanguage; // System's UI language.
-    [SerializeField] private string selectedFile; // File path of the selected language.
-    [SerializeField] private string selectedLanguage; // Name of the selected language.
-    [Space(5)]
-    [SerializeField] private string pathFolder; // Folder path containing language files.
-    [SerializeField] private string saveFile; // Path to save the selected language data.
+    [Header("UI Components")]
+    [SerializeField] private TMP_Dropdown languageDropdown; // TMP Dropdown used for selecting the current language.
 
+    private List<LanguageAvailable> availableLanguages; // Cached list of available languages loaded from LanguageSettingsData.
+    private LanguageSettingsData languageData; // Language configuration loaded from resources.
+
+    /// <summary>
+    /// Initializes the dropdown with available languages and applies the saved selection.
+    /// </summary>
     private void Start()
     {
-        // Ensure the dropdown is assigned.
-        if (dropdown == null)
+        // Verify if the Dropdown component is assigned in the inspector.
+        if (languageDropdown == null)
         {
-            Debug.LogError("Dropdown not assigned");
+            Debug.LogError("LanguageManagerTMP: TMP_Dropdown is not assigned.", this);
             return;
         }
 
-        dropdown.ClearOptions(); // Clear any existing options in the dropdown.
-
-        // Get system language, paths, and default language.
-        systemLanguage = CultureInfo.InstalledUICulture.DisplayName;
-        pathFolder = LanguageFileManager.GetLanguageFilesFolderPath();
-        saveFile = LanguageFileManager.GetSaveFilePath();
-        string defaultLanguage = LanguageFileManager.LoadLanguageSettings().defaultLanguage;
-
-        string[] files = Directory.GetFiles(pathFolder, "*.txt"); // Get all language files in the specified folder.
-
-        // Check if a saved language file exists.
-        if (!File.Exists(saveFile))
+        // Load language settings data from resources.
+        languageData = LoadLanguageSettings();
+        if (languageData == null)
         {
-            // Find a language file that matches the system language and save it.
-            foreach (string filePath in files)
-            {
-                string[] lines = File.ReadAllLines(filePath);
-                if (lines.Length > 1 && systemLanguage == lines[1])
-                {
-                    string languageName = lines[0].Replace("Linguagem - [", "").Replace("]", "");
-
-                    LanguageSaveData languageDataSave = new()
-                    {
-                        selectedFile = filePath,
-                        selectedLanguage = languageName
-                    };
-
-                    string json = JsonUtility.ToJson(languageDataSave);
-                    File.WriteAllText(saveFile, json);
-
-                    break;
-                }
-            }
+            Debug.LogError("LanguageManagerTMP: Failed to load LanguageSettingsData.", this);
+            return;
         }
 
-        int defaultLanguageIndex = -1; // Initialize index for default language.
-        // Populate the dropdown with available languages.
-        foreach (string filePath in files)
-        {
-            string[] lines = File.ReadAllLines(filePath);
-            if (lines.Length > 0 && lines[0].StartsWith("Linguagem - ["))
-            {
-                string language = lines[0].Replace("Linguagem - [", "").Replace("]", "");
-                dropdown.options.Add(new TMP_Dropdown.OptionData(language));
-                string languageIndex = lines[1];
+        // Populate the list of available languages from the loaded settings.
+        GetAvailableLanguages();
+        availableLanguages = languageData.availableLanguages;
 
-                // Set the default language index if it matches.
-                if (languageIndex == defaultLanguage)
-                {
-                    defaultLanguageIndex = dropdown.options.Count - 1;
-                }
-            }
-        }
-
-        // If a saved language file exists, load the saved language.
-        if (File.Exists(saveFile))
-        {
-            string json = File.ReadAllText(saveFile);
-            var saveData = JsonUtility.FromJson<LanguageSaveData>(json);
-            selectedFile = saveData.selectedFile;
-            selectedLanguage = saveData.selectedLanguage;
-
-            // Set the dropdown to the saved language.
-            for (int i = 0; i < dropdown.options.Count; i++)
-            {
-                if (dropdown.options[i].text == selectedLanguage)
-                {
-                    dropdown.value = i;
-                    dropdown.RefreshShownValue();
-                    break;
-                }
-            }
-        }
-        else if (defaultLanguageIndex >= 0) // Otherwise, set the dropdown to the default language.
-        {
-            dropdown.value = defaultLanguageIndex;
-            dropdown.RefreshShownValue();
-            selectedLanguage = defaultLanguage;
-            selectedFile = files[defaultLanguageIndex];
-            OnLanguageChanged(defaultLanguageIndex);
-        }
-
-        // Add listener to handle language changes through the dropdown.
-        dropdown.onValueChanged.RemoveListener(OnLanguageChanged);
-        dropdown.onValueChanged.AddListener(OnLanguageChanged);
-
-        LanguageManagerDelegate.NotifyLanguageUpdate();
+        PopulateDropdown(); // Fill the dropdown UI with the language names and select saved culture.
+        SetupDropdownSelection(); // Set up event listener to handle user language selection changes.
     }
 
-    // Method to handle changes in selected language.
-    private void OnLanguageChanged(int index)
+    /// <summary>
+    /// Populates the dropdown with localized language names and selects the saved culture.
+    /// </summary>
+    private void PopulateDropdown()
     {
-        selectedLanguage = dropdown.options[index].text;
+        languageDropdown.ClearOptions(); // Clear any existing dropdown options.
 
-        // Find the file corresponding to the selected language.
-        string[] files = Directory.GetFiles(pathFolder, "*.txt");
-        for (int i = 0; i < files.Length; i++)
+        List<string> options = new();
+        int selectedIndex = 0; // Default index to select (0) if no saved culture found.
+        string savedCulture = GetSaveCultureCode(); // Retrieve saved culture code to restore dropdown selection.
+
+        // Populate options with available language names.
+        for (int i = 0; i < availableLanguages.Count; i++)
         {
-            string[] lines = File.ReadAllLines(files[i]);
-            foreach (string line in lines)
-            {
-                if (line.StartsWith("Linguagem - ["))
-                {
-                    string language = line.Replace("Linguagem - [", "").Replace("]", "");
-                    if (language == selectedLanguage)
-                    {
-                        selectedFile = files[i];
-                        break;
-                    }
-                }
-            }
+            options.Add(availableLanguages[i].name);
+
+            // Match saved culture to set initial dropdown value.
+            if (availableLanguages[i].culture == savedCulture) selectedIndex = i;
         }
 
-        // Save the selected language data.
-        LanguageSaveData saveData = new()
-        {
-            selectedFile = selectedFile,
-            selectedLanguage = selectedLanguage
-        };
-        string json = JsonUtility.ToJson(saveData);
-        File.WriteAllText(saveFile, json);
+        languageDropdown.AddOptions(options); // Add all language names to the dropdown options.
+        languageDropdown.SetValueWithoutNotify(selectedIndex); // Set dropdown to saved or default selection index without firing events.
+    }
 
-        LanguageManagerDelegate.NotifyLanguageUpdate();
+    /// <summary>
+    /// Subscribes to the TMP_Dropdown value change event to handle user selection.
+    /// </summary>
+    private void SetupDropdownSelection()
+    {
+        languageDropdown.onValueChanged.RemoveListener(OnLanguageChanged); // Remove any previous listeners to avoid duplicates.
+        languageDropdown.onValueChanged.AddListener(OnLanguageChanged); // Add listener for dropdown value changes.
+    }
+
+    /// <summary>
+    /// Called when the language dropdown value changes. Updates the selected culture,
+    /// reloads language data, and triggers a system-wide language update.
+    /// </summary>
+    /// <param name="index">Index of the selected language in the dropdown.</param>
+    private void OnLanguageChanged(int index)
+    {
+        // Check that the selected index is within the valid range.
+        if (index < 0 || index >= availableLanguages.Count)
+        {
+            Debug.LogWarning("LanguageManagerTMP: Selected index is out of range.", this);
+            return;
+        }
+
+        string selectedCulture = availableLanguages[index].culture; // Get the culture code for the selected language.
+        SetSaveCultureCode(selectedCulture); // Persist the selected culture code.
+        GetAllData(); // Reload all language data based on new selection.
+        LanguageManagerDelegate.NotifyLanguageUpdate(); // Notify other components to update localized content.
     }
 }

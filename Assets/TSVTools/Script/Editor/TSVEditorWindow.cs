@@ -4,6 +4,7 @@
  *              It provides functionalities to load, save, modify, and resize rows and columns in a table format.
  *              The script allows users to interact with the table through an editor window with scrollable views,
  *              resizing handles, and options for adding/removing rows/columns.
+ *              
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
@@ -14,6 +15,7 @@ using UnityEditor;
 using System.IO;
 using System.Linq;
 using System;
+
 using static TSVTools.TabTableUtility;
 
 namespace TSVTools
@@ -84,10 +86,7 @@ namespace TSVTools
         }
 
         // OnEnable callback to subscribe to undo/redo actions.
-        private void OnEnable()
-        {
-            Undo.undoRedoPerformed += OnUndoRedo;
-        }
+        private void OnEnable() => Undo.undoRedoPerformed += OnUndoRedo;
 
         // OnDestroy callback to unsubscribe from undo/redo actions.
         private void OnDestroy()
@@ -102,10 +101,7 @@ namespace TSVTools
         }
 
         // Callback when undo or redo actions are performed.
-        private void OnUndoRedo()
-        {
-            Repaint();
-        }
+        private void OnUndoRedo() => Repaint();
 
         // OnGUI method to draw and manage the editor window.
         private void OnGUI()

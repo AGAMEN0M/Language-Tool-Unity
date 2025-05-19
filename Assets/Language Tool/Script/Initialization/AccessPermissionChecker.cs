@@ -1,7 +1,8 @@
 /*
  * ---------------------------------------------------------------------------
- * Description: This script checks access permissions for essential folders 
- *              in the Unity project and displays a warning if access is restricted.
+ * Description: Verifies runtime access permissions to critical Unity project
+ *              directories (Assets and StreamingAssets). Displays an in-game
+ *              warning if access is denied.
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
@@ -13,81 +14,85 @@ using System.IO;
 
 public class AccessPermissionChecker : MonoBehaviour
 {
-    // This method is called when the game starts to check access permissions.
+    /// <summary>
+    /// Automatically called on game start to verify folder access permissions.
+    /// Displays a warning if access to necessary directories is restricted.
+    /// </summary>
     [RuntimeInitializeOnLoadMethod]
-    public static void InitializeCheckSettings()
-    {
-        CheckAccessPermissions(); // Start checking access permissions for necessary folders.
-    }
+    public static void InitializeCheckSettings() => CheckAccessPermissions();
 
-    // This method checks access to essential directories and logs errors if access is restricted.
+    // Checks folder access for Assets and StreamingAssets directories.
     private static void CheckAccessPermissions()
     {
-        // Check access to the "Assets" and "StreamingAssets" folders.
-        bool hasDataPathAccess = CheckFolderAccess(Application.dataPath);
-        bool hasStreamingAssetsPathAccess = CheckFolderAccess(Application.streamingAssetsPath);
+        // Verify read/write permissions for Assets folder.
+        bool hasAccessToAssets = CheckFolderAccess(Application.dataPath);
 
-        // If access to either folder is restricted, display a warning.
-        if (!hasDataPathAccess || !hasStreamingAssetsPathAccess)
+        // Verify read/write permissions for StreamingAssets folder.
+        bool hasAccessToStreaming = CheckFolderAccess(Application.streamingAssetsPath);
+
+        // If either folder is inaccessible, show warning.
+        if (!hasAccessToAssets || !hasAccessToStreaming)
         {
-            ShowWarning(); // Show a warning to the user.
-            Debug.LogError("Access to necessary folders is restricted. Warning displayed.");
+            Debug.LogError("Access to one or more required folders is restricted.");
+            ShowWarning();
         }
         else
         {
-            Debug.Log("Folder access verified successfully.");
+            Debug.Log("Folder access check passed.");
         }
     }
 
-    // This method tests whether the application has access to a specified folder by attempting to write and delete a file.
+    // Attempts to create and delete a temporary file in the given directory.
+    // Returns true if both operations succeed.
     private static bool CheckFolderAccess(string path)
     {
+        // Return false immediately if the directory doesn't exist.
+        if (!Directory.Exists(path)) return false;
+
+        string testFile = Path.Combine(path, "TestAccessFile.tmp");
+
         try
         {
-            // If the folder does not exist, return false.
-            if (!Directory.Exists(path)) return false;
-
-            // Create a temporary file to test write and delete permissions.
-            string testFilePath = Path.Combine(path, "TestAccessFile.tmp");
-            File.WriteAllText(testFilePath, "Test Access"); // Write a test file.
-            File.Delete(testFilePath); // Delete the test file.
-
-            return true; // Return true if file operations succeed.
+            File.WriteAllText(testFile, "Test Access"); // Try writing to the directory.
+            File.Delete(testFile); // Try deleting the written file.
+            return true;
         }
-        catch (IOException ex) // Handle any I/O exceptions, such as file access issues.
+        catch (IOException ex)
         {
-            Debug.LogError($"IOException occurred: {ex.Message}");
-            return false;
+            Debug.LogError($"IO error while checking access to {path}: {ex.Message}");
         }
-        catch (System.UnauthorizedAccessException ex) // Handle unauthorized access exceptions.
+        catch (System.UnauthorizedAccessException ex)
         {
-            Debug.LogError($"UnauthorizedAccessException occurred: {ex.Message}");
-            return false;
+            Debug.LogError($"Access denied to {path}: {ex.Message}");
         }
+
+        return false;
     }
 
-    // This method displays a warning to the user if folder access is restricted.
+    // Loads the warning UI from language settings and ensures it persists between scenes.
     private static void ShowWarning()
     {
-        // Load the language settings to get the warning UI element.
-        var settingsData = LanguageFileManager.LoadLanguageSettings();
+        // Load language settings that include the warning prefab reference.
+        var settings = LanguageFileManager.LoadLanguageSettings();
 
-        if (settingsData == null) // If settings data is missing, log an error.
+        if (settings == null)
         {
-            Debug.LogError("The languageSettingsData is not assigned.");
+            Debug.LogError("Language settings could not be loaded.");
             return;
         }
 
-        // Instantiate the warning GameObject from the language settings.
-        GameObject warningInstance = Instantiate(settingsData.errorLanguageTool);
-        if (warningInstance != null)
+        // Instantiate the warning GameObject defined in the settings.
+        var warning = Instantiate(settings.errorLanguageTool);
+
+        if (warning != null)
         {
-            DontDestroyOnLoad(warningInstance); // Ensure the warning persists across scenes.
-            Debug.Log("Warning instance created and set to not destroy on load.");
+            // Ensure the warning UI persists across scene loads.
+            DontDestroyOnLoad(warning);
+            Debug.Log("Warning displayed and marked as persistent.");
         }
         else
         {
-            Debug.LogError("Failed to instantiate the warning GameObject.");
+            Debug.LogError("Failed to instantiate warning GameObject.");
         }
     }
 }

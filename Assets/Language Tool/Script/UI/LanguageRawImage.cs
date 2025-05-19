@@ -1,10 +1,9 @@
 /*
  * ---------------------------------------------------------------------------
- * Description: This component loads and assigns localized textures to a 
- *              RawImage component based on the current language setting. It retrieves 
- *              the appropriate image file path from the language files and loads the 
- *              texture asynchronously. If the specified image file is not found, 
- *              an error is logged.
+ * Description: This component loads and displays localized images using a 
+ *              RawImage component. It dynamically constructs the path to the 
+ *              image file based on the selected language and loads it asynchronously. 
+ *              If the file cannot be found or fails to load, an error is logged.
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
@@ -17,93 +16,97 @@ using LanguageTools;
 using UnityEngine;
 using System.IO;
 
-// This component is responsible for loading and assigning localized textures to a RawImage component.
+using static LanguageTools.LanguageFileManager;
+
 [AddComponentMenu("Language/UI/Language Raw Image")]
 public class LanguageRawImage : MonoBehaviour
 {
     [Header("Settings")]
-    public RawImage rawImage; // The RawImage component that will display the localized image.
+    [Tooltip("Do not use characters outside the basic ASCII Table.")]
+    [SerializeField] private string fileName = "Example.png"; // Name of the image file to load.
+    [SerializeField] private bool useRawImage = true; // Whether to apply the texture to a RawImage component.
     [Space(5)]
-    [Tooltip("Do not use characters outside the basic ASCII Table")]
-    [SerializeField] private string fileName = "Example.png"; // The name of the image file to load.
-    [Space(10)]
-    [Header("Automatic Information")]
-    [SerializeField] private string selectedFile; // Stores the path of the selected language file.
-    [Space(5)]
-    [SerializeField] private string saveFile; // Stores the path of the save file containing user preferences.
-    [Space(5)]
-    [SerializeField] private string filePath; // Stores the path of the image file to load.
+    public RawImage rawImage; // Reference to the RawImage component to display the texture.
+    public Texture2D imageTexture; // Loaded texture from disk.
 
-    // Subscribes to the OnLanguageUpdate event when the object is enabled.
+    private LanguageSettingsData languageData; // Stores the loaded language configuration.
+    private string previousFilePath; // Stores the last used file path to avoid reloading the same image.
+    private string filePath; // Full path to the localized image file for the selected culture.
+
+    /// <summary>
+    /// Subscribes to the language update event and triggers image update when the component is enabled.
+    /// </summary>
     private void OnEnable()
     {
-        LanguageManagerDelegate.OnLanguageUpdate += LanguageUpdate;
-        LanguageUpdate(); // Perform an initial update when the component is enabled.
+        LanguageManagerDelegate.OnLanguageUpdate += LanguageUpdate; // Register to receive language change updates.
+        LanguageUpdate(); // Perform initial image update.
     }
 
-    // Unsubscribes from the OnLanguageUpdate event when the object is disabled.
-    private void OnDisable()
-    {
-        LanguageManagerDelegate.OnLanguageUpdate -= LanguageUpdate;
-    }
+    /// <summary>
+    /// Unsubscribes from the language update event when the component is disabled.
+    /// </summary>
+    private void OnDisable() => LanguageManagerDelegate.OnLanguageUpdate -= LanguageUpdate;
 
-    // Updates the image source based on the current language and loads the corresponding file.
+    /// <summary>
+    /// Updates the displayed image based on the currently selected language.
+    /// If the image path hasn't changed, it skips reloading.
+    /// </summary>
     public void LanguageUpdate()
     {
-        // Ensure that the RawImage component is assigned.
-        if (rawImage == null)
+        // Check if RawImage is required but not assigned.
+        if (useRawImage && rawImage == null)
         {
-            Debug.LogError("rawImage is not assigned. Please assign an RawImage component.");
+            Debug.LogError("RawImage is not assigned. Please assign a RawImage component.", this);
             return;
         }
 
-        saveFile = LanguageFileManager.GetSaveFilePath(); // Retrieve the path to the save file.
-
-        // Check if the save file exists, and load the selected language file path from it.
-        if (File.Exists(saveFile))
+        // Load language settings to get current culture.
+        languageData = LoadLanguageSettings();
+        if (languageData == null)
         {
-            string json = File.ReadAllText(saveFile);
-            var saveData = JsonUtility.FromJson<LanguageSaveData>(json);
-            selectedFile = saveData.selectedFile;
-        }
-        else
-        {
-            // Fallback to the default language file if the save file does not exist.
-            selectedFile = LanguageFileManager.FindDefaultLanguageFilePath();
+            Debug.LogError("LanguageRawImage: Failed to load LanguageSettingsData.", this);
+            return;
         }
 
-        // Construct the file path to the image based on the language tag and file name.
-        filePath = $"{LanguageFileManager.GetLanguageFilesFolderPath()}/{LanguageFileManager.GetLanguageTagFromFile(selectedFile)}/Image/{fileName}";
+        // Construct the path to the localized image.
+        filePath = Path.Combine(GetLanguageAssetsPath(), "Assets", languageData.selectedCulture, "Image", fileName);
 
-        // If the file does not exist at the specified path, log an error and exit the method.
+        // Avoid reloading if the same file was already loaded.
+        if (filePath == previousFilePath) return;
+        previousFilePath = filePath;
+
+        // Confirm that the file actually exists on disk.
         if (!File.Exists(filePath))
         {
-            Debug.LogError($"Image file not found at path: {filePath}");
+            Debug.LogError($"Image file not found at path: {filePath} (Culture: {languageData.selectedCulture})", this);
             return;
         }
 
-        // Start a coroutine to asynchronously load the image file.
-        StartCoroutine(LoadFile());
+        if (imageTexture != null) Destroy(imageTexture); // Destroy previously loaded texture to free memory.
+
+        StartCoroutine(LoadFileCoroutine()); // Start asynchronous image loading.
     }
 
-    // Coroutine to load the image file asynchronously.
-    private IEnumerator LoadFile()
+    /// <summary>
+    /// Coroutine to load a localized image texture from disk and assign it to the RawImage component.
+    /// </summary>
+    private IEnumerator LoadFileCoroutine()
     {
-        // Create a UnityWebRequest to load the image file as a texture.
+        // Create a UnityWebRequest to load the image file from local path.
         using UnityWebRequest request = UnityWebRequestTexture.GetTexture($"file://{filePath}");
-        yield return request.SendWebRequest(); // Send the request and wait for it to complete.
+        yield return request.SendWebRequest(); // Wait until the request completes.
 
-        // Check if the request was successful.
-        if (request.result == UnityWebRequest.Result.Success)
+        // Log error if the request failed.
+        if (request.result != UnityWebRequest.Result.Success)
         {
-            // If successful, retrieve the texture from the request and assign it to the RawImage component.
-            Texture2D texture = DownloadHandlerTexture.GetContent(request);
-            rawImage.texture = texture;
+            Debug.LogError($"Error loading image: {request.error}", this);
+            yield break;
         }
-        else
-        {
-            // Log an error if the request failed.
-            Debug.LogError($"Error loading image: {request.error}");
-        }
+
+        // Extract the Texture2D from the response.
+        imageTexture = DownloadHandlerTexture.GetContent(request);
+
+        // Assign the texture to the RawImage if enabled.
+        if (imageTexture != null && useRawImage) rawImage.texture = imageTexture;
     }
 }

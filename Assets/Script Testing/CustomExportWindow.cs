@@ -21,7 +21,7 @@ public class CustomExportWindow : EditorWindow
     public bool onEnable; // Flag to track if the OnEnable method has been called.
 
     // Menu item to open the custom export window.
-    [MenuItem("Assets/Custom Export Package...", false, 23)]
+    [MenuItem("Assets/Custom Export Package...", false, 20)]
     public static void ShowWindow()
     {
         GetWindow<CustomExportWindow>("Custom Export Package");

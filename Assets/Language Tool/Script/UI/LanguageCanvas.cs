@@ -1,210 +1,101 @@
 /*
  * ---------------------------------------------------------------------------
- * Description: This script manages language settings for a Unity canvas. It
- *              updates the canvas and its child elements' data (position, scale, etc.) based 
- *              on the current language and configuration, ensuring the UI adapts to localized 
- *              settings. The script also handles saving and loading canvas data.
+ * Description: Manages language-specific UI updates for a Unity Canvas.
+ *              Loads localized canvas configuration (position, scale, layout)
+ *              from language settings and applies it at runtime. Also supports
+ *              saving canvas layout during development via a custom editor.
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
 */
 
-using System.Collections.Generic;
-using LanguageTools;
 using UnityEngine.UI;
+using LanguageTools;
 using UnityEngine;
 
+using static LanguageTools.LanguageFileManager;
+using static LanguageTools.CanvasManager;
+
 #if UNITY_EDITOR
-using LanguageTools.Editor;
+using static LanguageTools.Editor.LanguageEditorUtilities;
 using UnityEditor;
 #endif
 
-// This class is responsible for managing the language aspects of a canvas within Unity.
-[RequireComponent(typeof(RectTransform))]
-[RequireComponent(typeof(Canvas))]
-[RequireComponent(typeof(CanvasScaler))]
+[RequireComponent(typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler))]
 [RequireComponent(typeof(GraphicRaycaster))]
 [AddComponentMenu("Language/UI/Language Canvas")]
 public class LanguageCanvas : MonoBehaviour
 {
     [Header("Settings")]
-    public int canvasID = 0; // The unique identifier for this canvas.
-    [Space(10)]
-    [Header("Automatic Information")]
-    [SerializeField] private string selectedFile; // Holds the currently selected file for language settings.
-    [Space(5)]
-    [SerializeField] private string saveFile; // Holds the file path for saving the canvas state.
-    [Space(10)]
+    [IDExists(true)] public int canvasID = 0; // Identifier for linking this canvas with localized layout data.
     [Header("Canvas Data")]
-    public CanvasData canvasData = new(); // Stores data related to the canvas.
-    public List<CanvasDataList> savedCanvasData = new(); // A list containing saved data for child canvas objects.
+    public CanvasStructure canvasStructure = new(); // Holds the current structure/layout data of this canvas.
 
-    // Called when the object is enabled, subscribing to the language update event.
+    /// <summary>
+    /// Subscribes to language updates and applies localized canvas data on enable.
+    /// </summary>
     private void OnEnable()
     {
-        LanguageManagerDelegate.OnLanguageUpdate += LanguageUpdate;
-        LanguageUpdate();
+        LanguageManagerDelegate.OnLanguageUpdate += LanguageUpdate; // Register this canvas to respond to language updates.
+        LanguageUpdate(); // Immediately apply localized canvas layout.
     }
 
-    // Called when the object is disabled, unsubscribing from the language update event.
-    private void OnDisable()
-    {
-        LanguageManagerDelegate.OnLanguageUpdate -= LanguageUpdate;
-    }
+    /// <summary>
+    /// Unsubscribes from language update event on disable.
+    /// </summary>
+    private void OnDisable() => LanguageManagerDelegate.OnLanguageUpdate -= LanguageUpdate;
 
-    // Updates the canvas language data when the language is changed.
+    /// <summary>
+    /// Loads and applies localized canvas data based on current language.
+    /// </summary>
     public void LanguageUpdate()
     {
-        // Loads the file path where the canvas save data is stored.
-        saveFile = LanguageFileManager.GetSaveFilePath();
-        // Loads all canvas-related data from the saved JSON file.
-        LoadAllCanvasDataList(LanguageFileManager.GetLocalizedJsonByID(canvasID, saveFile, ref selectedFile));
+        var languageData = LoadLanguageSettings(); // Retrieve the current language settings.
+        LoadCanvasData(GetIDText(languageData.idCanvasData, canvasID)); // Fetch the canvas layout data using the ID and apply it.
     }
 
-    // Loads the saved canvas data list from the specified JSON string.
-    private void LoadAllCanvasDataList(string json)
+    /// <summary>
+    /// Loads and parses canvas data from JSON and applies it to the GameObject.
+    /// </summary>
+    /// <param name="json">Serialized CanvasStructure JSON string.</param>
+    private void LoadCanvasData(string json)
     {
-        if (json == "CanvasID not found") return;
-
-        var canvasDataSave = JsonUtility.FromJson<CanvasDataSave>(json); // Deserialize the JSON data to CanvasDataSave object.
-
-        if (canvasDataSave == null)
+        // Check if the provided data is valid.
+        if (string.IsNullOrEmpty(json))
         {
-            Debug.LogError("Failed to parse CanvasDataSave.");
+            Debug.LogError("LanguageCanvas: JSON data is null or empty.", this);
             return;
         }
 
-        canvasData = canvasDataSave.canvasData; // Loads the canvas data into the local variables.
-
-        // Ensures that the number of saved canvas items matches the expected count.
-        if (canvasDataSave.savedCanvasData.Count != savedCanvasData.Count)
+        // Attempt to parse JSON into a CanvasStructure object.
+        var parsed = JsonUtility.FromJson<CanvasStructure>(json);
+        if (parsed == null)
         {
-            Debug.LogWarning($"Warning: Expected {savedCanvasData.Count} savedCanvasData items but found {canvasDataSave.savedCanvasData.Count} in the loaded data.");
+            Debug.LogError("LanguageCanvas: Failed to parse JSON into CanvasStructure.", this);
+            return;
         }
 
-        // Updates the saved canvas data with the new values.
-        for (int i = 0; i < savedCanvasData.Count; i++)
-        {
-            var existingCanvasData = savedCanvasData[i];
-            var sourceCanvasData = canvasDataSave.savedCanvasData.Find(s => s.instanceID == existingCanvasData.instanceID);
-
-            if (sourceCanvasData != null)
-            {
-                existingCanvasData.localPosition = sourceCanvasData.localPosition;
-                existingCanvasData.localRotation = sourceCanvasData.localRotation;
-                existingCanvasData.localScale = sourceCanvasData.localScale;
-                existingCanvasData.anchorMin = sourceCanvasData.anchorMin;
-                existingCanvasData.anchorMax = sourceCanvasData.anchorMax;
-                existingCanvasData.anchoredPosition = sourceCanvasData.anchoredPosition;
-                existingCanvasData.sizeDelta = sourceCanvasData.sizeDelta;
-                existingCanvasData.pivot = sourceCanvasData.pivot;
-            }
-        }
-
-        // Applies the loaded values to the canvas's RectTransform components.
-        foreach (var canvasData in savedCanvasData)
-        {
-            RectTransform rectTransform = canvasData.rectTransform;
-
-            if (rectTransform != null)
-            {
-                rectTransform.localPosition = canvasData.localPosition;
-                rectTransform.localRotation = canvasData.localRotation;
-                rectTransform.localScale = canvasData.localScale;
-                rectTransform.anchorMin = canvasData.anchorMin;
-                rectTransform.anchorMax = canvasData.anchorMax;
-                rectTransform.anchoredPosition = canvasData.anchoredPosition;
-                rectTransform.sizeDelta = canvasData.sizeDelta;
-                rectTransform.pivot = canvasData.pivot;
-            }
-            else
-            {
-                Debug.LogError("RectTransform component is missing.");
-            }
-        }
+        // Store parsed data and apply it to the canvas.
+        canvasStructure = parsed;
+        ApplyCanvasData(canvasStructure, gameObject);
     }
 
 #if UNITY_EDITOR
-    // Saves the current hierarchy of the canvas and its child objects.
-    public string SaveCanvasHierarchy()
+    /// <summary>
+    /// Extracts canvas data from the GameObject and returns it as a JSON string.
+    /// </summary>
+    /// <returns>Serialized CanvasStructure JSON string.</returns>
+    public string SaveCanvasData()
     {
-        Undo.RecordObject(this, "Save Canvas Hierarchy");
-        savedCanvasData.Clear();
-        var allTransforms = GetComponentsInChildren<RectTransform>(true);
-
-        canvasData.canvasHierarchy = new string[0];
-        List<string> hierarchyList = new();
-
-        // Loop through each child object of the canvas and record its properties.
-        foreach (var rectTransform in allTransforms)
-        {
-            GameObject obj = rectTransform.gameObject;
-            hierarchyList.Add(LanguageEditorUtilities.GetGameObjectPath(rectTransform));
-
-            if (obj.GetComponent<Canvas>() && obj.TryGetComponent(out CanvasScaler canvasScaler) && obj.GetComponent<GraphicRaycaster>())
-            {
-                // Store the main canvas information.
-                canvasData.canvasName = obj.name;
-                canvasData.localPosition = rectTransform.localPosition;
-                canvasData.localRotation = rectTransform.localRotation;
-                canvasData.localScale = rectTransform.localScale;
-                canvasData.anchorMin = rectTransform.anchorMin;
-                canvasData.anchorMax = rectTransform.anchorMax;
-                canvasData.anchoredPosition = rectTransform.anchoredPosition;
-                canvasData.sizeDelta = rectTransform.sizeDelta;
-                canvasData.pivot = rectTransform.pivot;
-
-                // Store the canvas scaler settings.
-                canvasData.uiScaleMode = canvasScaler.uiScaleMode;
-                canvasData.referencePixelsPerUnit = canvasScaler.referencePixelsPerUnit;
-                canvasData.scaleFactor = canvasScaler.scaleFactor;
-                canvasData.referenceResolution = canvasScaler.referenceResolution;
-                canvasData.screenMatchMode = canvasScaler.screenMatchMode;
-                canvasData.matchWidthOrHeight = canvasScaler.matchWidthOrHeight;
-                canvasData.physicalUnit = canvasScaler.physicalUnit;
-                canvasData.fallbackScreenDPI = canvasScaler.fallbackScreenDPI;
-                canvasData.defaultSpriteDPI = canvasScaler.defaultSpriteDPI;
-                canvasData.dynamicPixelsPerUnit = canvasScaler.dynamicPixelsPerUnit;
-            }
-            else
-            {
-                // Store the properties of child canvas objects.
-                CanvasDataList canvasData = new()
-                {
-                    gameObjectName = obj.name,
-                    gameObjectEnable = obj.activeSelf,
-                    rectTransform = rectTransform,
-                    instanceID = rectTransform.GetInstanceID(),
-                    localPosition = rectTransform.localPosition,
-                    localRotation = rectTransform.localRotation,
-                    localScale = rectTransform.localScale,
-                    anchorMin = rectTransform.anchorMin,
-                    anchorMax = rectTransform.anchorMax,
-                    anchoredPosition = rectTransform.anchoredPosition,
-                    sizeDelta = rectTransform.sizeDelta,
-                    pivot = rectTransform.pivot
-                };
-
-                savedCanvasData.Add(canvasData);
-            }
-        }
-
-        canvasData.canvasHierarchy = hierarchyList.ToArray();
-
-        // Create an object that contains all the saved canvas data and return it as a JSON string.
-        CanvasDataSave canvasDataSave = new()
-        {
-            canvasData = canvasData,
-            savedCanvasData = savedCanvasData
-        };
-
-        return JsonUtility.ToJson(canvasDataSave);
+        Undo.RecordObject(this, "Save Canvas Hierarchy"); // Record undo state for editor support.
+        ExtractCanvasData(ref canvasStructure, gameObject); // Extract the current layout data into the canvasStructure object.
+        return canvasStructure != null ? JsonUtility.ToJson(canvasStructure) : null; // Return the serialized JSON, or null if extraction failed.
     }
 #endif
 }
 
 #if UNITY_EDITOR
-// Custom editor to enhance the Unity editor's Inspector view for the LanguageCanvas component.
+[CanEditMultipleObjects]
 [CustomEditor(typeof(LanguageCanvas))]
 public class LanguageCanvasEditor : Editor
 {
@@ -212,46 +103,30 @@ public class LanguageCanvasEditor : Editor
     {
         serializedObject.Update();
         var script = (LanguageCanvas)target;
-        LanguageEditorUtilities.DrawReadOnlyMonoScriptField(target);
 
+        // Display a helpful message for proper data capture.
+        EditorGUILayout.HelpBox("For accurate capture, activate all objects within the Canvas before importing.", MessageType.Info);
         EditorGUILayout.Space(5);
 
-        // Button to import settings for the canvas.
-        if (GUILayout.Button("Import Settings", LanguageEditorUtilities.CreateCustomButtonStyle(15), GUILayout.Height(30)))
+        using (new EditorGUI.DisabledScope(targets.Length > 1))
         {
-            if (LanguageEditorUtilities.IsIDInCanvasList(script.canvasID))
+            // Draw the "Import Settings" button.
+            if (GUILayout.Button("Import Settings", CreateCustomButtonStyle(15), GUILayout.Height(30)))
             {
-                if (!EditorUtility.DisplayDialog("Replace ID", "An ID with this number is already saved. Do you want to replace it?", "Yes", "No"))
-                {
+                // Check for duplicate ID and prompt user confirmation.
+                if (IsIDInCanvasList(script.canvasID) && !EditorUtility.DisplayDialog("Replace ID", "An ID with this number is already saved. Do you want to replace it?", "Yes", "No"))
                     return;
-                }
+
+                // Save current canvas layout and open the editor window for editing.
+                var data = script.SaveCanvasData();
+                if (data != null) OpenEditorWindowWithCanvas(script.canvasID, data);
             }
-
-            LanguageEditorUtilities.OpenEditorWindowWithCanvas(script.canvasID, script.SaveCanvasHierarchy());
         }
 
         EditorGUILayout.Space(5);
-        EditorGUILayout.HelpBox("This script uses 'GetInstanceID()' to build an appropriate database. However, 'GetInstanceID()' is unique to this session. \nMake sure to use it only after 'Canvas' is 100% configured. Otherwise, you will have to rewrite all the language files every session.", MessageType.Warning);
-        EditorGUILayout.Space(5);
 
-        if (LanguageEditorUtilities.IsIDInCanvasList(script.canvasID))
-        {
-            GUI.color = Color.yellow;
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("canvasID"));
-            EditorGUILayout.HelpBox("There is an canvasID with this number Saved!", MessageType.Warning);
-            GUI.color = Color.white;
-        }
-        else
-        {
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("canvasID"));
-        }
-
-        // Display other relevant properties in the inspector.
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("selectedFile"));
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("saveFile"));
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("canvasData"));
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("savedCanvasData"));
-
+        // Draw default inspector fields.
+        DrawDefaultInspector();
         serializedObject.ApplyModifiedProperties();
     }
 }

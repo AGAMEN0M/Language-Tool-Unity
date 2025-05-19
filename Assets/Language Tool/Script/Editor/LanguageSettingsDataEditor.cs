@@ -1,11 +1,17 @@
-/*
+﻿/*
  * ---------------------------------------------------------------------------
- * Description: A custom editor for the LanguageSettingsData ScriptableObject 
- *              in Unity. This script provides a user-friendly interface for managing 
- *              language settings, including default language selection, font lists, 
- *              and archive locations for both Unity Editor and builds. It facilitates 
- *              editing and visualizing properties related to language settings and 
- *              ensures that changes can be easily tracked and saved within the Unity Editor.
+ * Description: Custom Unity Editor inspector for the LanguageSettingsData 
+ *              ScriptableObject. This interface allows streamlined configuration 
+ *              and visualization of language settings such as:
+ *              - Default language selection using system cultures.
+ *              - Management of font data (standard and TMP).
+ *              - Folder path configuration for localization archives.
+ *              - Real-time display of runtime language extraction data.
+ *              
+ *              The editor enhances user workflow by offering intuitive fields, 
+ *              dropdowns, and property views, maintaining clean integration with 
+ *              Unity's undo and asset save systems.
+ *              
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
@@ -16,102 +22,104 @@ using UnityEditor;
 using UnityEngine;
 using System;
 
-// Custom inspector for the LanguageSettingsData ScriptableObject.
+/// <summary>
+/// Custom Inspector for LanguageSettingsData, enabling management of language preferences,
+/// fonts, archive locations, and visualization of runtime language data.
+/// </summary>
+[CanEditMultipleObjects]
 [CustomEditor(typeof(LanguageSettingsData))]
 public class LanguageSettingsDataEditor : Editor
 {
-    private string[] availableCultureDisplayNames; // Array to store culture display names for the dropdown.
-    private CultureInfo[] availableCultures; // Array to store all available CultureInfo objects.
-    private int currentSelectedCultureIndex; // Index of the currently selected culture in the dropdown.
+    private string[] availableCultureDisplayNames; // Stores display names for available cultures.
+    private CultureInfo[] availableCultures; // Stores all available system cultures.
+    private int currentSelectedCultureIndex; // Tracks selected culture index.
 
     private void OnEnable()
     {
-        // Initialize the cultures and culture names for the dropdown.
-        availableCultures = CultureInfo.GetCultures(CultureTypes.AllCultures); // Get all available cultures.
-        availableCultureDisplayNames = new string[availableCultures.Length]; // Initialize the array for culture names.
+        // Load all cultures and prepare display names.
+        availableCultures = CultureInfo.GetCultures(CultureTypes.AllCultures);
+        availableCultureDisplayNames = new string[availableCultures.Length];
 
-        // Populate the cultureNames array with display names of the cultures.
         for (int i = 0; i < availableCultures.Length; i++)
-        {
-            availableCultureDisplayNames[i] = availableCultures[i].DisplayName;
-        }
+            availableCultureDisplayNames[i] = availableCultures[i].EnglishName;
     }
 
     public override void OnInspectorGUI()
     {
-        var script = (LanguageSettingsData)target; // Cast the target object to LanguageSettingsData.
+        var script = (LanguageSettingsData)target;
 
-        // Create a style for titles with bold font and size 14.
-        GUIStyle titleStyle = new(EditorStyles.boldLabel)
-        {
-            fontSize = 14
-        };
+        // Style for section headers.
+        GUIStyle titleStyle = new(EditorStyles.boldLabel) { fontSize = 14 };
 
-        Undo.RecordObject(script, "Language Settings Data"); // Record the object to allow undo operations.
+        Undo.RecordObject(script, "Edit Language Settings");
 
-        // Disable the script field to prevent editing.
+        // Display the script reference field (read-only).
         EditorGUI.BeginDisabledGroup(true);
         EditorGUILayout.ObjectField("Script", MonoScript.FromScriptableObject(script), typeof(MonoScript), false);
         EditorGUI.EndDisabledGroup();
 
         EditorGUILayout.Space(10);
 
+        // Folder path section.
         EditorGUILayout.LabelField("Archives Location", titleStyle);
-        // Draw and edit the path for Unity Editor.
-        EditorGUILayout.LabelField("in Unity Editor", EditorStyles.boldLabel);
-        script.saveNameInUnity = EditorGUILayout.TextField("Save Name:", script.saveNameInUnity);
-        // Draw and edit the path for build.
-        EditorGUILayout.LabelField("In Build", EditorStyles.boldLabel);
-        script.saveNameInBuild = EditorGUILayout.TextField("Save Name:", script.saveNameInBuild);
-        // Draw and edit the folder name.
         EditorGUILayout.LabelField("Assets", EditorStyles.boldLabel);
         script.folderName = EditorGUILayout.TextField("Folder Name:", script.folderName);
 
         EditorGUILayout.Space(15);
 
+        // Default language section using dropdown.
         EditorGUILayout.LabelField("Default Language", titleStyle);
-        string currentLanguage = script.defaultLanguage;
-        currentSelectedCultureIndex = Array.FindIndex(availableCultures, c => c.DisplayName == currentLanguage); // Find the index of the current language.
-        currentSelectedCultureIndex = EditorGUILayout.Popup("Language:", currentSelectedCultureIndex, availableCultureDisplayNames); // Show the dropdown for selecting language.
-        script.defaultLanguage = availableCultures[currentSelectedCultureIndex].DisplayName; // Update the default language based on selection.
+        currentSelectedCultureIndex = Array.FindIndex(availableCultures, c => c.Name == script.defaultLanguage);
+        currentSelectedCultureIndex = EditorGUILayout.Popup("Language:", currentSelectedCultureIndex, availableCultureDisplayNames);
+        script.defaultLanguage = availableCultures[currentSelectedCultureIndex].Name;
 
         EditorGUILayout.Space(15);
 
+        // Font data (regular).
         EditorGUILayout.LabelField("Font List Data", titleStyle);
-
-        // Draw and edit the LanguageFontListData reference.
         script.fontListData = (LanguageFontListData)EditorGUILayout.ObjectField("Font List Data:", script.fontListData, typeof(LanguageFontListData), false);
 
-        // If fontListData is assigned, draw its properties.
         if (script.fontListData != null)
         {
-            SerializedObject serializedFontListData = new(script.fontListData); // Create a SerializedObject for the fontListData.
-            SerializedProperty fontListProperty = serializedFontListData.FindProperty("fontList"); // Find the "fontList" property.
-            EditorGUILayout.PropertyField(fontListProperty, new GUIContent("Fonts"), true); // Draw the property field with a label.
-            serializedFontListData.ApplyModifiedProperties(); // Apply any changes made to the SerializedObject.
+            SerializedObject fontDataSO = new(script.fontListData);
+            EditorGUILayout.PropertyField(fontDataSO.FindProperty("fontList"), new GUIContent("Fonts"), true);
+            fontDataSO.ApplyModifiedProperties();
         }
 
         EditorGUILayout.Space(10);
 
-        // Draw and edit the LanguageFontListDataTMP reference.
+        // Font data (TextMeshPro).
         script.fontListDataTMP = (LanguageFontListDataTMP)EditorGUILayout.ObjectField("Font List Data (TMP):", script.fontListDataTMP, typeof(LanguageFontListDataTMP), false);
 
-        // If fontListDataTMP is assigned, draw its properties.
         if (script.fontListDataTMP != null)
         {
-            SerializedObject serializedTMPFontListData = new(script.fontListDataTMP); // Create a SerializedObject for the fontListDataTMP.
-            SerializedProperty tmpFontListProperty = serializedTMPFontListData.FindProperty("TMPFontList"); // Find the "TMPFontList" property.
-            EditorGUILayout.PropertyField(tmpFontListProperty, new GUIContent("Fonts (TMP)"), true); // Draw the property field with a label.
-            serializedTMPFontListData.ApplyModifiedProperties(); // Apply any changes made to the SerializedObject.
+            SerializedObject tmpFontDataSO = new(script.fontListDataTMP);
+            EditorGUILayout.PropertyField(tmpFontDataSO.FindProperty("TMPFontList"), new GUIContent("Fonts (TMP)"), true);
+            tmpFontDataSO.ApplyModifiedProperties();
         }
 
         EditorGUILayout.Space(15);
 
-        // Draw and edit the error language tool GameObject reference.
+        // Canvas log reference.
         EditorGUILayout.LabelField("Canvas Log", titleStyle);
         script.errorLanguageTool = (GameObject)EditorGUILayout.ObjectField("Error Language Tool:", script.errorLanguageTool, typeof(GameObject), true);
 
-        // If any changes have been made in the inspector, mark the script as dirty and save assets.
+        EditorGUILayout.Space(10);
+
+        // Visualization of extracted runtime data.
+        GUI.enabled = false;
+        EditorGUILayout.LabelField("Extracted Data", titleStyle);
+        script.selectedCulture = EditorGUILayout.TextField("Selected Culture:", script.selectedCulture);
+
+        SerializedObject scriptSO = new(script);
+        EditorGUILayout.PropertyField(scriptSO.FindProperty("availableLanguages"), new GUIContent("Available Languages"), true);
+        EditorGUILayout.PropertyField(scriptSO.FindProperty("idData"), new GUIContent("IDs"), true);
+        EditorGUILayout.PropertyField(scriptSO.FindProperty("idMetaData"), new GUIContent("IDs Meta"), true);
+        EditorGUILayout.PropertyField(scriptSO.FindProperty("idCanvasData"), new GUIContent("IDs Canvas"), true);
+        scriptSO.ApplyModifiedProperties();
+        GUI.enabled = true;
+
+        // Save changes if GUI changed.
         if (GUI.changed)
         {
             EditorUtility.SetDirty(script);

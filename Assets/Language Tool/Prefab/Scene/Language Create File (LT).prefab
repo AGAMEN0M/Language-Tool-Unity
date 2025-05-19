@@ -13,7 +13,7 @@ GameObject:
   m_Layer: 0
   m_Name: Language Create File (LT)
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 2800000, guid: 2c1b3dc97a05bdc409dc92d2578c8de7, type: 3}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -44,13 +44,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 037bad271278c3245912f8bfd6b94b99, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  folderInUnity: Editor
-  folderInBuild: StreamingAssets
   fileName: Test File
   fileExtension: .txt
+  folderInUnity: Editor
+  folderInBuild: StreamingAssets
   fileLines:
-  - text: Test Language
+  - iD: 0
+    text: 'Language Create File:'
+    translateText: 0
+  - iD: -5
+    text: Test Language
     translateText: 1
-    iD: -5
-  selectedFile: 
-  saveFile: 

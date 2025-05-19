@@ -1,7 +1,8 @@
 /*
  * ---------------------------------------------------------------------------
- * Description: This script handles loading and updating localized text 
- *              for language scripts in the Unity scene, enabling multilingual support.
+ * Description: Component responsible for managing localized texts in the scene.
+ *              It synchronizes UI or 3D elements with translated content using
+ *              language IDs and applies changes through UnityEvents.
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
@@ -11,92 +12,92 @@ using System.Collections.Generic;
 using UnityEngine.Events;
 using LanguageTools;
 using UnityEngine;
-using System.IO;
 
 #if UNITY_EDITOR
-using LanguageTools.Editor;
+using static LanguageTools.Editor.LanguageEditorUtilities;
 using UnityEditor;
 #endif
 
-// This component is responsible for loading and updating language scripts in the scene.
+using static LanguageTools.LanguageFileManager;
+
+/// <summary>
+/// Handles localization of UI or 3D texts in the scene by updating content
+/// from LanguageSettingsData and applying changes via UnityEvents.
+/// </summary>
 [AddComponentMenu("Language/3D Object/Language Script")]
 public class LanguageScript : MonoBehaviour
 {
-    [Header("Settings")]
-    // List of script texts associated with this component. Contains the text and its ID.
-    public List<ScriptText> scriptTexts = new() { new ScriptText { iD = -9, text = "Test Language Script" } };
-    [Space(10)]
-    [Header("Automatic Information")]
-    [SerializeField] private string selectedFile; // Stores the path of the selected language file.
+    [Header("Script Components")]
+    [SerializeField] private bool debug = false; // Show debug messages when updating texts.
     [Space(5)]
-    [SerializeField] private string saveFile; // Stores the path to the save file.
+    [Tooltip("List of localized texts with assigned language IDs.")]
+    public List<ScriptText> scriptTexts = new() { new ScriptText { iD = -9, text = "Test Language Script" } };
 
-    // Subscribes to the OnLanguageUpdate event when the object is enabled.
+    private LanguageSettingsData languageData; // Current language settings.
+
+    /// <summary>
+    /// Subscribes to the language update event and immediately updates the text.
+    /// </summary>
     private void OnEnable()
     {
-        LanguageManagerDelegate.OnLanguageUpdate += LanguageUpdate; // Subscribe to language updates.
-        LanguageUpdate(); // Perform an initial update when enabled.
+        LanguageManagerDelegate.OnLanguageUpdate += LanguageUpdate; // Subscribe to the language change event.
+        LanguageUpdate(); // Perform an initial update to reflect the current language settings.
     }
 
-    // Unsubscribes from the OnLanguageUpdate event when the object is disabled.
-    private void OnDisable()
-    {
-        LanguageManagerDelegate.OnLanguageUpdate -= LanguageUpdate; // Unsubscribe from language updates.
-    }
+    /// <summary>
+    /// Unsubscribes from the language update event.
+    /// </summary>
+    private void OnDisable() => LanguageManagerDelegate.OnLanguageUpdate -= LanguageUpdate;
 
-    // Updates the script by loading the localized text based on the selected file and IDs.
+    /// <summary>
+    /// Updates all registered scriptTexts using the selected language settings.
+    /// </summary>
     public void LanguageUpdate()
     {
-        saveFile = LanguageFileManager.GetSaveFilePath(); // Retrieve the path to the save file.
-
-        // Check if the save file exists, then load the selected language file from it.
-        if (File.Exists(saveFile))
+        // Load the current language settings.
+        languageData = LoadLanguageSettings();
+        if (languageData == null)
         {
-            string json = File.ReadAllText(saveFile);
-            var saveData = JsonUtility.FromJson<LanguageSaveData>(json); // Deserialize the save data.
-            selectedFile = saveData.selectedFile; // Set the selected file path.
-        }
-        else
-        {
-            // If no save file exists, find the default language file path.
-            selectedFile = LanguageFileManager.FindDefaultLanguageFilePath();
+            Debug.LogError("LanguageScript: Failed to load LanguageSettingsData.", this);
+            return;
         }
 
-        ProcessLine(); // Process the loaded lines from the file.
-    }
-
-    // Processes each script text in the list, fetching and applying the localized text.
-    private void ProcessLine()
-    {
+        // Iterate through each scriptText entry.
         foreach (var scriptText in scriptTexts)
         {
-            // Find the localized line of text by its ID and extract the text inside curly braces.
-            string text = LanguageFileManager.FindLineByID(selectedFile, scriptText.iD);
-            scriptText.text = LanguageFileManager.ExtractTextBetweenBraces(text);
+            // Retrieve the localized text from the language data using the provided ID.
+            scriptText.text = GetIDText(languageData.idData, scriptText.iD);
 
-            // Apply the text to the target UnityEvent (scripts connected to this event).
+            // If debugging is enabled, log the applied translation.
+            if (debug) Debug.LogWarning($"LanguageScript(ID:{scriptText.iD}): {scriptText.text}", this);
+
+            // Apply the localized text to any bound UnityEvent callbacks.
             ApplyUnityEvent(scriptText.targetScripts, scriptText.text);
         }
     }
 
-    // Invokes the UnityEvent with the localized text as a parameter.
+    /// <summary>
+    /// Invokes all methods in a UnityEvent with the provided string value.
+    /// </summary>
+    /// <param name="unityEvent">UnityEvent to be invoked.</param>
+    /// <param name="value">String value to be passed to the event listeners.</param>
     private void ApplyUnityEvent(UnityEvent<string> unityEvent, string value)
     {
-        // Get the number of persistent calls (methods) registered with the UnityEvent.
-        var persistentCalls = unityEvent.GetPersistentEventCount();
+        // Get the number of persistent listeners assigned to this UnityEvent.
+        int persistentCalls = unityEvent.GetPersistentEventCount();
 
-        // Loop through each persistent call and invoke the method if valid.
+        // Iterate over each registered callback.
         for (int i = 0; i < persistentCalls; i++)
         {
-            var target = unityEvent.GetPersistentTarget(i); // Get the target object.
-            var method = unityEvent.GetPersistentMethodName(i); // Get the method name.
+            var target = unityEvent.GetPersistentTarget(i);
+            var method = unityEvent.GetPersistentMethodName(i);
 
-            // If the target and method exist, invoke the method with the localized text.
+            // Validate the target and method name before invoking.
             if (target != null && !string.IsNullOrEmpty(method))
             {
-                var methodInfo = target.GetType().GetMethod(method); // Get method info.
+                var methodInfo = target.GetType().GetMethod(method);
 
-                // Check if the method takes one string parameter and invoke it if valid.
+                // Ensure method accepts a single string parameter before calling it.
                 if (methodInfo != null && methodInfo.GetParameters().Length == 1 && methodInfo.GetParameters()[0].ParameterType == typeof(string))
                 {
                     methodInfo.Invoke(target, new object[] { value });
@@ -107,69 +108,44 @@ public class LanguageScript : MonoBehaviour
 }
 
 #if UNITY_EDITOR
-// Custom editor for the LanguageScript component in the Unity editor.
+/// <summary>
+/// Custom inspector for LanguageScript. Provides buttons for importing and editing language settings.
+/// </summary>
+[CanEditMultipleObjects]
 [CustomEditor(typeof(LanguageScript))]
 public class LanguageScriptEditor : Editor
 {
-    // Overrides the default Inspector GUI with custom fields and buttons.
     public override void OnInspectorGUI()
     {
-        serializedObject.Update(); // Update the serialized properties of the object.
-        var script = (LanguageScript)target; // Reference to the target script.
-        LanguageEditorUtilities.DrawReadOnlyMonoScriptField(target); // Draws the read-only field for the script reference.
+        // Sync serialized fields with the inspector.
+        serializedObject.Update();
+        var script = (LanguageScript)target;
 
+        using (new EditorGUI.DisabledScope(targets.Length > 1))
+        {
+            // Draw an import button and assign click behavior.
+            if (GUILayout.Button("Import Settings", CreateCustomButtonStyle(15), GUILayout.Height(30)))
+            {
+                // Check if any IDs in scriptTexts already exist in the language system.
+                bool alreadySaved = script.scriptTexts.Exists(i => IsIDInLanguageList(i.iD));
+
+                // Ask user whether to overwrite existing IDs.
+                if (alreadySaved && !EditorUtility.DisplayDialog("Replace ID", "An ID with this number is already saved. Do you want to replace it?", "Yes", "No"))
+                {
+                    return;
+                }
+
+                // Open the editor window for each entry to allow manual editing.
+                foreach (var i in script.scriptTexts) OpenEditorWindowWithComponent(i.iD, 4, i.text, 0, 0, 0);
+            }
+        }
+
+        // Draw other default inspector fields.
         EditorGUILayout.Space(5);
+        DrawDefaultInspector();
 
-        // Button to import the settings for the script texts.
-        if (GUILayout.Button("Import Settings", LanguageEditorUtilities.CreateCustomButtonStyle(15), GUILayout.Height(30)))
-        {
-            bool alreadySaved = false;
-
-            // Check if any of the IDs are already saved.
-            foreach (ScriptText i in script.scriptTexts)
-            {
-                if (LanguageEditorUtilities.IsIDInLanguageList(i.iD))
-                {
-                    alreadySaved = true;
-                    break;
-                }
-            }
-
-            // If any ID is already saved, prompt the user to confirm if they want to replace it.
-            if (alreadySaved)
-            {
-                if (!EditorUtility.DisplayDialog("Replace ID", "An ID with this number is already saved. Do you want to replace it?", "Yes", "No"))
-                {
-                    return; // Exit if the user chooses not to replace the ID.
-                }
-            }
-
-            // Open the editor window for each script text's ID for further modification.
-            foreach (ScriptText i in script.scriptTexts)
-            {
-                LanguageEditorUtilities.OpenEditorWindowWithComponent(i.iD, 4, i.text, 0, 0, 0, true, false, false, false);
-            }
-        }
-
-        // Property field for the list of script texts.
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("scriptTexts"));
-
-        // Display a warning if any of the script text IDs are already saved.
-        foreach (ScriptText i in script.scriptTexts)
-        {
-            if (LanguageEditorUtilities.IsIDInLanguageList(i.iD))
-            {
-                GUI.color = Color.yellow;
-                EditorGUILayout.HelpBox($"There is an ID ({i.iD}) with this number Saved!", MessageType.Warning);
-                GUI.color = Color.white;
-            }
-        }
-
-        // Property fields for displaying the selected file and save file paths.
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("selectedFile"));
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("saveFile"));
-
-        serializedObject.ApplyModifiedProperties(); // Apply any modified properties.
+        // Apply property changes back to the serialized object.
+        serializedObject.ApplyModifiedProperties();
     }
 }
 #endif

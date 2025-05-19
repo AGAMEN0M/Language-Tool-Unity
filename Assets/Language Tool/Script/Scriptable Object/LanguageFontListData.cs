@@ -1,8 +1,8 @@
 /*
  * ---------------------------------------------------------------------------
- * Description: This ScriptableObject holds a list of legacy Font assets 
- *              for localization purposes in Unity. It provides a custom inspector to 
- *              facilitate adding Font objects via drag and drop.
+ * Description: ScriptableObject containing a list of legacy Unity Font objects 
+ *              used for localization purposes in Unity. Includes a custom 
+ *              inspector that supports drag-and-drop for easier font management.
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
@@ -15,62 +15,71 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-// ScriptableObject that holds a list of Font assets.
-[CreateAssetMenu(fileName = "New Language Font List (Legacy)", menuName = "Language/Language Font List Data (Legacy)")]
+/// <summary>
+/// Holds a list of legacy Font assets for localization support.
+/// </summary>
+[CreateAssetMenu(fileName = "New Language Font List (Legacy)", menuName = "Language/Language Font List Data (Legacy)", order = 2)]
 public class LanguageFontListData : ScriptableObject
 {
-    public List<Font> fontList; // List of Font assets.
+    [Tooltip("List of Unity legacy Font objects used for localization.")]
+    public List<Font> fontList = new(); // Initialized to prevent null errors.
 }
 
 #if UNITY_EDITOR
-// Custom inspector for the LanguageFontListData ScriptableObject.
+/// <summary>
+/// Custom inspector that enables drag-and-drop for adding Font assets to the list.
+/// </summary>
+[CanEditMultipleObjects]
 [CustomEditor(typeof(LanguageFontListData))]
 public class LanguageFontListDataInspector : Editor
 {
     public override void OnInspectorGUI()
     {
-        serializedObject.Update(); // Update the serialized object before drawing the inspector.
+        // Sync serialized data with the target object.
+        serializedObject.Update();
+        var script = (LanguageFontListData)target;
 
-        var script = (LanguageFontListData)target; // Cast the target object to LanguageFontListData.
-
-        // Create a drop area in the inspector GUI for dragging and dropping Font assets.
-        Rect dropArea = GUILayoutUtility.GetRect(0, 100, GUILayout.ExpandWidth(true));
-        EditorGUI.DrawRect(dropArea, new Color(0.15f, 0.15f, 0.15f, 0.5f)); // Draw a background color for the drop area.
-        EditorGUI.DropShadowLabel(dropArea, "Drop Font Assets Here"); // Draw a label indicating where to drop Font assets.
-
-        // Handle drag and drop events.
-        var evt = Event.current;
-        if (evt.type == EventType.DragUpdated || evt.type == EventType.DragPerform)
+        using (new EditorGUI.DisabledScope(targets.Length > 1))
         {
-            // Check if the drag event is within the drop area.
-            if (dropArea.Contains(evt.mousePosition))
+            // Create a large area for drag-and-drop input.
+            Rect dropArea = GUILayoutUtility.GetRect(0, 100, GUILayout.ExpandWidth(true));
+            EditorGUI.DrawRect(dropArea, new Color(0.15f, 0.15f, 0.15f, 0.5f));
+            EditorGUI.DropShadowLabel(dropArea, "Drop Font Assets Here");
+
+            Event evt = Event.current;
+
+            // Handle drag and drop interaction inside the defined area.
+            if ((evt.type == EventType.DragUpdated || evt.type == EventType.DragPerform) && dropArea.Contains(evt.mousePosition))
             {
-                // Set visual mode to indicate that dropping is allowed.
                 DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
+
                 if (evt.type == EventType.DragPerform)
                 {
-                    DragAndDrop.AcceptDrag(); // Accept the drag and drop operation.
-                    Undo.RecordObject(script, "Add Fonts"); // Record the undo operation for adding fonts.
+                    DragAndDrop.AcceptDrag();
+                    Undo.RecordObject(script, "Add Fonts");
 
-                    // Add each dragged object to the fontList if it is a Font and not already in the list.
-                    foreach (Object draggedObject in DragAndDrop.objectReferences)
+                    // Add unique Font objects to the list.
+                    foreach (Object obj in DragAndDrop.objectReferences)
                     {
-                        if (draggedObject is Font font && !script.fontList.Contains(font))
+                        if (obj is Font font && !script.fontList.Contains(font))
                         {
                             script.fontList.Add(font);
                         }
                     }
-                    EditorUtility.SetDirty(script); // Mark the scriptable object as dirty to save changes.
+
+                    EditorUtility.SetDirty(script); // Mark the asset as dirty to save changes.
                 }
-                evt.Use();
+
+                evt.Use(); // Use the current event to avoid default processing.
             }
         }
 
-        GUILayout.Space(10); // Add some space before drawing the default inspector.
+        // Draw any other serialized properties.
+        GUILayout.Space(10);
+        DrawDefaultInspector();
 
-        DrawDefaultInspector(); // Draw the default inspector properties.
-
-        serializedObject.ApplyModifiedProperties(); // Apply any changes made to the serialized object.
+        // Apply property modifications to serialized object.
+        serializedObject.ApplyModifiedProperties();
     }
 }
 #endif

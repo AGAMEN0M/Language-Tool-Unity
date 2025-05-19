@@ -1,11 +1,9 @@
 /*
  * ---------------------------------------------------------------------------
- * Description: A utility class for managing fonts and text alignment in 
- *              Unity's UI system. This class provides methods to retrieve fonts by index, 
- *              find the index of a specified font, and convert between integer alignment 
- *              codes and TextAnchor values. It supports multilingual applications by 
- *              loading language-specific font lists and ensures correct text alignment 
- *              settings.
+ * Description: Utility class for managing legacy Unity UI fonts and text 
+ *              alignment in multilingual applications. Provides font access 
+ *              by index or asset, and conversion between integer alignment 
+ *              codes and UnityEngine.TextAnchor values.
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
@@ -13,78 +11,67 @@
 
 using UnityEngine;
 
+using static LanguageTools.LanguageFileManager;
+
 namespace LanguageTools.Legacy
 {
     public static class FontAndAlignmentUtility
     {
-        // Retrieves a font from the font list based on the given index.
+        /// <summary>
+        /// Retrieves a Font from the language settings by its index.
+        /// </summary>
+        /// <param name="fontListIndex">1-based index of the font in the list.</param>
+        /// <returns>Corresponding Font, or null if index is invalid.</returns>
         public static Font GetFontByIndex(int fontListIndex)
         {
-            // Loads the language settings to access the font list.
-            var fontListObject = LanguageFileManager.LoadLanguageSettings().fontListData;
+            // Load list of legacy fonts from language settings.
+            var fonts = LoadLanguageSettings().fontListData.fontList;
 
-            // Checks if the font index is within valid range and returns the corresponding font.
-            if (fontListIndex > 0 && fontListIndex <= fontListObject.fontList.Count)
-            {
-                return fontListObject.fontList[fontListIndex - 1];
-            }
-
-            return null; // Returns null if the index is out of range.
+            // Return font at index (1-based); return null if index is out of bounds.
+            return (fontListIndex > 0 && fontListIndex <= fonts.Count) ? fonts[fontListIndex - 1] : null;
         }
 
-        // Retrieves the index of a specific font from the font list.
+        /// <summary>
+        /// Retrieves the index of a given Font from the language settings.
+        /// </summary>
+        /// <param name="font">Font asset to find.</param>
+        /// <returns>1-based index if found; otherwise, 0.</returns>
         public static int GetFontIndex(Font font)
         {
-            // Loads the language settings to access the font list.
-            var fontListObject = LanguageFileManager.LoadLanguageSettings().fontListData;
+            // Load list of fonts from language settings.
+            var fonts = LoadLanguageSettings().fontListData.fontList;
 
-            // Iterates through the font list to find the matching font and returns its index.
-            for (int i = 0; i < fontListObject.fontList.Count; i++)
+            // Search for the matching font and return its index (1-based).
+            for (int i = 0; i < fonts.Count; i++)
             {
-                if (fontListObject.fontList[i] == font)
-                {
-                    return i + 1; // Adding 1 to match the indexing style used elsewhere.
-                }
+                if (fonts[i] == font) return i + 1;
             }
 
-            return 0; // Returns 0 if the font is not found in the list.
+            return 0; // Return 0 if the font is not found.
         }
 
-        // Converts an integer alignment code to the corresponding TextAnchor value.
+        /// <summary>
+        /// Converts an integer alignment code to TextAnchor.
+        /// </summary>
+        /// <param name="alignment">Integer alignment code.</param>
+        /// <returns>Corresponding TextAnchor enum value.</returns>
         public static TextAnchor ConvertToTextAnchor(int alignment)
         {
-            var newAlignment = TextAnchor.UpperLeft; // Default value for the text alignment.
+            // Default alignment value.
+            var newAlignment = TextAnchor.UpperLeft;
 
-            // Maps specific alignment codes to TextAnchor values.
+            // Match integer code to corresponding TextAnchor.
             switch (alignment)
             {
-                case 1:
-                    newAlignment = TextAnchor.UpperLeft;
-                    break;
-                case 2:
-                    newAlignment = TextAnchor.UpperCenter;
-                    break;
-                case 3:
-                    newAlignment = TextAnchor.UpperRight;
-                    break;
-                case 7:
-                    newAlignment = TextAnchor.MiddleLeft;
-                    break;
-                case 8:
-                    newAlignment = TextAnchor.MiddleCenter;
-                    break;
-                case 9:
-                    newAlignment = TextAnchor.MiddleRight;
-                    break;
-                case 13:
-                    newAlignment = TextAnchor.LowerLeft;
-                    break;
-                case 14:
-                    newAlignment = TextAnchor.LowerCenter;
-                    break;
-                case 15:
-                    newAlignment = TextAnchor.LowerRight;
-                    break;                
+                case 1: newAlignment = TextAnchor.UpperLeft; break;
+                case 2: newAlignment = TextAnchor.UpperCenter; break;
+                case 3: newAlignment = TextAnchor.UpperRight; break;
+                case 7: newAlignment = TextAnchor.MiddleLeft; break;
+                case 8: newAlignment = TextAnchor.MiddleCenter; break;
+                case 9: newAlignment = TextAnchor.MiddleRight; break;
+                case 13: newAlignment = TextAnchor.LowerLeft; break;
+                case 14: newAlignment = TextAnchor.LowerCenter; break;
+                case 15: newAlignment = TextAnchor.LowerRight; break;                
                 default:
                     Debug.LogWarning($"Alignment value '{alignment}' is not recognized. Using default alignment.");
                     break;
@@ -93,41 +80,27 @@ namespace LanguageTools.Legacy
             return newAlignment;
         }
 
-        // Converts a TextAnchor value to the corresponding integer alignment code.
+        /// <summary>
+        /// Converts a TextAnchor value to its corresponding integer code.
+        /// </summary>
+        /// <param name="alignment">TextAnchor enum value.</param>
+        /// <returns>Corresponding integer code; returns 1 if not recognized.</returns>
         public static int ConvertToAlignmentCode(TextAnchor alignment)
         {
-            int alignmentValue = 1; // Default alignment code.
+            int alignmentValue = 0;
 
-            // Maps TextAnchor values to corresponding integer alignment codes.
+            // Match TextAnchor value to integer code.
             switch (alignment)
             {
-                case TextAnchor.UpperLeft:
-                    alignmentValue = 1;
-                    break;
-                case TextAnchor.UpperCenter:
-                    alignmentValue = 2;
-                    break;
-                case TextAnchor.UpperRight:
-                    alignmentValue = 3;
-                    break;
-                case TextAnchor.MiddleLeft:
-                    alignmentValue = 7;
-                    break;
-                case TextAnchor.MiddleCenter:
-                    alignmentValue = 8;
-                    break;
-                case TextAnchor.MiddleRight:
-                    alignmentValue = 9;
-                    break;
-                case TextAnchor.LowerLeft:
-                    alignmentValue = 13;
-                    break;
-                case TextAnchor.LowerCenter:
-                    alignmentValue = 14;
-                    break;
-                case TextAnchor.LowerRight:
-                    alignmentValue = 15;
-                    break;
+                case TextAnchor.UpperLeft: alignmentValue = 1; break;
+                case TextAnchor.UpperCenter: alignmentValue = 2; break;
+                case TextAnchor.UpperRight: alignmentValue = 3; break;
+                case TextAnchor.MiddleLeft: alignmentValue = 7; break;
+                case TextAnchor.MiddleCenter: alignmentValue = 8; break;
+                case TextAnchor.MiddleRight: alignmentValue = 9; break;
+                case TextAnchor.LowerLeft: alignmentValue = 13; break;
+                case TextAnchor.LowerCenter: alignmentValue = 14; break;
+                case TextAnchor.LowerRight: alignmentValue = 15; break;
                 default:
                     Debug.LogWarning($"Alignment option '{alignment}' is not recognized. Returning default alignment value.");
                     break;

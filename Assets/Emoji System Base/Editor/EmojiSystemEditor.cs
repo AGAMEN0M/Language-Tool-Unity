@@ -10,6 +10,7 @@
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
 */
+
 using UnityEngine.SceneManagement;
 using UnityEngine.TextCore.Text;
 using UnityEngine.TextCore;
@@ -45,17 +46,13 @@ public class EmojiSystemEditor : EditorWindow
     public string pythonPath;
 
     // Enumeration for asset types.
-    public enum Type
-    {
-        Legacy,
-        TextMeshPro
-    }
+    public enum Type { Legacy, TextMeshPro }
 
     // Add menu item to open the editor window.
     [MenuItem("Window/Emoji System Editor", false, 2030)]
     public static void ShowWindow()
     {
-        EmojiSystemEditor window = GetWindow<EmojiSystemEditor>("Emoji System Editor");
+        var window = GetWindow<EmojiSystemEditor>("Emoji System Editor");
 
         // Load and set an icon for the editor window if it exists.
         string[] guids = AssetDatabase.FindAssets("EmojiSystemEditor Icon t:Texture2D");
@@ -72,10 +69,7 @@ public class EmojiSystemEditor : EditorWindow
     }
 
     // Initialize the SerializedObject when the window is enabled.
-    private void OnEnable()
-    {
-        serializedObject = new SerializedObject(this);
-    }
+    private void OnEnable() => serializedObject = new SerializedObject(this);
 
     // Draw the GUI for the editor window.
     private void OnGUI()
@@ -339,15 +333,8 @@ public class EmojiSystemEditor : EditorWindow
 
         process.WaitForExit();
 
-        if (output != "")
-        {
-            UnityEngine.Debug.Log(output);
-        }
-
-        if (error != "")
-        {
-            UnityEngine.Debug.LogError(error);
-        }
+        if (output != "") UnityEngine.Debug.Log(output);
+        if (error != "") UnityEngine.Debug.LogError(error);
     }
 
     // Open a file panel to select the Python executable.

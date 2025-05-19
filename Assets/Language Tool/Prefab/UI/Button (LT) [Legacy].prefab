@@ -10,10 +10,10 @@ GameObject:
   m_Component:
   - component: {fileID: 1145917995025942972}
   - component: {fileID: 8891562749123497739}
-  - component: {fileID: 4663717650544695804}
   - component: {fileID: 4013020498080612171}
+  - component: {fileID: 4663717650544695804}
   m_Layer: 5
-  m_Name: Text (LT) [Legacy]
+  m_Name: 'Text (LT) [Legacy]'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -46,6 +46,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1050972566879415964}
   m_CullTransparentMesh: 1
+--- !u!114 &4013020498080612171
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1050972566879415964}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9947169f88507274dac888f9cb3e9426, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  textComponent: {fileID: 4663717650544695804}
+  translateText: 1
+  iD: -1
 --- !u!114 &4663717650544695804
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -80,23 +95,6 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: Button
---- !u!114 &4013020498080612171
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1050972566879415964}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9947169f88507274dac888f9cb3e9426, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  text: {fileID: 4663717650544695804}
-  iD: -1
-  translateText: 1
-  selectedFile: 
-  saveFile: 
 --- !u!1 &1696457142745199336
 GameObject:
   m_ObjectHideFlags: 0
@@ -110,9 +108,9 @@ GameObject:
   - component: {fileID: 4027308862581390206}
   - component: {fileID: 8014907708737997378}
   m_Layer: 5
-  m_Name: Button (LT) [Legacy]
+  m_Name: 'Button (LT) [Legacy]'
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 2800000, guid: 70f6424025aaaa04b8158f8918eadff8, type: 3}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1

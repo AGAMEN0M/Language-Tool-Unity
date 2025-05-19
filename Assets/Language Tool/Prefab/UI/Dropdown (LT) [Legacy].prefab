@@ -428,9 +428,9 @@ GameObject:
   - component: {fileID: 322796325400209520}
   - component: {fileID: 4918392670220727778}
   m_Layer: 5
-  m_Name: Dropdown (LT) [Legacy]
+  m_Name: 'Dropdown (LT) [Legacy]'
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 2800000, guid: 20275f3e909cc6045893348fdfb0c08d, type: 3}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -566,6 +566,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dropdown: {fileID: 322796325400209520}
+  translateText: 1
   options:
   - text: Option A
     sprite: {fileID: 0}
@@ -576,8 +577,6 @@ MonoBehaviour:
   - text: Option C
     sprite: {fileID: 0}
     iD: -4
-  selectedFile: 
-  saveFile: 
 --- !u!1 &5687405152231566452
 GameObject:
   m_ObjectHideFlags: 0
@@ -972,7 +971,7 @@ MonoBehaviour:
   canvasRectTransform: {fileID: 0}
   canvasWidth: 0
   objectWidth: 0
-  TextList: []
+  textList: []
   textIsBroken: 0
   sizeAdjustment: 0
 --- !u!1 &8403868705958525059

@@ -204,7 +204,7 @@ MonoBehaviour:
   canvasRectTransform: {fileID: 0}
   canvasWidth: 0
   objectWidth: 0
-  TextList: []
+  textList: []
   textIsBroken: 0
   sizeAdjustment: 0
 --- !u!1 &3015817915235951981
@@ -892,9 +892,9 @@ GameObject:
   - component: {fileID: 7056632040780121770}
   - component: {fileID: 2819717033511422897}
   m_Layer: 5
-  m_Name: Language Manager (LT) [Legacy]
+  m_Name: 'Language Manager (LT) [Legacy]'
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 2800000, guid: 93715cc753e899240b62b047a7588df3, type: 3}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -1025,12 +1025,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c30091442e592748b3eb988bb11b27e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dropdown: {fileID: 7056632040780121770}
-  systemLanguage: 
-  selectedFile: 
-  selectedLanguage: 
-  pathFolder: 
-  saveFile: 
+  languageDropdown: {fileID: 7056632040780121770}
 --- !u!1 &8963587997761038727
 GameObject:
   m_ObjectHideFlags: 0

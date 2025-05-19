@@ -1,8 +1,9 @@
 /*
  * ---------------------------------------------------------------------------
- * Description: This component dynamically updates a UI Image based on the 
- *              selected language. It loads the appropriate image file corresponding 
- *              to the current language setting from disk using asynchronous file loading.
+ * Description: Dynamically updates a Unity UI Image component with a localized
+ *              sprite based on the current language. The component constructs
+ *              the appropriate image path and loads the asset asynchronously
+ *              from disk when the language changes.
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
@@ -15,91 +16,104 @@ using LanguageTools;
 using UnityEngine;
 using System.IO;
 
-// Adds this script to the Unity Component Menu under the specified path.
+using static LanguageTools.LanguageFileManager;
+
 [AddComponentMenu("Language/UI/Language Image")]
 public class LanguageImage : MonoBehaviour
 {
     [Header("Settings")]
-    public Image image; // Reference to the UI Image component to update.
+    [Tooltip("Do not use characters outside the basic ASCII Table.")]
+    [SerializeField] private string fileName = "Example.png"; // Name of the image file (with extension) to load.
+    [SerializeField] private bool useImage = true; // Flag to determine whether to use and update the Image component.
     [Space(5)]
-    [Tooltip("Do not use characters outside the basic ASCII Table")]
-    [SerializeField] private string fileName = "Example.png"; // The file name of the image to be loaded.
-    [Space(10)]
-    [Header("Automatic Information")]
-    [SerializeField] private string selectedFile; // Holds the path to the currently selected language file.
-    [Space(5)]
-    [SerializeField] private string saveFile; // Path to the saved language settings file.
-    [Space(5)]
-    [SerializeField] private string filePath; // Path where the image file is located.
+    public Image image; // Unity UI Image component to which the loaded sprite will be assigned.
+    public Texture2D imageTexture; // Holds the loaded texture data from disk.
+    public Sprite spriteTexture; // Sprite created from the loaded texture to be used by the Image component.
 
-    // Subscribes to the LanguageUpdate event and calls the LanguageUpdate method when the object is enabled.
+    private LanguageSettingsData languageData; // Holds the current language settings for determining the culture-specific path.
+    private string previousFilePath; // Stores the last loaded file path to prevent redundant reloads.
+    private string filePath; // Full file path to the localized image based on the selected language.
+
+    /// <summary>
+    /// Subscribes to the language update event and immediately updates the image when the object is enabled.
+    /// </summary>
     private void OnEnable()
     {
-        LanguageManagerDelegate.OnLanguageUpdate += LanguageUpdate;
-        LanguageUpdate(); // Call to update the language data immediately when enabled.
+        LanguageManagerDelegate.OnLanguageUpdate += LanguageUpdate; // Listen for language changes.
+        LanguageUpdate(); // Trigger image update immediately.
     }
 
-    // Unsubscribes from the LanguageUpdate event when the object is disabled.
-    private void OnDisable()
-    {
-        LanguageManagerDelegate.OnLanguageUpdate -= LanguageUpdate;
-    }
+    /// <summary>
+    /// Unsubscribes from the language update event when the object is disabled.
+    /// </summary>
+    private void OnDisable() => LanguageManagerDelegate.OnLanguageUpdate -= LanguageUpdate;
 
-    // Method that updates the image based on the current language settings.
+    /// <summary>
+    /// Updates the image based on the selected language.
+    /// Avoids reloading if the file path remains unchanged.
+    /// </summary>
     public void LanguageUpdate()
     {
-        // Check if the Image component is assigned.
-        if (image == null)
+        // Validate the Image component reference.
+        if (useImage && image == null)
         {
-            Debug.LogError("image is not assigned. Please assign an Image component.");
+            Debug.LogError("Image is not assigned. Please assign an Image component.", this);
             return;
         }
 
-        saveFile = LanguageFileManager.GetSaveFilePath(); // Load the file path where the save data is stored.
-
-        // Check if the save file exists, and if so, read the selected language file from it.
-        if (File.Exists(saveFile))
+        // Load current language settings to determine the selected culture.
+        languageData = LoadLanguageSettings();
+        if (languageData == null)
         {
-            string json = File.ReadAllText(saveFile);
-            var saveData = JsonUtility.FromJson<LanguageSaveData>(json);
-            selectedFile = saveData.selectedFile; // Store the selected language file.
-        }
-        else
-        {
-            selectedFile = LanguageFileManager.FindDefaultLanguageFilePath(); // If no save file is found, use the default language file.
+            Debug.LogError("LanguageImage: Failed to load LanguageSettingsData.", this);
+            return;
         }
 
-        // Construct the full file path for the image based on the selected language.
-        filePath = $"{LanguageFileManager.GetLanguageFilesFolderPath()}/{LanguageFileManager.GetLanguageTagFromFile(selectedFile)}/Image/{fileName}";
+        // Construct the absolute path to the localized image file.
+        filePath = Path.Combine(GetLanguageAssetsPath(), "Assets", languageData.selectedCulture, "Image", fileName);
 
-        // Check if the image file exists at the constructed file path.
+        // Prevent reloading if the image hasn't changed.
+        if (filePath == previousFilePath) return;
+        previousFilePath = filePath;
+
+        // Verify that the image file exists at the computed path.
         if (!File.Exists(filePath))
         {
-            Debug.LogError($"Image file not found at path: {filePath}");
+            Debug.LogError($"Image file not found at path: {filePath} (Culture: {languageData.selectedCulture})", this);
             return;
         }
 
-        StartCoroutine(LoadFile()); // Start a coroutine to load the image file asynchronously.
+        // Clean up previously loaded resources.
+        if (imageTexture != null) Destroy(imageTexture);
+        if (spriteTexture != null) Destroy(spriteTexture);
+
+        // Begin loading the image asynchronously.
+        StartCoroutine(LoadFileCoroutine());
     }
 
-    // Coroutine to load the image file asynchronously from disk using UnityWebRequest.
-    private IEnumerator LoadFile()
+    /// <summary>
+    /// Coroutine that asynchronously loads a texture from disk and applies it as a sprite to the Image component.
+    /// </summary>
+    private IEnumerator LoadFileCoroutine()
     {
-        // Create a UnityWebRequest to load the image file.
+        // Create a UnityWebRequest to load the texture from the file system.
         using UnityWebRequest request = UnityWebRequestTexture.GetTexture($"file://{filePath}");
+        yield return request.SendWebRequest();
 
-        yield return request.SendWebRequest(); // Wait until the web request is completed.
+        // Handle loading errors.
+        if (request.result != UnityWebRequest.Result.Success)
+        {
+            Debug.LogError($"Error loading image: {request.error}", this);
+            yield break;
+        }
 
-        // Check if the web request was successful.
-        if (request.result == UnityWebRequest.Result.Success)
-        {
-            // If successful, create a texture from the loaded data and assign it to the Image component.
-            Texture2D texture = DownloadHandlerTexture.GetContent(request);
-            image.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.one * 0.5f);
-        }
-        else
-        {
-            Debug.LogError($"Error loading image: {request.error}");
-        }
+        // Extract texture content from the request response.
+        imageTexture = DownloadHandlerTexture.GetContent(request);
+
+        // Create a new sprite from the texture.
+        spriteTexture = Sprite.Create(imageTexture, new Rect(0, 0, imageTexture.width, imageTexture.height), new Vector2(0.5f, 0.5f));
+
+        // Assign the sprite to the Image component if enabled.
+        if (useImage && imageTexture != null) image.sprite = spriteTexture;
     }
 }

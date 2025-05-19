@@ -5,6 +5,7 @@
  *              saving, modifying, and viewing content in TSV tables. Operations 
  *              such as adding and removing rows or columns, and setting or getting 
  *              text in specific cells are available through the Unity Editor.
+ *              
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------

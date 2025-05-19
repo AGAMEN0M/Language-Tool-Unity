@@ -5,6 +5,7 @@
  *              adding and removing rows or columns. The tables are represented as arrays of VerticalTable objects, 
  *              where each object contains a row of tab-separated values. The script also provides text conversion 
  *              functions to handle special tokens for formatting.
+ *              
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
@@ -30,10 +31,7 @@ namespace TSVTools
         /// <returns>The converted text.</returns>
         public static string ConvertText(string text)
         {
-            if (string.IsNullOrEmpty(text))
-            {
-                return string.Empty; // Handle null or empty text.
-            }
+            if (string.IsNullOrEmpty(text)) return string.Empty; // Handle null or empty text.
 
             // Check if text contains special tokens, replace them with actual characters.
             if (text.Contains("%tab%") || text.Contains("%newline%"))
@@ -91,7 +89,7 @@ namespace TSVTools
         }
 
         /// <summary>
-        /// Saves the given table to a TSV file.
+        /// Saves the given table to a TSV file, ensuring all rows have the same number of columns.
         /// </summary>
         /// <param name="filePath">The path to save the file to.</param>
         /// <param name="table">The table data to save.</param>
@@ -102,6 +100,28 @@ namespace TSVTools
             {
                 Debug.LogError("Table is empty or null.");
                 return;
+            }
+
+            // Find the maximum number of columns in any row.
+            int maxColumns = table.Max(row => row.horizontalTable?.Length ?? 0);
+
+            // Normalize all rows to have the same number of columns.
+            foreach (var row in table)
+            {
+                if (row.horizontalTable == null)
+                {
+                    row.horizontalTable = new string[maxColumns];
+                }
+                else if (row.horizontalTable.Length < maxColumns)
+                {
+                    var extendedRow = new string[maxColumns];
+                    row.horizontalTable.CopyTo(extendedRow, 0); // Copy existing data.
+                    for (int i = row.horizontalTable.Length; i < maxColumns; i++)
+                    {
+                        extendedRow[i] = string.Empty; // Fill missing cells with empty string.
+                    }
+                    row.horizontalTable = extendedRow;
+                }
             }
 
             // Convert each row of the table into a string with tab-separated values.
@@ -165,11 +185,7 @@ namespace TSVTools
             table[columnVertical].horizontalTable[columnHorizontal] = text;
         }
 
-        public enum LineDirection
-        {
-            Vertical,
-            Horizontal
-        }
+        public enum LineDirection { Vertical, Horizontal }
 
         /// <summary>
         /// Adds a new line to the table, either vertically (row) or horizontally (column).

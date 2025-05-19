@@ -1,249 +1,349 @@
 /*
  * ---------------------------------------------------------------------------
- * Description: This script manages the loading and saving of language settings 
- *              for the application. It provides methods for retrieving localized strings, 
- *              handling file paths, and extracting content from language files.
+ * Description: Manages loading, saving, and parsing of language data in the application.
+ *              Handles localization files, user preferences, and extraction of translated strings.
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
 */
 
+using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using TSVTools;
+
+using static TSVTools.TabTableUtility;
+using System.Linq;
 
 namespace LanguageTools
 {
     public class LanguageFileManager
     {
-        // This method attempts to load the LanguageSettingsData resource from the Resources folder.
-        // If the resource is not found, it logs an error and returns null.
+        private static LanguageSettingsData cachedLanguageData = null; // Stores the loaded language settings.
+        private static readonly string CultureCodeKey = "SelectedCulture"; // Key for storing the culture code in PlayerPrefs.
+        private static string assetsPath = null; // Cached path to the folder containing language assets.
+
+        /// <summary>
+        /// Loads the language settings from the Resources folder and caches them for future use.
+        /// </summary>
+        /// <returns>The loaded <see cref="LanguageSettingsData"/> object or null if loading fails.</returns>
         public static LanguageSettingsData LoadLanguageSettings()
         {
-            // Attempt to load the LanguageSettingsData from the Resources folder.
+            // Return cached data if already loaded.
+            if (cachedLanguageData != null) return cachedLanguageData;
+
+            // Attempt to load the LanguageSettingsData asset from Resources.
             var languageData = Resources.Load<LanguageSettingsData>("Language Data");
             if (languageData == null)
             {
                 Debug.LogError("Failed to load LanguageSettingsData from Resources. Ensure the resource exists and is named correctly.");
-                return null; // Return null if loading failed.
+                return null;
             }
 
-            return languageData; // Return the loaded LanguageSettingsData.
+            // Cache and return the loaded data.
+            cachedLanguageData = languageData;
+            return languageData;
         }
 
-        // This method retrieves the save file path for the language settings.
-        // The path differs depending on whether the game is running in the Unity Editor or in a build.
-        public static string GetSaveFilePath()
+        /// <summary>
+        /// Retrieves the currently saved or default culture code from PlayerPrefs.
+        /// </summary>
+        /// <returns>The culture code string, or null if loading fails.</returns>
+        public static string GetSaveCultureCode()
         {
-            // Load language settings to get the save file name.
             var languageData = LoadLanguageSettings();
             if (languageData == null)
             {
-                Debug.LogError("Failed to load LanguageSettingsData");
-                return ""; // Return an empty string if there is no valid data.
+                Debug.LogError("Failed to load LanguageSettingsData.");
+                return null;
             }
 
-            string saveFile = "";
-        #if UNITY_EDITOR
-            // In the Unity Editor, the save file is located in the Assets folder.
-            saveFile = $"{Application.dataPath}/{languageData.saveNameInUnity}.json";
-        #else
-            // In a build, the save file is located in the Application's data path.
-            saveFile = $"{Application.dataPath}/{languageData.saveNameInUnity}.json";
-        #endif
+            var cultureCode = languageData.defaultLanguage; // Start with the default language.
 
-            return saveFile; // Return the constructed file path.
+            // Check if a value was saved previously.
+            if (PlayerPrefs.HasKey(CultureCodeKey)) cultureCode = PlayerPrefs.GetString(CultureCodeKey);
+
+            // Update the runtime-selected culture.
+            languageData.selectedCulture = cultureCode;
+            return cultureCode;
         }
 
-        // This method returns the folder path where the language files are stored.
-        // The folder name is specified in the LanguageSettingsData.
-        public static string GetLanguageFilesFolderPath()
+        /// <summary>
+        /// Saves the selected culture code to PlayerPrefs and updates the language settings object.
+        /// </summary>
+        /// <param name="newCode">The culture code to be saved.</param>
+        public static void SetSaveCultureCode(string newCode)
         {
-            // Load language settings to get the folder name.
+            var languageData = LoadLanguageSettings();
+            if (languageData != null) languageData.selectedCulture = newCode;
+
+            // Store and persist the new culture code.
+            PlayerPrefs.SetString(CultureCodeKey, newCode);
+            PlayerPrefs.Save();
+        }
+
+        /// <summary>
+        /// Gets the full path to the folder where language files are stored.
+        /// </summary>
+        /// <returns>The language asset folder path, or null if loading fails.</returns>
+        public static string GetLanguageAssetsPath()
+        {
+            if (!string.IsNullOrEmpty(assetsPath)) return assetsPath; // Return cached path if available.
+
             var languageData = LoadLanguageSettings();
             if (languageData == null)
             {
-                Debug.LogError("Failed to load LanguageSettingsData");
-                return ""; // Return an empty string if there is no valid data.
+                Debug.LogError("Failed to load LanguageSettingsData.");
+                return null;
             }
 
-            // Return the constructed folder path for language files.
-            return $"{Application.streamingAssetsPath}/{languageData.folderName}";
+            assetsPath = $"{Application.streamingAssetsPath}/{languageData.folderName}"; // Construct the full path.
+            if (!Directory.Exists(assetsPath)) Directory.CreateDirectory(assetsPath); // Ensure the directory exists.
+
+            return assetsPath;
         }
 
-        // This method finds the default language file path based on the default language setting.
-        public static string FindDefaultLanguageFilePath()
+        /// <summary>
+        /// Determines the number of rows and columns in a vertical table structure.
+        /// </summary>
+        /// <param name="table">The vertical table to measure.</param>
+        /// <param name="rowCount">The output number of rows.</param>
+        /// <param name="columnCount">The output number of columns.</param>
+        public static void RowAndColumnCounter(VerticalTable[] table, out int rowCount, out int columnCount)
         {
-            string defaultLanguage = LoadLanguageSettings().defaultLanguage; // Retrieve the default language from the settings.
-            string[] files = Directory.GetFiles(GetLanguageFilesFolderPath(), "*.txt"); // Get all language files with the ".txt" extension.
-
-            // Loop through each file to find the one with the matching default language.
-            foreach (string filePath in files)
+            if (table != null && table.Length > 0)
             {
-                string[] lines = File.ReadAllLines(filePath);
-                if (lines.Length > 1)
-                {
-                    // If the second line matches the default language, return the file path.
-                    if (lines[1] == defaultLanguage) return filePath;
-                }
-            }
-
-            return ""; // Return an empty string if no matching file is found.
-        }
-
-        // This method finds a line by ID in a language file.
-        public static string FindLineByID(string filePath, int iD)
-        {
-            string[] lines = File.ReadAllLines(filePath); // Read all lines from the specified file.
-
-            // Iterate through each line to search for the ID.
-            foreach (string line in lines)
-            {
-                if (line.StartsWith("id:"))
-                {
-                    // Split the line into parts and extract the ID.
-                    string[] parts = line.Split(';');
-                    float id = float.Parse(parts[0].Replace("id:", ""));
-
-                    if (iD == id) return line; // If the current line's ID matches the provided ID, return the line.
-                }
-            }
-
-            return "ID not found"; // Return this if no matching ID is found.
-        }
-
-        // This method finds a canvas by its ID in a language file.
-        public static string FindCanvasByID(string filePath, int canvasID)
-        {
-            string[] lines = File.ReadAllLines(filePath); // Read all lines from the specified file.
-
-            // Iterate through the lines to search for the canvas ID.
-            foreach (string line in lines)
-            {
-                if (line.StartsWith("canvasID:"))
-                {
-                    // Extract the canvas ID and compare it with the provided ID.
-                    string[] parts = line.Split(';');
-                    float id = float.Parse(parts[0].Replace("canvasID:", ""));
-
-                    // If the current line's canvas ID matches, return the remaining content.
-                    if (canvasID == id) return line.Replace(parts[0] + ";", "");
-                }
-            }
-
-            return "CanvasID not found"; // Return this if no matching canvas ID is found.
-        }
-
-        // This method retrieves the localized line by ID from a save file or the default file.
-        public static string GetLocalizedLineByID(int iD, string saveFile, ref string selectedFile)
-        {
-            string line;
-
-            // Check if the save file exists.
-            if (File.Exists(saveFile))
-            {
-                // Read the save file and deserialize it to get the selected language file.
-                string json = File.ReadAllText(saveFile);
-                var saveData = JsonUtility.FromJson<LanguageSaveData>(json);
-                selectedFile = saveData.selectedFile;
-
-                line = FindLineByID(selectedFile, iD); // Find the line by ID in the selected file.
+                rowCount = table.Length;
+                columnCount = table[0].horizontalTable?.Length ?? 0;
             }
             else
             {
-                // If no save file exists, use the default language file.
-                string defaultFile = FindDefaultLanguageFilePath();
-                selectedFile = defaultFile;
-                line = FindLineByID(defaultFile, iD);
+                rowCount = 0;
+                columnCount = 0;
             }
-
-            return line; // Return the found line.
         }
 
-        // This method retrieves the localized JSON content for a canvas by its ID.
-        public static string GetLocalizedJsonByID(int canvasID, string saveFile, ref string selectedFile)
+        /// <summary>
+        /// Parses the LanguageData.tsv file and populates available languages in the settings.
+        /// </summary>
+        public static void GetAvailableLanguages()
         {
-            string jsonLine;
+            var languageData = LoadLanguageSettings();
+            var assetsPath = GetLanguageAssetsPath();
 
-            // Check if the save file exists.
-            if (File.Exists(saveFile))
+            if (languageData == null || string.IsNullOrEmpty(assetsPath))
             {
-                // Read the save file and deserialize it to get the selected language file.
-                string json = File.ReadAllText(saveFile);
-                var saveData = JsonUtility.FromJson<LanguageSaveData>(json);
-                selectedFile = saveData.selectedFile;
-
-                // Find the canvas content by ID in the selected file.
-                jsonLine = FindCanvasByID(selectedFile, canvasID);
-            }
-            else
-            {
-                // If no save file exists, use the default language file.
-                string defaultFile = FindDefaultLanguageFilePath();
-                selectedFile = defaultFile;
-                jsonLine = FindCanvasByID(defaultFile, canvasID);
+                Debug.LogError("Language settings or assets path could not be loaded.");
+                return;
             }
 
-            return jsonLine;
-        }
+            // Load the table file from disk.
+            var TSVfile = $"{assetsPath}/LanguageData.tsv";
+            VerticalTable[] table = null;
+            LoadTableFile(TSVfile, ref table);
 
-        // This method extracts text enclosed in curly braces from the input string.
-        public static string ExtractTextBetweenBraces(string input)
-        {
-            int startIndex = input.IndexOf("{");
-            int endIndex = input.LastIndexOf("}");
-
-            if (startIndex >= 0 && endIndex > startIndex)
+            if (table == null || table.Length == 0)
             {
-                // Extract and return the text between the braces.
-                string textInsideBraces = input.Substring(startIndex + 1, endIndex - startIndex - 1);
-                return textInsideBraces;
+                Debug.LogWarning("Table is empty or not loaded. Please load a TSV file first.");
+                return;
             }
 
-            return ""; // Return an empty string if no valid braces are found.
-        }
-
-        // This method removes the text enclosed in curly braces from the input string.
-        public static string RemoveTextBetweenBraces(string input)
-        {
-            int startIndex = input.IndexOf("{");
-            int endIndex = input.LastIndexOf("}");
-
-            if (startIndex >= 0 && endIndex > startIndex)
+            // Get the dimensions of the table.
+            RowAndColumnCounter(table, out int rowCount, out int columnCount);
+            if (rowCount < 3 || columnCount < 3)
             {
-                // Remove the text between the braces (including the braces themselves).
-                return input.Remove(startIndex, endIndex - startIndex + 1);
+                Debug.LogWarning("The table does not have enough columns to extract the expected data.");
+                return;
             }
 
-            return input; // Return the input string as-is if no braces are found.
-        }
-
-        // This method extracts an integer value from a string based on a given identifier.
-        public static int ExtractIntValue(string line, string identifier)
-        {
-            int startIndex = line.IndexOf(identifier);
-            if (startIndex >= 0)
+            // Initialize the available languages list.
+            languageData.availableLanguages = new();
+            for (int col = 0; col < columnCount; col++)
             {
-                int semicolonIndex = line.IndexOf(";", startIndex);
-                if (semicolonIndex >= 0)
+                if (col == 0 || col == 1) continue; // Skip ID and label columns.
+
+                // Extract values from the current column.
+                var culture = GetText(table, 0, col);
+                var name = GetText(table, 1, col);
+                var isAvailableText = GetText(table, 2, col);
+                bool isAvailable = bool.TryParse(isAvailableText, out bool result) && result;
+
+                if (isAvailable)
                 {
-                    // Extract the value string and convert it to an integer.
-                    string valueString = line.Substring(startIndex + identifier.Length, semicolonIndex - startIndex - identifier.Length);
-                    if (int.TryParse(valueString, out int value)) return value; // Return the extracted value.
+                    // Add valid available language.
+                    languageData.availableLanguages.Add(new()
+                    {
+                        culture = culture,
+                        name = name,
+                        isAvailable = true,
+                        columnIndex = col
+                    });
+                }
+            }
+        }
+
+        /// <summary>
+        /// Extracts a list of localized ID data from a given table and culture code.
+        /// </summary>
+        /// <param name="table">The TSV table to parse.</param>
+        /// <param name="languages">The list of available languages.</param>
+        /// <param name="cultureCode">The culture code to extract data for.</param>
+        /// <returns>A list of <see cref="IdData"/> objects, or null if extraction fails.</returns>
+        public static List<IdData> ExtractIDs(VerticalTable[] table, List<LanguageAvailable> languages, string cultureCode)
+        {
+            if (table == null || table.Length == 0)
+            {
+                Debug.LogWarning("Table is empty or not loaded. Please load a TSV file first.");
+                return null;
+            }
+
+            // Get dimensions.
+            RowAndColumnCounter(table, out int rowCount, out int columnCount);
+            if (rowCount < 4 || columnCount < 2)
+            {
+                Debug.LogWarning("The table does not have enough data to extract IDs.");
+                return null;
+            }
+
+            // Find the correct column for the selected culture.
+            int columnIndex = languages.FirstOrDefault(lang => lang.culture == cultureCode)?.columnIndex ?? -1;
+            if (columnIndex == -1)
+            {
+                Debug.LogWarning($"Selected culture '{cultureCode}' not found in the table.");
+                return null;
+            }
+
+            // Extract ID and corresponding localized text.
+            List<IdData> ids = new();
+            for (int row = 3; row < rowCount; row++)
+            {
+                var idText = GetText(table, row, 1);
+                var text = GetText(table, row, columnIndex);
+
+                if (int.TryParse(idText, out int id))
+                {
+                    ids.Add(new() { iD = id, text = text });
+                }
+                else
+                {
+                    Debug.LogWarning($"Invalid ID value at row {row}: '{idText}'");
                 }
             }
 
-            return 0; // Return 0 if the identifier is not found or conversion fails.
+            return ids;
         }
 
-        // This method retrieves the language tag from a specified file.
-        public static string GetLanguageTagFromFile(string filePath)
+        /// <summary>
+        /// Loads and parses all localization-related TSV files into the language settings structure.
+        /// </summary>
+        public static void GetAllData()
         {
-            string[] lines = File.ReadAllLines(filePath); // Read all lines from the file.
-            if (lines.Length > 1) return lines[1]; // If there are sufficient lines, return the language tag from the second line.
+            var languageData = LoadLanguageSettings();
+            var assetsPath = GetLanguageAssetsPath();
 
-            // Log a warning if the file content is insufficient and return the default language.
-            Debug.LogWarning("Extract Language Name: Insufficient Content in the File");
-            return LoadLanguageSettings().defaultLanguage;
+            if (languageData == null || string.IsNullOrEmpty(assetsPath))
+            {
+                Debug.LogError("Language settings or assets path could not be loaded.");
+                return;
+            }
+
+            // Define paths to TSV files.
+            var TSVlanguage = $"{assetsPath}/LanguageData.tsv";
+            var TSVmeta = $"{assetsPath}/MetaData.tsv";
+            var TSVcanvas = $"{assetsPath}/CanvasData.tsv";
+
+            // Verify file existence.
+            bool allFilesExist = true;
+            if (!File.Exists(TSVlanguage)) { Debug.LogError("The file 'LanguageData.tsv' was not found."); allFilesExist = false; }
+            if (!File.Exists(TSVmeta)) { Debug.LogError("The file 'MetaData.tsv' was not found."); allFilesExist = false; }
+            if (!File.Exists(TSVcanvas)) { Debug.LogError("The file 'CanvasData.tsv' was not found."); allFilesExist = false; }
+
+            if (!allFilesExist) return;
+
+            // Load all three tables.
+            VerticalTable[] tableLanguage = null, tableMeta = null, tableCanvas = null;
+            LoadTableFile(TSVlanguage, ref tableLanguage);
+            LoadTableFile(TSVmeta, ref tableMeta);
+            LoadTableFile(TSVcanvas, ref tableCanvas);
+
+            var al = languageData.availableLanguages;
+            string code = languageData.selectedCulture;
+
+            // Fallback to default language if selected language is missing.
+            if (!al.Any(lang => lang.culture == code))
+            {
+                languageData.selectedCulture = languageData.defaultLanguage;
+                code = languageData.defaultLanguage;
+                LanguageManagerDelegate.NotifyLanguageUpdate();
+            }
+
+            // Populate localization data.
+            languageData.idData = ExtractIDs(tableLanguage, al, code);
+            var idMetaData = ExtractIDs(tableMeta, al, code);
+            languageData.idCanvasData = ExtractIDs(tableCanvas, al, code);
+
+            // Parse metadata JSON strings into structured objects.
+            List<IdMetaData> metaData = new();
+            foreach (var id in idMetaData)
+            {
+                try
+                {
+                    var dataJson = JsonUtility.FromJson<IdMetaData>(id.text);
+                    metaData.Add(new()
+                    {
+                        iD = id.iD,
+                        alignment = dataJson.alignment,
+                        fontSize = dataJson.fontSize,
+                        fontListIndex = dataJson.fontListIndex,
+                        componentType = dataJson.componentType
+                    });
+                }
+                catch
+                {
+                    Debug.LogWarning($"Failed to parse JSON for ID {id.iD}");
+                    metaData.Add(new() { iD = id.iD });
+                }
+            }
+
+            languageData.idMetaData = metaData; // Assign parsed metadata.
+        }
+
+        /// <summary>
+        /// Retrieves the localized string for a given ID from the list.
+        /// </summary>
+        /// <param name="ids">The list of ID data to search.</param>
+        /// <param name="id">The ID to find.</param>
+        /// <returns>The localized text or null if not found.</returns>
+        public static string GetIDText(List<IdData> ids, int id)
+        {
+            // Ensure the list is populated.
+            if (ids.Count == 0)
+            {
+                Debug.LogWarning("No IDs available. Ensure you've extracted IDs before calling this method.");
+                return null;
+            }
+
+            // Find and return the text for the given ID.
+            return ids.Find(data => data.iD == id)?.text;
+        }
+
+        /// <summary>
+        /// Retrieves the metadata for a given ID.
+        /// </summary>
+        /// <param name="ids">The list of metadata to search.</param>
+        /// <param name="id">The ID to find.</param>
+        /// <returns>The associated <see cref="IdMetaData"/> or null if not found.</returns>
+        public static IdMetaData GetIDMeta(List<IdMetaData> ids, int id)
+        {
+            // Ensure the list is populated.
+            if (ids.Count == 0)
+            {
+                Debug.LogWarning("No IDs available. Ensure you've extracted IDs before calling this method.");
+                return null;
+            }
+
+            // Find and return metadata for the given ID.
+            return ids.Find(data => data.iD == id);
         }
     }
 }

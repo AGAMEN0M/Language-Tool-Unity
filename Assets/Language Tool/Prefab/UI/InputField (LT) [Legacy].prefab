@@ -172,9 +172,9 @@ GameObject:
   - component: {fileID: 7894742106896144551}
   - component: {fileID: 6475613984236598456}
   m_Layer: 5
-  m_Name: InputField (LT) [Legacy]
+  m_Name: 'InputField (LT) [Legacy]'
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 2800000, guid: e85b6884d4e304d49bf9743825fc20c3, type: 3}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -318,6 +318,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   inputField: {fileID: 7894742106896144551}
+  translateText: 1
   iD: -6
-  selectedFile: 
-  saveFile: 

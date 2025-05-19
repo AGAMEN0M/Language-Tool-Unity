@@ -1,9 +1,9 @@
 /*
  * ---------------------------------------------------------------------------
- * Description: This script provides the editor window for managing language 
- *              files and components in Unity. It allows users to save, load, and organize 
- *              language files, and provides tools to handle language-related UI components 
- *              and canvas data.
+ * Description: Editor window for managing language files and UI components in Unity.
+ *              Allows saving, loading, and organizing language files,
+ *              with tools to handle language components and canvas data.
+ *              
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
@@ -12,325 +12,371 @@
 #if UNITY_EDITOR
 using System.Collections.Generic;
 using System.Globalization;
-using LanguageTools.Editor;
+using System.Linq;
 using LanguageTools;
 using UnityEditor;
 using UnityEngine;
-using System.Linq;
-using System.Text;
+using TSVTools;
 using System.IO;
 using System;
 
+using static LanguageTools.Editor.LanguageEditorUtilities;
+using static LanguageTools.LanguageFileManager;
+using static TSVTools.TabTableUtility;
+using static UnityEditor.EditorGUILayout;
+
 public class LanguageFileManagerWindow : EditorWindow
 {
-    public string fileName = "ENGLISH"; // The name of the language file.
-    public string computerLanguage = "English"; // The selected language on the computer.
+    public string languageForEditing = "en"; // The language currently selected for editing in the dropdown.
 
-    public List<LanguageComponentSave> componentSave = new(); // List of language components to save.
-    public List<CanvasSave> canvasSave = new(); // List of canvas components to save.
+    public List<LanguageForEditingSave> componentSave = new(); // List of saved language component data used for localization.
+    public List<CanvasForEditingSave> canvasSave = new(); // List of saved canvas component data for UI elements.
 
-    public Vector2 scrollPosition = Vector2.zero; // Used for handling scroll position in the GUI.
-    public bool firstTime = false; // Flag to determine if it's the first time opening the window.
-    public int idIndex; // Stores the current selected ID.
+    public List<LanguageAvailable> availableLanguages = new(); // List of languages that are available and detected from disk.
 
-    private const string fileData = "ProjectSettings/LanguageFileData.json"; // Path to the saved JSON data file.
-    private string saveFilePath; // Path to the language file folder.
+    public Vector2 scrollPosition = Vector2.zero; // Current scroll position for the window’s scroll view.
+    public bool firstTime = false; // Whether the window is being initialized for the first time.
+    public int idIndex; // Current index of the ID being edited or searched.
+    public bool showTextData = true; // Whether text component data should be displayed in the editor window.
+    public bool showCanvasData = true; // Whether canvas component data should be displayed in the editor window.
+    public bool fileIsSaved = true; // Tracks whether the current data state has been saved to disk.
 
-    private SerializedObject serializedObject; // Serialized object to track changes in the GUI.
-    private List<int> duplicateID = new(); // List of duplicate component IDs.
-    private List<int> canvasID = new(); // List of duplicate canvas IDs.
+    private const string fileData = "ProjectSettings/LanguageFileData.json"; // Path to the local file for storing language editing state.
+    private string assetsPath; // Root directory path for language TSV files.
+    private string canvasDataFile; // Full path to the canvas data TSV file.
+    private string languageDataFile; // Full path to the language data TSV file.
+    private string metaDataFile; // Full path to the metadata TSV file.
 
-    private string[] cultureNames; // Array of culture names for language selection.
-    private CultureInfo[] cultures; // Array of CultureInfo objects.
-    private int selectedCultureIndex; // Stores the currently selected culture index.
+    private SerializedObject serializedObject; // Serialized representation of this EditorWindow for Unity’s property drawer system.
+    private List<int> duplicateID = new(); // List of duplicate IDs found in the language components.
+    private List<int> canvasID = new(); // List of duplicate canvas IDs found in the canvas components.
 
-    // Adds a menu item to open the Language File Manager window.
-    [MenuItem("Window/Language/Language File Manager")]
+    private string[] cultureNames; // Display names of available cultures.
+    private CultureInfo[] cultures; // Array of all CultureInfo supported by .NET.
+    private int selectedCultureIndex; // Index of the currently selected culture in the dropdown.
+
+    private Texture2D trashImage; // Cached trash icon used in UI for delete buttons.
+
+    /// <summary>
+    /// Adds a menu item to open the Language File Manager editor window.
+    /// </summary>
+    [MenuItem("Window/Language/Language File Manager", false, 2029)]
     public static void ShowEditorWindow()
     {
-        var window = GetWindow<LanguageFileManagerWindow>("Language File Manager"); // Opens the window.
-        window.titleContent = new GUIContent("Language File Manager", LanguageEditorUtilities.FindTextureByName("LanguageFileManagerWindow Icon"));
+        var window = GetWindow<LanguageFileManagerWindow>("Language File Manager");
+        window.titleContent = new GUIContent("Language File Manager", FindTextureByName("LanguageFileManagerWindow Icon"));
     }
 
-    // Called when the window is enabled.
+    /// <summary>
+    /// Initializes the editor window when enabled.
+    /// </summary>
     private void OnEnable()
     {
-        Undo.undoRedoPerformed += OnUndoRedo; // Subscribes to undo/redo actions.
-        serializedObject = new SerializedObject(this); // Creates a serialized object for this window.
+        Undo.undoRedoPerformed += OnUndoRedo;
 
-        cultures = CultureInfo.GetCultures(CultureTypes.AllCultures); // Loads all available cultures.
-        cultureNames = new string[cultures.Length]; // Initializes the culture name array.
+        // Create a SerializedObject to allow Unity to serialize fields properly in the inspector.
+        serializedObject = new SerializedObject(this);
 
-        for (int i = 0; i < cultures.Length; i++) // Fills culture names array with display names.
-        {
-            cultureNames[i] = cultures[i].DisplayName;
-        }
+        // Get all cultures supported by .NET and their display names for the dropdown list.
+        cultures = CultureInfo.GetCultures(CultureTypes.AllCultures);
+        cultureNames = cultures.Select(c => c.DisplayName).ToArray();
 
-        saveFilePath = LanguageFileManager.GetLanguageFilesFolderPath(); // Gets the save file path for language files.
+        // Load trash icon used in UI for removing items.
+        trashImage = FindTextureByName("Trash Icon");
+
+        // Initialize file paths for language assets.
+        assetsPath = GetLanguageAssetsPath();
+        canvasDataFile = $"{assetsPath}/CanvasData.tsv";
+        languageDataFile = $"{assetsPath}/LanguageData.tsv";
+        metaDataFile = $"{assetsPath}/MetaData.tsv";
+
+        // Ensure all files exist and are valid; create default data if necessary.
+        if (IsInvalidTSV(canvasDataFile)) SaveTableFile(canvasDataFile, CreateLanguageDataBase());
+        if (IsInvalidTSV(languageDataFile)) SaveTableFile(languageDataFile, CreateLanguageDataBase());
+        if (IsInvalidTSV(metaDataFile)) SaveTableFile(metaDataFile, CreateLanguageDataBase());
     }
 
-    // Called when the window is destroyed.
+    /// <summary>
+    /// Cleans up event subscriptions and saves data when the window is destroyed.
+    /// </summary>
     private void OnDestroy()
     {
-        Undo.undoRedoPerformed -= OnUndoRedo; // Unsubscribes from undo/redo actions.
-        SaveDataJson(); // Saves data when the window is closed.
+        Undo.undoRedoPerformed -= OnUndoRedo;
+        SaveDataJson();
     }
 
-    // Repaints the window on undo/redo actions.
-    private void OnUndoRedo()
-    {
-        Repaint();
-    }
+    /// <summary>Repaints the window when an undo or redo action occurs.</summary>
+    private void OnUndoRedo() => Repaint();
 
-    // Main GUI method that draws the interface elements.
+    /// <summary>
+    /// Draws the main GUI elements of the editor window.
+    /// </summary>
     private void OnGUI()
     {
-        FindDuplicateIds(); // Checks for duplicate IDs.
+        FindDuplicateIds(); // Check for and highlight duplicate IDs in the saved data.
 
-        if (firstTime == false) // Loads default data if this is the first time opening the window.
+        // Initialize data only once when the window is first opened.
+        if (!firstTime)
         {
-            LanguageEditorUtilities.AddDefaultLanguageComponents(ref componentSave, ref canvasSave); // Adds default language components.
-            LoadDataJson(); // Loads saved data from JSON.
-            firstTime = true;
+            // Add any missing default language components.
+            AddDefaultLanguageComponents(ref componentSave, ref canvasSave);
+            LoadDataJson(); // Load any previously saved component data from JSON file.
+            firstTime = true; // Prevent this block from running again.
         }
 
-        serializedObject.Update(); // Updates the serialized object to track changes in the GUI.
-        scrollPosition = GUILayout.BeginScrollView(scrollPosition); // Begin scrollable area.
+        serializedObject.Update(); // Begin update for serialized fields.
+        scrollPosition = GUILayout.BeginScrollView(scrollPosition); // Begin scrollable view for editor window content.
 
-        EditorGUILayout.Space(10);
-        DrawActionButtons(); // Draws action buttons (e.g., save/load).
-        EditorGUILayout.Space(10);
+        // Draw title for editor settings.
+        LabelField("Editor Settings", CreateLabelStyle(15, true));
+        Space(10);
+        DrawActionButtons(); // Draw buttons for common editor actions (save, load, open folder, etc.).
+        Space(20);
+        DrawLanguageDropdown(); // Draw dropdown to select the editing language.
+        Space(20);
 
-        EditorGUILayout.LabelField("Language File Editor Settings", LanguageEditorUtilities.CreateLabelStyle(15, true)); // Section title.
-        EditorGUILayout.Space(10);
-
-        string previousFileName = fileName; // Cache the previous file name.
-        previousFileName = LanguageEditorUtilities.DrawLabeledTextField("File Name:", previousFileName, 130, 150); // Draws a text field for the file name.
-        if (fileName != previousFileName) // If the file name changed.
+        // If there is any component data, show the ID display panel inside a colored box.
+        if (componentSave.Count > 0)
         {
-            Undo.RecordObject(this, "Change File Name"); // Records the change for undo.
-            fileName = previousFileName; // Updates the file name.
-            EditorUtility.SetDirty(this); // Marks the object as dirty (unsaved changes).
-        }
-
-        DrawLanguageDropdown();
-        EditorGUILayout.Space(20); // Draws the language selection dropdown.
-
-        if (componentSave.Count > 0) // If there are saved components, display them.
-        {
-            LanguageEditorUtilities.DrawColoredBox(() =>
+            DrawColoredBox(() =>
             {
-                EditorGUILayout.Space(10);
-                DrawIdDisplayPanel(); // Draws the ID panel.
-                EditorGUILayout.Space(10);
-            }, new Color(0, 0, 0, 0.15f)); // Adds a slightly transparent box around the ID panel.
+                Space(10);
+                DrawIdDisplayPanel();
+                Space(10);
+            }, new Color(0, 0, 0, 0.15f)); // Semi-transparent black.
         }
 
-        EditorGUILayout.Space(25);
-        EditorGUILayout.LabelField("Feature Lists", LanguageEditorUtilities.CreateLabelStyle(15, true)); // Section for component and canvas lists.
-        EditorGUILayout.Space(10);
+        // Draw title for feature lists.
+        Space(25);
+        LabelField("Feature Lists", CreateLabelStyle(15, true));
+        Space(5);
 
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("componentSave"), true, GUILayout.Width(550)); // Displays the component save list.
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("canvasSave"), true, GUILayout.Width(550)); // Displays the canvas save list.
+        // Toggle checkboxes to show/hide Text or Canvas data.
+        BeginHorizontal();
+        Space(60);
+        showTextData = ToggleLeft("Show Text Component Data", showTextData);
+        Space(10);
+        showCanvasData = ToggleLeft("Show Canvas Component Data", showCanvasData);
+        GUILayout.FlexibleSpace();
+        EndHorizontal();
 
-        GUILayout.EndScrollView(); // Ends the scrollable area.
-        serializedObject.ApplyModifiedProperties(); // Applies any changes made to the serialized object.
+        Space(-30); // Adjust spacing before showing property lists.
+
+        // Show serialized property list of text components if enabled.
+        if (showTextData) PropertyField(serializedObject.FindProperty("componentSave"), true, GUILayout.Width(550));
+
+        // Show serialized property list of canvas components if enabled.
+        if (showCanvasData) PropertyField(serializedObject.FindProperty("canvasSave"), true, GUILayout.Width(550));
+
+        GUILayout.EndScrollView(); // End scroll view for the editor layout.
+
+        serializedObject.ApplyModifiedProperties(); // Apply any modified properties in the serialized object.
     }
 
-    // Draws buttons for actions like saving, loading, and opening the folder.
+    /// <summary>
+    /// Draws buttons for saving, loading, opening folder, rebuilding canvas, organizing items, and Search by ID.
+    /// </summary>
     private void DrawActionButtons()
     {
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.Space(20);
-        DrawButton("Open Folder", () => Application.OpenURL(saveFilePath)); // Opens the save folder.
-        EditorGUILayout.Space(10);
-        DrawButton("Save File", () => SaveLanguageFile()); // Saves the language file.
-        EditorGUILayout.Space(10);
-        DrawButton("Load File", () => LoadLanguageFile()); // Loads a language file.
+        BeginHorizontal();
+        Space(20);
+        DrawButton("Open Folder", () => Application.OpenURL(assetsPath)); // Button to open the folder containing the TSV files.
+        Space(10);
+        GUI.backgroundColor = fileIsSaved ? Color.white : Color.yellow; // Highlight the Save button if there are unsaved changes.
+        DrawButton("Save File", SaveLanguageFile); // Button to save current language and canvas data to file.
+        GUI.backgroundColor = Color.white; // Reset background color after drawing Save button.
+        Space(10);
+        DrawButton("Load File", LoadLanguageFile); // Button to load language and canvas data from file.
         GUILayout.FlexibleSpace();
-        EditorGUILayout.EndHorizontal();
+        EndHorizontal();
 
-        EditorGUILayout.Space(5);
+        Space(5);
 
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.Space(20);
-        DrawButton("Create Excel Table", () => LanguageExcelConverterWindow.ShowEditorWindow()); // Opens the Excel converter window.
-        EditorGUILayout.Space(10);
-        DrawButton("Load Excel Table", () => LoadExcelCsv()); // Loads data from a CSV file.
-        EditorGUILayout.Space(10);
-        DrawButton("Rebuild Canvas", () => {
-            GameObject rebuildCanvas = new("[Rebuild Canvas]"); // Creates a new GameObject to rebuild the canvas.
-            Undo.RegisterCreatedObjectUndo(rebuildCanvas, "Create Rebuild Canvas"); // Registers the action for undo.
-            Undo.AddComponent<RebuildCanvas>(rebuildCanvas); // Adds the RebuildCanvas component to the GameObject.
-        });
-        GUILayout.FlexibleSpace();
-        EditorGUILayout.EndHorizontal();
-
-        EditorGUILayout.Space(5);
-
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.Space(20);
-        DrawButton("Organize All Items", () => {
-            Undo.RecordObject(this, "Organize All Items"); // Records the action for undo.
-            CompareID(); // Organizes the component and canvas IDs.
-            EditorUtility.SetDirty(this); // Marks the object as dirty (unsaved changes).
-        });
-        EditorGUILayout.Space(10);
-        DrawButton("Remove ID", () => {
-            Undo.RecordObject(this, "Remove ID"); // Records the action for undo.
-            var itemToRemove = componentSave.FirstOrDefault(cs => cs.iD == idIndex); // Finds the component with the selected ID.
-
-            if (itemToRemove != null) // If a component with the ID exists, ask for confirmation to remove it.
-            {
-                if (EditorUtility.DisplayDialog("Remove ID?", $"Do you really want to remove the ID '{idIndex}'?", "Yes", "No"))
-                {
-                    componentSave.Remove(itemToRemove); // Removes the component.
-                    EditorUtility.SetDirty(this); // Marks the object as dirty.
-
-                    if (componentSave.Count > 0) // If there are still components left, update the ID index.
-                    {
-                        idIndex = componentSave.Select(cs => cs.iD).OrderBy(id => Math.Abs(id - idIndex)).FirstOrDefault();
-                    }
-                    else
-                    {
-                        idIndex = 0; // Resets the ID index if no components remain.
-                    }
-                }
-            }
-            else
-            {
-                EditorUtility.DisplayDialog("ID not found", $"There is no component with ID '{idIndex}' to remove.", "Ok"); // Displays a warning if the ID is not found.
-            }
-        });
-        GUILayout.FlexibleSpace();
-        EditorGUILayout.EndHorizontal();
-    }
-
-    // Compares component and canvas IDs to ensure they are in order.
-    private void CompareID()
-    {
-        componentSave.Sort((a, b) => a.iD.CompareTo(b.iD)); // Sorts components by ID.
-        canvasSave.Sort((a, b) => a.canvasID.CompareTo(b.canvasID)); // Sorts canvases by ID.
-    }
-
-    // Draws a button with a specified label and action.
-    private void DrawButton(string label, Action action)
-    {
-        if (GUILayout.Button(label, LanguageEditorUtilities.CreateCustomButtonStyle(15), GUILayout.Width(160), GUILayout.Height(30)))
+        BeginHorizontal();
+        Space(20);
+        // Button to trigger canvas rebuild process by adding the RebuildCanvas component.
+        DrawButton("Rebuild Canvas", () =>
         {
-            action(); // Executes the provided action when the button is clicked.
-        }
+            SaveDataJson(); // Save current state before rebuild.
+
+            // Create a new GameObject for rebuild and register with undo system.
+            var rebuildCanvas = new GameObject("[Rebuild Canvas]");
+            Undo.RegisterCreatedObjectUndo(rebuildCanvas, "Create Rebuild Canvas");
+
+            // Add the component responsible for rebuilding canvas structure.
+            Undo.AddComponent<RebuildCanvas>(rebuildCanvas);
+        });
+        Space(10);
+        // Button to organize all language and canvas items (e.g., sort and compare IDs).
+        DrawButton("Organize All Items", () =>
+        {
+            Undo.RecordObject(this, "Organize All Items");
+
+            CompareID(); // Run comparison logic to organize items.
+
+            // Mark the file as needing save and flag this object as dirty.
+            fileIsSaved = false;
+            EditorUtility.SetDirty(this);
+        });
+        Space(10);
+        DrawButton($"Search by ID: {idIndex}", () => SearchByID(idIndex)); // Button to trigger ID-based search and highlight in the editor.
+        GUILayout.FlexibleSpace();
+        EndHorizontal();
     }
 
-    // Draws the dropdown for selecting the computer's language.
+    /// <summary>
+    /// Draws the language selection dropdown for the computer's language.
+    /// </summary>
     private void DrawLanguageDropdown()
     {
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField("Computer Language:", GUILayout.Width(130)); // Label for the dropdown.
+        BeginHorizontal();
 
-        string previousLanguage = computerLanguage; // Cache the current language.
-        selectedCultureIndex = Array.FindIndex(cultures, c => c.DisplayName == previousLanguage); // Finds the current culture index.
+        // Label for dropdown.
+        LabelField("Language for Editing:", GUILayout.Width(130));
 
-        if (selectedCultureIndex < 0) selectedCultureIndex = 0; // Defaults to the first culture if the language is not found.
+        string previousLanguage = languageForEditing;
 
-        int newSelectedCultureIndex = EditorGUILayout.Popup(selectedCultureIndex, cultureNames, GUILayout.Width(150)); // Draws the dropdown and gets the newly selected index.
+        // Get the index of the currently selected language in the culture list.
+        selectedCultureIndex = Array.FindIndex(cultures, c => c.Name == previousLanguage);
+        if (selectedCultureIndex < 0) selectedCultureIndex = 0;
 
-        string newLanguage = cultures[newSelectedCultureIndex].DisplayName; // Gets the name of the selected language.
-        if (newLanguage != previousLanguage) // If the language has changed.
+        // Show popup with all available cultures.
+        int newSelectedCultureIndex = Popup(selectedCultureIndex, cultureNames, GUILayout.Width(150));
+
+        // If a new culture was selected, update internal state and optionally load its file.
+        string newLanguage = cultures[newSelectedCultureIndex].Name;
+        if (newLanguage != previousLanguage)
         {
-            Undo.RecordObject(this, "Change Computer Language"); // Records the action for undo.
-            computerLanguage = newLanguage; // Updates the computer language.
-            EditorUtility.SetDirty(this); // Marks the object as dirty (unsaved changes).
+            Undo.RecordObject(this, "Change Computer Language");
+            languageForEditing = newLanguage;
+            fileIsSaved = false;
+            EditorUtility.SetDirty(this);
+
+            var match = availableLanguages.FirstOrDefault(lang => lang.culture == newLanguage && lang.isAvailable);
+            if (match != null && EditorUtility.DisplayDialog(
+                    "Load Language File",
+                    $"The language '{match.name}' is available.\nDo you want to load the language?",
+                    "Yes",
+                    "No"))
+            {
+                LoadLanguageFile();
+            }
         }
 
-        EditorGUILayout.Space(10);
-        GUILayout.Label($"Recommended: {CultureInfo.InstalledUICulture.DisplayName}", LanguageEditorUtilities.CreateLabelStyle(13, true)); // Suggests the system's default language.
+        // Display selected culture and system default culture.
+        Space(5);
+        GUILayout.Label($"({languageForEditing})");
+        Space(10);
+        GUILayout.Label($"You: '{CultureInfo.InstalledUICulture.DisplayName}'");
+
         GUILayout.FlexibleSpace();
-        EditorGUILayout.EndHorizontal();
+        EndHorizontal();
     }
 
-    // Draws the panel that displays the current selected ID and allows navigation between IDs.
+    /// <summary>
+    /// Displays the panel for navigating and viewing current selected ID, and shows duplicates if any.
+    /// </summary>
     private void DrawIdDisplayPanel()
     {
-        EditorGUILayout.BeginHorizontal();
+        // Draw centered header label.
+        BeginHorizontal();
         GUILayout.FlexibleSpace();
-        EditorGUILayout.LabelField("ID Display", LanguageEditorUtilities.CreateLabelStyle(15, true, true)); // Label for the ID display.
+        LabelField("ID Display", CreateLabelStyle(15, true, true));
         GUILayout.FlexibleSpace();
-        EditorGUILayout.EndHorizontal();
+        EndHorizontal();
 
-        EditorGUILayout.Space(5);
+        Space(5);
 
-        int minID = componentSave.Count > 0 ? componentSave.Min(cs => cs.iD) : 0; // Gets the minimum ID from the components.
-        int maxID = componentSave.Count > 0 ? componentSave.Max(cs => cs.iD) : 0; // Gets the maximum ID from the components.
-
-        EditorGUILayout.BeginHorizontal();
-        GUILayout.FlexibleSpace();
-        EditorGUILayout.LabelField($"{minID}/{maxID}", LanguageEditorUtilities.CreateLabelStyle(13, true, true)); // Displays the minimum and maximum ID.
-        GUILayout.FlexibleSpace();
-        EditorGUILayout.EndHorizontal();
-
-        EditorGUILayout.BeginHorizontal();
-        GUILayout.FlexibleSpace();
-        LanguageEditorUtilities.DrawArrowButton("<--", ref idIndex, minID, maxID, this, () => idIndex--); // Draws a button to decrease the ID index.
-
-        EditorGUILayout.Space(10);
-        int newIdIndex = EditorGUILayout.IntField(idIndex, new GUIStyle(EditorStyles.textField) { alignment = TextAnchor.MiddleCenter }, GUILayout.Width(50)); // Text field to manually enter an ID.
-        if (newIdIndex != idIndex) // If the ID has changed.
+        if (duplicateID.Count == 0)
         {
-            Undo.RecordObject(this, "Change ID Index"); // Records the action for undo.
-            idIndex = newIdIndex; // Updates the ID index.
-            EditorUtility.SetDirty(this); // Marks the object as dirty (unsaved changes).
+            // Determine the ID range from the saved components.
+            int minID = componentSave.Count > 0 ? componentSave.Min(cs => cs.iD) : 0;
+            int maxID = componentSave.Count > 0 ? componentSave.Max(cs => cs.iD) : 0;
+
+            // Show current index range in center.
+            BeginHorizontal();
+            GUILayout.FlexibleSpace();
+            LabelField($"{minID}/{maxID}", CreateLabelStyle(13, true, true));
+            GUILayout.FlexibleSpace();
+            EndHorizontal();
+
+            // Navigation panel for ID selection.
+            BeginHorizontal();
+            GUILayout.FlexibleSpace();
+
+            // Backward arrow to decrement ID index.
+            DrawArrowButton("<--", ref idIndex, minID, maxID, this, () => idIndex--);
+
+            Space(10);
+
+            // Manual ID index entry field.
+            int newIdIndex = IntField(idIndex, new GUIStyle(EditorStyles.textField) { alignment = TextAnchor.MiddleCenter }, GUILayout.Width(50));
+            if (newIdIndex != idIndex)
+            {
+                Undo.RecordObject(this, "Change ID Index");
+                idIndex = newIdIndex;
+                fileIsSaved = false;
+                EditorUtility.SetDirty(this);
+            }
+
+            Space(10);
+
+            // Forward arrow to increment ID index.
+            DrawArrowButton("-->", ref idIndex, minID, maxID, this, () => idIndex++);
+            GUILayout.FlexibleSpace();
+            EndHorizontal();
         }
-        EditorGUILayout.Space(10);
-
-        LanguageEditorUtilities.DrawArrowButton("-->", ref idIndex, minID, maxID, this, () => idIndex++); // Draws a button to increase the ID index.
-        GUILayout.FlexibleSpace();
-        EditorGUILayout.EndHorizontal();
-
-        if (duplicateID.Count > 0) // Displays duplicate IDs in red if any exist.
+        else
         {
-            EditorGUILayout.Space(10);
+            // Show list of duplicated IDs in red.
+            Space(10);
             GUI.color = Color.red;
-            GUILayout.Label($"Duplicated ID: {string.Join(", ", duplicateID)}", LanguageEditorUtilities.CreateLabelStyle(15, true, true));
+            GUILayout.Label($"Duplicated ID: {string.Join(", ", duplicateID)}", CreateLabelStyle(15, true, true));
             GUI.color = Color.white;
         }
 
-        EditorGUILayout.Space(10);
+        Space(10);
 
-        bool itemRemoved = false; // Flag to track if an item is removed.
-        LanguageComponentSave itemToRemove = null; // Stores the item to remove if needed.
+        bool itemRemoved = false;
+        LanguageForEditingSave itemToRemove = null;
 
-        LanguageEditorUtilities.DrawColoredBox(() =>
+        // Draw main panel to display or remove components.
+        DrawColoredBox(() =>
         {
-            if (duplicateID.Count > 0) // If there are duplicate IDs, display them.
+            if (duplicateID.Count > 0)
             {
+                // Display all items with duplicate IDs, each with a delete button.
                 foreach (var id in duplicateID)
                 {
                     var items = componentSave.Where(cs => cs.iD == id).ToList();
                     foreach (var item in items)
                     {
-                        RenderComponentDisplay(item); // Displays the component information.
+                        RenderComponentDisplay(item);
 
-                        EditorGUILayout.BeginHorizontal();
+                        BeginHorizontal();
                         GUILayout.FlexibleSpace();
-                        if (GUILayout.Button("-", LanguageEditorUtilities.CreateCustomButtonStyle(15), GUILayout.Width(20), GUILayout.Height(20)))
+
+                        // Draw delete button for this item.
+                        GUI.backgroundColor = Color.red;
+                        if (GUILayout.Button(new GUIContent(trashImage), GUILayout.Width(30), GUILayout.Height(30)))
                         {
-                            itemToRemove = item; // Marks the item to be removed.
-                            itemRemoved = true; // Sets the flag to true.
+                            itemToRemove = item;
+                            itemRemoved = true;
+                            GUI.FocusControl(null);
                         }
-                        EditorGUILayout.EndHorizontal();
+                        GUI.backgroundColor = Color.white;
+                        EndHorizontal();
 
-                        EditorGUILayout.Space(5);
+                        Space(5);
 
-                        LanguageEditorUtilities.DrawColoredBox(() =>
-                        {
-                            EditorGUILayout.Space(1);
-                        }, new Color(1, 1, 1, 1)); // Adds a small box around the component information.
+                        // Small visual separator.
+                        DrawColoredBox(() => { Space(1); }, new Color(1, 1, 1, 1));
                     }
                 }
             }
-            else // If no duplicate IDs, display the selected component.
+            else
             {
+                // Display the currently selected item if no duplicates.
                 var item = componentSave.FirstOrDefault(cs => cs.iD == idIndex);
                 if (item != null)
                 {
@@ -338,380 +384,587 @@ public class LanguageFileManagerWindow : EditorWindow
                 }
                 else
                 {
-                    EditorGUILayout.LabelField("ID Slot Available", LanguageEditorUtilities.CreateLabelStyle(18, true, true)); // Displays if the ID slot is available.
+                    // Indicate empty slot for this ID.
+                    LabelField("ID Slot Available", CreateLabelStyle(18, true, true));
                 }
             }
+        }, new(0, 0, 1, 0.5f)); // Blueish background.
 
-        }, new(0, 0, 1, 0.5f));
-
-        if (itemRemoved && itemToRemove != null) // If an item was marked for removal, remove it.
+        // If an item was flagged for removal, perform cleanup.
+        if (itemRemoved && itemToRemove != null)
         {
             Undo.RecordObject(this, "Remove Duplicate ID");
             componentSave.Remove(itemToRemove);
+            fileIsSaved = false;
             EditorUtility.SetDirty(this);
-            FindDuplicateIds(); // Rechecks for duplicate IDs after removing.
+            FindDuplicateIds(); // Re-scan for remaining duplicates.
         }
     }
 
-    // Renders the display for a language component.
-    private void RenderComponentDisplay(LanguageComponentSave component)
+    /// <summary>
+    /// Renders the UI fields for editing a language component's properties.
+    /// </summary>
+    /// <param name="component">The language component to display and edit.</param>
+    private void RenderComponentDisplay(LanguageForEditingSave component)
     {
-        EditorGUILayout.Space(10);
-        if (component != null)
+        Space(10);
+        if (component == null) return;
+
+        BeginHorizontal();
+
+        // Display and allow editing of the ID field.
+        int previousInt = component.iD;
+        previousInt = DrawLabeledIntField("ID:", previousInt, 20, 50);
+        if (component.iD != previousInt)
         {
-            LanguageEditorUtilities.DisplayComponentIcon(component.componentType); // Displays an icon based on the component type.
-            int previousInt = component.iD;
-            previousInt = LanguageEditorUtilities.DrawLabeledIntField("ID:", previousInt, 20, 50); // Displays the component ID and allows editing.
-            if (component.iD != previousInt) // If the ID changed.
-            {
-                Undo.RecordObject(this, "Change item.iD");
-                component.iD = previousInt;
-                EditorUtility.SetDirty(this); // Marks the object as dirty.
-            }
-            EditorGUILayout.Space(10);
-            if (component.textWrite) // If the component has text, display the text field.
-            {
-                string previousText = component.text;
-                previousText = LanguageEditorUtilities.DrawLabeledTextField("Text:", previousText, 40, 430); // Displays the text field.
-                if (component.text != previousText) // If the text changed.
-                {
-                    Undo.RecordObject(this, "Change item.text");
-                    component.text = previousText;
-                    EditorUtility.SetDirty(this); // Marks the object as dirty.
-                }
-            }
-            EditorGUILayout.Space(10);
-            EditorGUILayout.BeginHorizontal();
-            if (component.alignmentWrite) // If the component has alignment, display the alignment field.
-            {
-                int previousAlignment = component.alignment;
-                previousAlignment = LanguageEditorUtilities.DrawLabeledIntField("Alignment:", previousAlignment, 70, 50);
-                if (component.alignment != previousAlignment) // If the alignment changed.
-                {
-                    Undo.RecordObject(this, "Change item.alignment");
-                    component.alignment = previousAlignment;
-                    EditorUtility.SetDirty(this); // Marks the object as dirty.
-                }
-            }
-            if (component.fontListIndexWrite) // If the component has a font size, display the font size field.
-            {
-                int previousIndex = component.fontSize;
-                previousIndex = LanguageEditorUtilities.DrawLabeledIntField("Font Size:", previousIndex, 70, 50);
-                if (component.fontSize != previousIndex) // If the font size changed.
-                {
-                    Undo.RecordObject(this, "Change item.fontSize");
-                    component.fontSize = previousIndex;
-                    EditorUtility.SetDirty(this); // Marks the object as dirty.
-                }
-            }
-            if (component.fontListIndexWrite) // If the component has a font index, display the font index field.
-            {
-                int previousFont = component.fontListIndex;
-                previousFont = LanguageEditorUtilities.DrawLabeledIntField("Font Index:", previousFont, 70, 50);
-                if (component.fontListIndex != previousFont) // If the font index changed.
-                {
-                    Undo.RecordObject(this, "Change item.fontListIndex");
-                    component.fontListIndex = previousFont;
-                    EditorUtility.SetDirty(this); // Marks the object as dirty.
-                }
-            }
-            GUILayout.FlexibleSpace();
-            EditorGUILayout.EndHorizontal();
+            Undo.RecordObject(this, "Change item.iD");
+            component.iD = previousInt;
+            fileIsSaved = false;
+            EditorUtility.SetDirty(this);
         }
-        EditorGUILayout.Space(10);
+
+        Space(5);
+
+        // Display and allow editing of the text context field.
+        string previousTextContext = component.textContext;
+        previousTextContext = DrawLabeledTextField("Text Context:", previousTextContext, 80, 305);
+        if (component.textContext != previousTextContext)
+        {
+            Undo.RecordObject(this, "Change item.textContext");
+            component.textContext = previousTextContext;
+            fileIsSaved = false;
+            EditorUtility.SetDirty(this);
+        }
+
+        GUILayout.FlexibleSpace();
+
+        // Delete button (disabled if there are duplicates).
+        GUI.enabled = duplicateID.Count == 0;
+        GUI.backgroundColor = Color.red;
+        if (GUILayout.Button(new GUIContent(trashImage), GUILayout.Width(30f), GUILayout.Height(30f)))
+        {
+            RemoveID();
+        }
+        GUI.backgroundColor = Color.white;
+        GUI.enabled = true;
+
+        EndHorizontal();
+
+        DisplayComponentIcon(component.componentType); // Show the component type icon.
+
+        Space(10);
+
+        // Check which fields to show based on component type.
+        int[] validTypes3 = { 1, 3, 6 };
+        int[] validTypes1 = { 4, 5 };
+        bool valid3 = Array.Exists(validTypes3, type => type == component.componentType) || component.componentType >= 7;
+        bool valid2 = component.componentType == 2;
+        bool valid1 = Array.Exists(validTypes1, type => type == component.componentType);
+
+        // If this component type supports it, display editable text field.
+        if (valid3 || valid2 || valid1)
+        {
+            string previousText = component.text;
+            previousText = DrawLabeledTextField("Text:", previousText, 40, 430);
+            if (component.text != previousText)
+            {
+                Undo.RecordObject(this, "Change item.text");
+                component.text = previousText;
+                fileIsSaved = false;
+                EditorUtility.SetDirty(this);
+            }
+        }
+
+        Space(10);
+        BeginHorizontal();
+
+        // Alignment field if applicable.
+        if (valid3)
+        {
+            int previousAlignment = component.alignment;
+            previousAlignment = DrawLabeledIntField("Alignment:", previousAlignment, 70, 50);
+            if (component.alignment != previousAlignment)
+            {
+                Undo.RecordObject(this, "Change item.alignment");
+                component.alignment = previousAlignment;
+                fileIsSaved = false;
+                EditorUtility.SetDirty(this);
+            }
+        }
+
+        // Font size field if applicable.
+        if (valid3 || valid2)
+        {
+            int previousIndex = component.fontSize;
+            previousIndex = DrawLabeledIntField("Font Size:", previousIndex, 70, 50);
+            if (component.fontSize != previousIndex)
+            {
+                Undo.RecordObject(this, "Change item.fontSize");
+                component.fontSize = previousIndex;
+                fileIsSaved = false;
+                EditorUtility.SetDirty(this);
+            }
+        }
+
+        // Font index field if applicable.
+        if (valid3 || valid2)
+        {
+            int previousFont = component.fontListIndex;
+            previousFont = DrawLabeledIntField("Font Index:", previousFont, 70, 50);
+            if (component.fontListIndex != previousFont)
+            {
+                Undo.RecordObject(this, "Change item.fontListIndex");
+                component.fontListIndex = previousFont;
+                fileIsSaved = false;
+                EditorUtility.SetDirty(this);
+            }
+        }
+
+        // Visual spacing compensation for alignment.
+        if (!(valid3 || valid2)) Space(22);
+        if (!(valid3 || valid2 || valid1)) Space(44);
+
+        GUILayout.FlexibleSpace();
+        EndHorizontal();
+
+        Space(10);
     }
 
-    // Finds and stores duplicate component and canvas IDs.
+    /// <summary>
+    /// Draws a button with the specified label and executes the provided action on click.
+    /// </summary>
+    /// <param name="label">The button's label text.</param>
+    /// <param name="action">The action to perform when clicked.</param>
+    private void DrawButton(string label, Action action)
+    {
+        // Draw button with custom style.
+        if (GUILayout.Button(label, CreateCustomButtonStyle(15), GUILayout.Width(160), GUILayout.Height(30)))
+        {
+            action(); // Execute provided action on click.
+            GUI.FocusControl(null); // Remove focus to avoid accidental repeats.
+        }
+    }
+
+    /// <summary>
+    /// Sorts componentSave and canvasSave lists by their IDs in ascending order.
+    /// </summary>
+    private void CompareID()
+    {
+        componentSave.Sort((a, b) => a.iD.CompareTo(b.iD)); // Sort language components by their ID.
+        canvasSave.Sort((a, b) => a.canvasID.CompareTo(b.canvasID)); // Sort canvas components by their canvas ID.
+    }
+
+    /// <summary>
+    /// Identifies and stores duplicate IDs in componentSave and canvasSave.
+    /// </summary>
     private void FindDuplicateIds()
     {
-        var idsArray = componentSave.Select(cs => cs.iD).ToArray();
-        duplicateID = LanguageEditorUtilities.FindDuplicateIDs(idsArray); // Finds duplicate component IDs.
-
-        var canvasArray = canvasSave.Select(cs => cs.canvasID).ToArray();
-        canvasID = LanguageEditorUtilities.FindDuplicateIDs(canvasArray); // Finds duplicate canvas IDs.
+        duplicateID = FindDuplicateIDs(componentSave.Select(cs => cs.iD).ToArray()); // Get duplicate IDs from the language components.
+        canvasID = FindDuplicateIDs(canvasSave.Select(cs => cs.canvasID).ToArray()); // Get duplicate canvas IDs.
     }
 
-    // Saves the language file to disk as a .txt file.
+    /// <summary>
+    /// Removes the component with the current idIndex, optionally confirming with the user.
+    /// </summary>
+    private void RemoveID()
+    {
+        Undo.RecordObject(this, "Remove ID");
+
+        // Find the component to remove based on current idIndex.
+        var itemToRemove = componentSave.FirstOrDefault(cs => cs.iD == idIndex);
+        if (itemToRemove == null)
+        {
+            // Show message if no matching ID is found.
+            EditorUtility.DisplayDialog("ID not found", $"There is no component with ID '{idIndex}' to remove.", "Ok");
+            return;
+        }
+
+        // Check if confirmation dialog should be skipped.
+        bool skipConfirmation = EditorPrefs.GetBool("RemoveID_SkipConfirmation", false);
+        bool shouldRemove = true;
+
+        if (!skipConfirmation)
+        {
+            // Prompt the user for confirmation before deletion.
+            int result = EditorUtility.DisplayDialogComplex(
+                "Remove ID?",
+                $"Do you really want to remove the ID '{idIndex}'?",
+                "Yes",
+                "No",
+                "Yes, and don't ask again"
+            );
+
+            if (result == 1) shouldRemove = false;
+            else if (result == 2) EditorPrefs.SetBool("RemoveID_SkipConfirmation", true);
+        }
+
+        if (!shouldRemove) return;
+
+        // Perform removal and mark the file as dirty for saving.
+        componentSave.Remove(itemToRemove);
+        fileIsSaved = false;
+        EditorUtility.SetDirty(this);
+
+        // Update idIndex to nearest available ID, or reset if none left.
+        if (componentSave.Count > 0)
+        {
+            idIndex = componentSave.Select(cs => cs.iD).OrderBy(id => Math.Abs(id - idIndex)).First();
+        }
+        else
+        {
+            idIndex = 0;
+        }
+    }
+
+    /// <summary>
+    /// Saves the language files (.tsv) by syncing IDs and data, confirming overwrites if necessary.
+    /// </summary>
     private void SaveLanguageFile()
     {
-        Undo.RecordObject(this, "Save File"); // Records the action for undo.
-        CompareID(); // Organizes the component and canvas IDs.
-        EditorUtility.SetDirty(this); // Marks the object as dirty (unsaved changes).
-        FindDuplicateIds(); // Rechecks for duplicate IDs.
-        SaveDataJson(); // Saves the data to JSON.
+        Undo.RecordObject(this, "Save File");
+        CompareID(); // Sort components before saving.
+        EditorUtility.SetDirty(this);
+        FindDuplicateIds(); // Ensure no duplicates exist before proceeding.
+        SaveDataJson();
 
-        if (duplicateID.Count == 0 && canvasID.Count == 0) // If no duplicates exist, proceed to save.
+        // Abort save if any duplicate IDs are detected.
+        if (duplicateID.Count > 0)
         {
-            string filePath = $"{saveFilePath}/{fileName}.txt"; // Determines the file path.
-
-            if (File.Exists(filePath)) // If the file already exists, ask for confirmation to replace it.
-            {
-                if (!EditorUtility.DisplayDialog("Replace file?", $"The file '{fileName}.txt' already exists. Do you want to replace it?", "Yes", "No"))
-                {
-                    return;
-                }
-            }
-
-            StringBuilder sb = new(); // StringBuilder to build the file content.
-
-            sb.AppendLine($"Linguagem - [{fileName}]"); // Adds the file header.
-            sb.AppendLine(computerLanguage); // Adds the computer language.
-
-            foreach (LanguageComponentSave id in componentSave) // Adds each component to the file.
-            {
-                sb.Append($"id:{id.iD}; ");
-                if (id.textWrite) sb.Append($"{{{id.text}}} ");
-                if (id.alignmentWrite) sb.Append($"Ali:{id.alignment}; ");
-                if (id.fontSizeWrite) sb.Append($"S:{id.fontSize:F0}; ");
-                if (id.fontListIndexWrite) sb.Append($"Font:{id.fontListIndex}; ");
-                sb.Append($"Type:{id.componentType:F0};");
-                sb.AppendLine();
-            }
-
-            sb.AppendLine("");
-
-            foreach (CanvasSave canvasID in canvasSave) // Adds each canvas to the file.
-            {
-                sb.Append($"canvasID:{canvasID.canvasID};");
-                sb.Append(canvasID.json);
-                sb.AppendLine();
-            }
-
-            File.WriteAllText(filePath, sb.ToString()); // Writes the content to the file.
-            Debug.Log($"Saved File: {filePath}"); // Logs the file save location.
+            Debug.LogError($"Language Save Editor: Unable to save due to duplicate IDs: {string.Join(", ", duplicateID)}");
+            return;
         }
-        else // If duplicates exist, logs an error.
+        if (canvasID.Count > 0)
         {
-            if (duplicateID.Count != 0)
+            Debug.LogError($"Language Save Editor: Unable to save due to duplicate canvasIDs: {string.Join(", ", canvasID)}");
+            return;
+        }
+
+        // Ask the user to confirm overwriting existing files.
+        if (!IsInvalidTSV(canvasDataFile) || !IsInvalidTSV(languageDataFile) || !IsInvalidTSV(metaDataFile))
+        {
+            if (!EditorUtility.DisplayDialog("Replace files?", "The '.tsv' files already exist. Do you want to replace them?", "Yes", "No"))
             {
-                Debug.LogError($"Language Save Editor: Unable to save due to duplicate IDs: {string.Join(", ", duplicateID)}");
-            }
-            else
-            {
-                Debug.LogError($"Language Save Editor: Unable to save due to duplicate canvasIDs: {string.Join(", ", canvasID)}");
+                return;
             }
         }
+
+        // Load current TSV files into memory.
+        VerticalTable[] canvasTable = null, languageDataTable = null, metaTable = null;
+        LoadTableFile(canvasDataFile, ref canvasTable);
+        LoadTableFile(languageDataFile, ref languageDataTable);
+        LoadTableFile(metaDataFile, ref metaTable);
+
+        // Collect supported languages and locate the selected language's index.
+        GetAllavailableLanguages(languageDataTable);
+        int columnIndex = availableLanguages.Find(lang => lang.culture == languageForEditing)?.columnIndex ?? -1;
+
+        // Build consistent headers based on the selected language and languages available.
+        var generatedHeader = BuildTableFromAvailableLanguages(availableLanguages, columnIndex);
+
+        // Replace top header rows in the loaded tables.
+        var canvasRebuild = ReplaceTopRows(canvasTable, generatedHeader);
+        var languageDataRebuild = ReplaceTopRows(languageDataTable, generatedHeader);
+        var metaRebuild = ReplaceTopRows(metaTable, generatedHeader);
+
+        // Create data rows from internal data structures.
+        var canvasIds = canvasSave.Select(c => new ManagerLanguageIdData { iD = c.canvasID, text = c.json, textContext = c.textContext }).ToList();
+        var languageIds = componentSave.Select(c => new ManagerLanguageIdData { iD = c.iD, text = c.text, textContext = c.textContext }).ToList();
+
+        var metaIds = componentSave.Select(c => new ManagerLanguageIdData
+        {
+            iD = c.iD,
+            text = JsonUtility.ToJson(new IdMetaData
+            {
+                iD = c.iD,
+                alignment = c.alignment,
+                fontSize = c.fontSize,
+                fontListIndex = c.fontListIndex,
+                componentType = c.componentType
+            }),
+            textContext = c.textContext
+        }).ToList();
+
+        // Sync data rows into their respective tables.
+        SyncTableWithIds(ref canvasRebuild, canvasIds);
+        SyncTableWithIds(ref languageDataRebuild, languageIds);
+        SyncTableWithIds(ref metaRebuild, metaIds);
+
+        // Insert additional data columns into tables based on the current language.
+        InsertIDsEditor(ref canvasRebuild, canvasIds, availableLanguages, languageForEditing);
+        InsertIDsEditor(ref languageDataRebuild, languageIds, availableLanguages, languageForEditing);
+        InsertIDsEditor(ref metaRebuild, metaIds, availableLanguages, languageForEditing);
+
+        // Save the final versions to their respective files.
+        SaveTableFile(canvasDataFile, canvasRebuild);
+        SaveTableFile(languageDataFile, languageDataRebuild);
+        SaveTableFile(metaDataFile, metaRebuild);
+
+        Debug.Log($"Saved Files in: {assetsPath}");
+        fileIsSaved = true;
     }
 
-    // Loads a language file from disk.
+    /// <summary>
+    /// Loads language files (.tsv) and updates internal data structures accordingly.
+    /// </summary>
     private void LoadLanguageFile()
     {
-        if (!Directory.Exists(saveFilePath)) // Checks if the folder path exists.
+        // Validate directory existence.
+        if (!Directory.Exists(assetsPath))
         {
-            Debug.LogError($"Folder path does not exist: {saveFilePath}");
+            Debug.LogError($"Folder path does not exist: {assetsPath}");
             return;
         }
 
-        string filePath = EditorUtility.OpenFilePanel("Select Language File", saveFilePath, "txt"); // Opens a file selection dialog.
+        // Validate each TSV file and log individual errors.
+        if (IsInvalidTSV(canvasDataFile)) Debug.LogError($"Invalid canvasDataFile: {canvasDataFile}");
+        if (IsInvalidTSV(languageDataFile)) Debug.LogError($"Invalid languageDataFile: {languageDataFile}");
+        if (IsInvalidTSV(metaDataFile)) Debug.LogError($"Invalid metaDataFile: {metaDataFile}");
 
-        if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath) || Path.GetExtension(filePath) != ".txt") // Checks if the selected file is valid.
-        {
-            Debug.LogError("Invalid file selected. Please select a valid .txt file.");
-            return;
-        }
+        // Abort if any file is invalid.
+        if (IsInvalidTSV(canvasDataFile) || IsInvalidTSV(languageDataFile) || IsInvalidTSV(metaDataFile)) return;
 
         try
         {
-            Undo.RecordObject(this, "Load File"); // Records the action for undo.
+            // Load data from TSV files into tables.
+            VerticalTable[] canvasTable = null, languageDataTable = null, metaTable = null;
+            LoadTableFile(canvasDataFile, ref canvasTable);
+            LoadTableFile(languageDataFile, ref languageDataTable);
+            LoadTableFile(metaDataFile, ref metaTable);
 
-            string[] lines = File.ReadAllLines(filePath); // Reads all lines from the file.
-            componentSave.Clear(); // Clears the current components.
-            canvasSave.Clear(); // Clears the current canvases.
+            Undo.RecordObject(this, "Load File");
 
-            fileName = Path.GetFileNameWithoutExtension(filePath); // Gets the file name.
-            computerLanguage = lines.Length > 1 ? lines[1] : "Invariant Language (Invariant Country)"; // Gets the computer language.
+            // Extract available languages from the table.
+            GetAllavailableLanguages(languageDataTable);
 
-            foreach (string line in lines) // Processes each line to add components.
+            componentSave.Clear();
+            canvasSave.Clear();
+
+            // Parse and store metadata entries.
+            var metaData = new List<IdMetaData>();
+            var idData = ExtractIDsEditor(languageDataTable, availableLanguages, languageForEditing);
+            var idMetaData = ExtractIDs(metaTable, availableLanguages, languageForEditing);
+            var idCanvasData = ExtractIDsEditor(canvasTable, availableLanguages, languageForEditing);
+
+            foreach (var id in idMetaData)
             {
-                if (!line.StartsWith("id:")) continue;
-                var component = LanguageEditorUtilities.ParseLanguageComponent(line);
-                if (component != null) componentSave.Add(component);
+                try
+                {
+                    // Try parsing metadata JSON for each ID.
+                    var dataJson = JsonUtility.FromJson<IdMetaData>(id.text);
+                    metaData.Add(new()
+                    {
+                        iD = id.iD,
+                        alignment = dataJson.alignment,
+                        fontSize = dataJson.fontSize,
+                        fontListIndex = dataJson.fontListIndex,
+                        componentType = dataJson.componentType
+                    });
+                }
+                catch
+                {
+                    // Log warning and add default metadata if parsing fails.
+                    Debug.LogWarning($"Failed to parse JSON for ID {id.iD}");
+                    metaData.Add(new() { iD = id.iD, alignment = 0, fontSize = 0, fontListIndex = 0, componentType = 7 });
+                }
             }
 
-            foreach (string line in lines) // Processes each line to add canvases.
+            // Merge parsed metadata with corresponding component data.
+            foreach (var data in idData.Where(d => d != null))
             {
-                if (!line.StartsWith("canvasID:")) continue;
-                var canvas = LanguageEditorUtilities.ParseCanvasSave(line);
-                if (canvas != null) canvasSave.Add(canvas);
+                var meta = metaData.FirstOrDefault(m => m.iD == data.iD);
+                componentSave.Add(new()
+                {
+                    iD = data.iD,
+                    text = data.text,
+                    textContext = data.textContext,
+                    alignment = meta?.alignment ?? 0,
+                    fontSize = meta?.fontSize ?? 0,
+                    fontListIndex = meta?.fontListIndex ?? 0,
+                    componentType = meta?.componentType ?? 7
+                });
             }
 
-            CompareID(); // Organizes the IDs.
-            EditorUtility.SetDirty(this); // Marks the object as dirty.
+            // Populate canvas data from extracted TSV records.
+            foreach (var canvasData in idCanvasData.Where(d => d != null))
+            {
+                canvasSave.Add(new() { canvasID = canvasData.iD, textContext = canvasData.textContext, json = canvasData.text });
+            }
+
+            CompareID();
+            fileIsSaved = true;
+            EditorUtility.SetDirty(this);
         }
-        catch (Exception e) // Catches and logs any errors during loading.
+        catch (Exception e)
         {
             Debug.LogError($"Error while loading file: {e.Message}");
         }
     }
 
-    // Loads data from a CSV file.
-    private void LoadExcelCsv()
+    /// <summary>
+    /// Populates availableLanguages from the provided language data table.
+    /// </summary>
+    /// <param name="languageDataTable">The table containing language data.</param>
+    private void GetAllavailableLanguages(VerticalTable[] languageDataTable)
     {
-        Undo.RecordObject(this, "Load Excel Table"); // Records the action for undo.
-        string filePath = EditorUtility.OpenFilePanel("Select CSV File", saveFilePath, "csv"); // Opens a file selection dialog.
-
-        if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath) || Path.GetExtension(filePath) != ".csv") // Checks if the selected file is valid.
+        // Ensure the table is valid.
+        if (languageDataTable == null || languageDataTable.Length == 0)
         {
-            Debug.LogWarning("Invalid CSV file selected.");
+            Debug.LogError("Language data table is null or empty.");
             return;
         }
 
-        try
+        availableLanguages.Clear();
+
+        // Count rows and columns in the table.
+        RowAndColumnCounter(languageDataTable, out int rowCount, out int columnCount);
+        if (rowCount < 3 || columnCount < 3)
         {
-            var lines = File.ReadAllLines(filePath, Encoding.UTF8); // Reads all lines from the file.
-
-            if (lines.Length == 0) // If the file is empty, logs a warning.
-            {
-                Debug.LogWarning("The CSV file is empty.");
-                return;
-            }
-
-            string[] headerFields = lines[0].Split(';'); // Splits the header into fields.
-            string[] languages = headerFields.Skip(1).ToArray(); // Gets the language columns.
-
-            List<ExcelData> excelDataList = new(); // List to store the parsed data.
-            foreach (string language in languages) // Initializes the list for each language.
-            {
-                excelDataList.Add(new ExcelData
-                {
-                    language = language,
-                    lines = new List<KeyValuePair<int, string>>()
-                });
-            }
-
-            for (int i = 1; i < lines.Length; i++) // Processes each row in the CSV.
-            {
-                string[] fields = lines[i].Split(';'); // Splits the row into fields.
-
-                if (fields.Length != headerFields.Length) // Checks if the row has the correct number of fields.
-                {
-                    Debug.LogWarning($"Row {i + 1} has a different number of columns than the header and was ignored.");
-                    continue;
-                }
-
-                if (!int.TryParse(fields[0], out int id)) // Parses the ID from the first column.
-                {
-                    Debug.LogWarning($"The ID at line {i + 1} is not a valid number and was ignored.");
-                    continue;
-                }
-
-                for (int j = 1; j < fields.Length; j++) // Processes each language field.
-                {
-                    string text = fields[j];
-                    excelDataList[j - 1].lines.Add(new KeyValuePair<int, string>(id, text)); // Adds the ID and text to the list.
-                }
-            }
-
-            foreach (var excelData in excelDataList) // Updates the components with the parsed data.
-            {
-                if (excelData.language == fileName) // Checks if the language matches the current file.
-                {
-                    foreach (var line in excelData.lines) // Updates the matching components.
-                    {
-                        var existingComponent = componentSave.FirstOrDefault(component => component.iD == line.Key);
-
-                        if (existingComponent != null)
-                        {
-                            int index = componentSave.IndexOf(existingComponent);
-                            componentSave[index].text = line.Value; // Updates the text of the component.
-                        }
-                    }
-                }
-            }
-        }
-        catch (Exception ex) // Catches and logs any errors during loading.
-        {
-            Debug.LogError($"Error loading CSV file: {ex.Message}");
+            Debug.LogWarning("The table does not have enough rows or columns to extract language data.");
+            return;
         }
 
-        EditorUtility.SetDirty(this); // Marks the object as dirty (unsaved changes).
+        // Loop through each language column and parse culture, name, and availability.
+        for (int col = 2; col < columnCount; col++)
+        {
+            var culture = GetText(languageDataTable, 0, col);
+            var name = GetText(languageDataTable, 1, col);
+            var isAvailableText = GetText(languageDataTable, 2, col);
+
+            bool isAvailable = bool.TryParse(isAvailableText, out bool result) && result;
+
+            availableLanguages.Add(new() { culture = culture, name = name, isAvailable = isAvailable, columnIndex = col });
+        }
     }
 
-    // Saves the current data to a JSON file.
+    /// <summary>
+    /// Saves the current editor data to a JSON file.
+    /// </summary>
     public void SaveDataJson()
     {
-        LanguageFileData data = new()
+        // Prepare data for serialization.
+        LanguageFileManagerWindowData data = new()
         {
-            fileName = fileName,
-            computerLanguage = computerLanguage,
+            languageForEditing = languageForEditing,
+            componentSave = componentSave,
+            canvasSave = canvasSave,
+            availableLanguages = availableLanguages,
             firstTime = firstTime,
             idIndex = idIndex,
-            componentSave = componentSave,
-            canvasSave = canvasSave
+            showTextData = showTextData,
+            showCanvasData = showCanvasData,
+            fileIsSaved = fileIsSaved
         };
-        string jsonData = JsonUtility.ToJson(data); // Converts the data to JSON format.
 
         try
         {
-            File.WriteAllText(fileData, jsonData); // Writes the JSON data to the file.
+            File.WriteAllText(fileData, JsonUtility.ToJson(data)); // Write serialized data to disk.
         }
-        catch (Exception e) // Catches and logs any errors during saving.
+        catch (Exception e)
         {
             Debug.LogError($"Error while saving data: {e.Message}");
         }
     }
 
-    // Loads data from a JSON file.
+    /// <summary>
+    /// Loads editor data from a JSON file.
+    /// </summary>
     private void LoadDataJson()
     {
-        if (File.Exists(fileData)) // Checks if the data file exists.
-        {
-            string jsonData = File.ReadAllText(fileData); // Reads the JSON data from the file.
-            var data = JsonUtility.FromJson<LanguageFileData>(jsonData); // Parses the JSON data.
+        // Skip if file doesn't exist.
+        if (!File.Exists(fileData)) return;
 
-            fileName = data.fileName; // Updates the file name.
-            computerLanguage = data.computerLanguage; // Updates the computer language.
-            firstTime = data.firstTime; // Updates the first-time flag.
-            idIndex = data.idIndex; // Updates the selected ID index.
+        var data = JsonUtility.FromJson<LanguageFileManagerWindowData>(File.ReadAllText(fileData));
 
-            componentSave.Clear(); // Clears the current component list.
-            componentSave = data.componentSave; // Updates the component list.
+        // Restore internal state from deserialized data.
+        languageForEditing = data.languageForEditing;
 
-            canvasSave.Clear(); // Clears the current canvas list.
-            canvasSave = data.canvasSave; // Updates the canvas list.
-        }
+        componentSave.Clear();
+        componentSave = data.componentSave;
+
+        canvasSave.Clear();
+        canvasSave = data.canvasSave;
+
+        availableLanguages.Clear();
+        availableLanguages = data.availableLanguages;
+
+        firstTime = data.firstTime;
+        idIndex = data.idIndex;
+        showTextData = data.showTextData;
+        showCanvasData = data.showCanvasData;
+        fileIsSaved = data.fileIsSaved;
     }
 
-    // Adds or updates a component in the save list.
-    public void AddComponent(LanguageComponentSave data)
+    /// <summary>
+    /// Adds or updates a component in the save list and updates the saved data.
+    /// </summary>
+    /// <param name="data">The component data to add or update.</param>
+    public void AddComponent(LanguageForEditingSave data)
     {
-        Undo.RecordObject(this, "Add Component"); // Records the action for undo.
-        var existingComponent = componentSave.FirstOrDefault(component => component.iD == data.iD); // Checks if the component already exists.
+        Undo.RecordObject(this, "Add Component");
 
-        if (existingComponent != null) // If the component exists, update it.
+        // Preserve current state before modification.
+        SaveDataJson();
+        LoadDataJson();
+
+        // Check if component already exists.
+        var existingComponent = componentSave.FirstOrDefault(c => c.iD == data.iD);
+
+        if (existingComponent != null)
         {
+            // Update existing component while preserving its textContext.
             int index = componentSave.IndexOf(existingComponent);
+            data.textContext = componentSave[index].textContext;
             componentSave[index] = data;
         }
-        else // If the component doesn't exist, add it.
+        else
         {
-            componentSave.Add(data);
+            componentSave.Add(data); // Add new component to list.
         }
 
-        componentSave.Sort((a, b) => a.iD.CompareTo(b.iD)); // Sorts the components by ID.
-        idIndex = data.iD; // Updates the selected ID index.
-        EditorUtility.SetDirty(this); // Marks the object as dirty.
+        // Sort components and mark as unsaved.
+        componentSave.Sort((a, b) => a.iD.CompareTo(b.iD));
+        idIndex = data.iD;
+        fileIsSaved = false;
+
+        // Save and mark the object dirty for Unity's serialization.
+        SaveDataJson();
+        EditorUtility.SetDirty(this);
     }
 
-    // Adds or updates a canvas in the save list.
-    public void AddCanvas(CanvasSave data)
+    /// <summary>
+    /// Adds or updates a canvas in the save list and updates the saved data.
+    /// </summary>
+    /// <param name="data">The canvas data to add or update.</param>
+    public void AddCanvas(CanvasForEditingSave data)
     {
-        Undo.RecordObject(this, "Add Canvas"); // Records the action for undo.
-        var existingComponent = canvasSave.FirstOrDefault(component => component.canvasID == data.canvasID); // Checks if the canvas already exists.
+        Undo.RecordObject(this, "Add Canvas");
 
-        if (existingComponent != null) // If the canvas exists, update it.
+        // Preserve current state before modification.
+        SaveDataJson();
+        LoadDataJson();
+
+        // Check if canvas already exists.
+        var existingComponent = canvasSave.FirstOrDefault(c => c.canvasID == data.canvasID);
+
+        if (existingComponent != null)
         {
+            // Update existing canvas while preserving its textContext.
             int index = canvasSave.IndexOf(existingComponent);
+            data.textContext = canvasSave[index].textContext;
             canvasSave[index] = data;
         }
-        else // If the canvas doesn't exist, add it.
+        else
         {
-            canvasSave.Add(data);
+            canvasSave.Add(data); // Add new canvas to list.
         }
 
-        canvasSave.Sort((a, b) => a.canvasID.CompareTo(b.canvasID)); // Sorts the canvases by ID.
-        idIndex = data.canvasID; // Updates the selected canvas ID index.
-        EditorUtility.SetDirty(this); // Marks the object as dirty.
+        // Sort canvases and mark data as modified.
+        canvasSave.Sort((a, b) => a.canvasID.CompareTo(b.canvasID));
+        fileIsSaved = false;
+
+        // Save and mark the object dirty for Unity.
+        SaveDataJson();
+        EditorUtility.SetDirty(this);
     }
 }
 #endif

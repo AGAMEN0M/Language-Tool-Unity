@@ -10,12 +10,12 @@ GameObject:
   m_Component:
   - component: {fileID: 2717760190781690680}
   - component: {fileID: 1653843265897680735}
-  - component: {fileID: 309205750558122783}
   - component: {fileID: 7490507757541777544}
+  - component: {fileID: 309205750558122783}
   m_Layer: 5
-  m_Name: Text (LT) [Legacy]
+  m_Name: 'Text (LT) [Legacy]'
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 2800000, guid: 70f6424025aaaa04b8158f8918eadff8, type: 3}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -46,6 +46,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7921821235177227170}
   m_CullTransparentMesh: 1
+--- !u!114 &7490507757541777544
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7921821235177227170}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9947169f88507274dac888f9cb3e9426, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  textComponent: {fileID: 309205750558122783}
+  translateText: 1
+  iD: -7
 --- !u!114 &309205750558122783
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -80,20 +95,3 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: New Text
---- !u!114 &7490507757541777544
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7921821235177227170}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9947169f88507274dac888f9cb3e9426, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  text: {fileID: 309205750558122783}
-  iD: -7
-  translateText: 1
-  selectedFile: 
-  saveFile: 

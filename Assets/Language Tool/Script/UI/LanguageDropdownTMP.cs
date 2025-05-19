@@ -1,234 +1,210 @@
 /*
  * ---------------------------------------------------------------------------
- * Description: This script integrates language settings into a TextMesh Pro (TMP) 
- *              dropdown in Unity. It dynamically updates the dropdown options and text styles 
- *              (alignment, font, font size) based on the currently selected language, ensuring 
- *              that the interface adapts to different languages.
+ * Description: Integrates LanguageTools with a TMP_Dropdown to dynamically 
+ *              update text content, font, alignment, and size according to the 
+ *              current language settings. Supports localized display of dropdown 
+ *              options using metadata and ID-linked translations.
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
 */
 
 using System.Collections.Generic;
-using LanguageTools.TMP;
 using LanguageTools;
 using UnityEngine;
 using TMPro;
 
 #if UNITY_EDITOR
-using LanguageTools.Editor;
+using static LanguageTools.Editor.LanguageEditorUtilities;
 using UnityEditor;
 #endif
 
-// Adds this script to Unity's Component Menu under "Language" and "UI/TextMesh Pro".
+using static LanguageTools.LanguageFileManager;
+using static LanguageTools.TMP.FontAndAlignmentUtilityTMP;
+
 [AddComponentMenu("Language/UI/TextMesh Pro/Language Dropdown (TMP)")]
 public class LanguageDropdownTMP : MonoBehaviour
 {
-    [Header("Settings")]
-    public TMP_Dropdown dropdown; // Reference to the TMP_Dropdown component to update.
+    [Header("UI Components")]
+    public TMP_Dropdown dropdown; // Reference to the TextMeshPro TMP_Dropdown component to localize.
+    public bool translateText = true; // Determines whether to translate the dropdown option texts.
     [Space(10)]
     public List<LanguageOptions> options = new()
     {
-        // Predefined options for the dropdown.
-        new LanguageOptions { text = "Option A", sprite = null, iD = -2 },
-        new LanguageOptions { text = "Option B", sprite = null, iD = -3 }, 
-        new LanguageOptions { text = "Option C", sprite = null, iD = -4 } 
-    };
-    [Space(10)]
-    [Header("Automatic Information")]
-    [SerializeField] private string selectedFile; // Path to the currently selected language file.
-    [Space(5)]
-    [SerializeField] private string saveFile; // Path to the save file storing language settings.
+        new() { text = "Option A", sprite = null, iD = -2 },
+        new() { text = "Option B", sprite = null, iD = -3 },
+        new() { text = "Option C", sprite = null, iD = -4 }
+    }; // List of dropdown options with localized text, optional sprites, and localization IDs.
 
-    private TMP_Text captionText; // Reference to the caption text of the TMP dropdown.
-    private TMP_Text itemText; // Reference to the item text of the TMP dropdown.
+    private LanguageSettingsData languageData; // Holds the currently loaded language data including texts and metadata.
+    private TMP_Text captionText; // Reference to the TMP_Text component used for the dropdown caption.
+    private TMP_Text itemText; // Reference to the TMP_Text component used for dropdown item labels.
 
-    // Subscribes to the LanguageUpdate event and immediately calls LanguageUpdate upon enabling the object.
+    /// <summary>
+    /// Subscribes to the language update event and applies localization.
+    /// </summary>
     private void OnEnable()
     {
         LanguageManagerDelegate.OnLanguageUpdate += LanguageUpdate;
-        LanguageUpdate(); // Immediate call to update dropdown content based on language settings.
+        LanguageUpdate();
     }
 
-    // Unsubscribes from the LanguageUpdate event when the object is disabled.
-    private void OnDisable()
-    {
-        LanguageManagerDelegate.OnLanguageUpdate -= LanguageUpdate;
-    }
+    /// <summary>
+    /// Unsubscribes from the language update event.
+    /// </summary>
+    private void OnDisable() => LanguageManagerDelegate.OnLanguageUpdate -= LanguageUpdate;
 
-    // Updates the dropdown options and styles (alignment, font size, font) based on the selected language.
+    /// <summary>
+    /// Updates dropdown options and text styles based on the current language.
+    /// </summary>
     public void LanguageUpdate()
     {
-        // Assign the caption text from the TMP dropdown.
-        captionText = dropdown.captionText;
-        if (captionText == null)
+        // Ensure dropdown component is assigned.
+        if (dropdown == null)
         {
-            Debug.LogError("Caption Text is null.");
+            Debug.LogError("LanguageDropdownTMP: Dropdown is not assigned.", this);
             return;
         }
 
-        // Assign the item text from the TMP dropdown.
-        itemText = dropdown.itemText;
-        if (itemText == null)
+        // Try to get the TMP_Text component for the dropdown's caption.
+        if (!dropdown.captionText.TryGetComponent(out captionText))
         {
-            Debug.LogError("Item Text is null.");
+            Debug.LogError("LanguageDropdownTMP: Caption text component is missing or invalid.", this);
             return;
         }
 
-        // Check if the options list is empty or null.
+        // Try to get the TMP_Text component for dropdown item labels.
+        if (!dropdown.itemText.TryGetComponent(out itemText))
+        {
+            Debug.LogError("LanguageDropdownTMP: Item text component is missing or invalid.", this);
+            return;
+        }
+
+        // Load language settings data including texts and metadata.
+        languageData = LoadLanguageSettings();
+        if (languageData == null)
+        {
+            Debug.LogError("LanguageDropdownTMP: Failed to load LanguageSettingsData.", this);
+            return;
+        }
+
+        // Check if options list is assigned and not empty.
         if (options == null || options.Count == 0)
         {
-            Debug.LogWarning("Options list is null or empty.");
+            Debug.LogWarning("LanguageDropdownTMP: Options list is empty.", this);
             return;
         }
 
-        saveFile = LanguageFileManager.GetSaveFilePath(); // Load the save file path to retrieve the current language settings.
+        // If translation is enabled, update localized option texts.
+        if (translateText) UpdateLocalizedOptions();
 
-        // Get the localized text for the first dropdown option and update the caption.
-        string line = LanguageFileManager.GetLocalizedLineByID(options[0].iD, saveFile, ref selectedFile);
-        ProcessLine(line); // Update the caption's style and font based on the localized settings.
-        ProcessOption(); // Update the dropdown options with the localized values.
+        // Retrieve metadata for the first option's ID to style the dropdown texts.
+        var meta = GetIDMeta(languageData.idMetaData, options[0].iD);
 
-        // Set the caption text to the first option if no selection has been made.
-        if (dropdown.value == 0) captionText.text = LanguageFileManager.ExtractTextBetweenBraces(line);
-    }
-
-    // Processes and applies the alignment, font size, and font settings to the dropdown caption and items.
-    private void ProcessLine(string line)
-    {
-        // Extract alignment, font size, and font data from the line.
-        string lineWithoutCurlyBraces = LanguageFileManager.RemoveTextBetweenBraces(line);
-        int alignment = LanguageFileManager.ExtractIntValue(lineWithoutCurlyBraces, "Ali:");
-        int fontSize = LanguageFileManager.ExtractIntValue(lineWithoutCurlyBraces, "S:");
-        int fontListIndex = LanguageFileManager.ExtractIntValue(lineWithoutCurlyBraces, "Font:");
-
-        // Apply alignment to the caption and item text if specified.
-        if (alignment != 0)
+        // Apply text alignment from metadata if specified.
+        if (meta.alignment != 0)
         {
-            TextAlignmentOptions correctAlignment = FontAndAlignmentUtilityTMP.ConvertToTextAnchor(alignment);
-            captionText.alignment = correctAlignment;
-            itemText.alignment = correctAlignment;
+            var alignment = ConvertToTextAnchor(meta.alignment);
+            captionText.alignment = alignment;
+            itemText.alignment = alignment;
         }
 
-        // Apply font size to the caption and item text if specified.
-        if (fontSize != 0)
+        // Apply font size from metadata if specified.
+        if (meta.fontSize != 0)
         {
-            captionText.fontSize = fontSize;
-            itemText.fontSize = fontSize;
+            captionText.fontSize = meta.fontSize;
+            itemText.fontSize = meta.fontSize;
         }
 
-        // Apply the font to the caption and item text if specified.
-        if (fontListIndex != 0)
+        // Apply font from metadata if specified.
+        if (meta.fontListIndex != 0)
         {
-            TMP_FontAsset correctFont = FontAndAlignmentUtilityTMP.GetFontByIndex(fontListIndex);
-            captionText.font = correctFont;
-            itemText.font = correctFont;
+            var font = GetFontByIndex(meta.fontListIndex);
+            captionText.font = font;
+            itemText.font = font;
         }
     }
 
-    // Updates the dropdown's options with the localized text and images.
-    private void ProcessOption()
+    /// <summary>
+    /// Translates the dropdown option texts and restores the previous selection index.
+    /// </summary>
+    private void UpdateLocalizedOptions()
     {
-        // Loop through each dropdown option and update its text with localized values.
-        foreach (LanguageOptions i in options)
+        // Translate each option's text based on its localization ID.
+        foreach (var option in options)
         {
-            string text = LanguageFileManager.FindLineByID(selectedFile, i.iD);
-            i.text = LanguageFileManager.ExtractTextBetweenBraces(text);
+            var translated = GetIDText(languageData.idData, option.iD);
+            if (!string.IsNullOrEmpty(translated)) option.text = translated;
         }
 
-        // Save the previously selected dropdown index.
-        int previousIndex = dropdown.value;
-        dropdown.ClearOptions(); // Clear existing dropdown options.
+        int previousIndex = dropdown.value; // Save the currently selected dropdown index.
+        dropdown.ClearOptions(); // Clear all existing options from the dropdown.
 
-        // Add each localized option back into the dropdown.
-        foreach (LanguageOptions i in options)
+        // Add all updated localized options back to the dropdown.
+        foreach (var option in options)
         {
-            TMP_Dropdown.OptionData optionData = new()
-            {
-                text = i.text,
-                image = i.sprite
-            };
-            dropdown.options.Add(optionData);
+            dropdown.options.Add(new(){ text = option.text, image = option.sprite });
         }
 
-        dropdown.value = previousIndex; // Restore the previously selected dropdown value.
+        captionText.text = options[previousIndex].text; // Set caption text to match the previously selected option.
+        dropdown.SetValueWithoutNotify(previousIndex); // Restore dropdown selection index without triggering callbacks.
     }
 }
 
 #if UNITY_EDITOR
-// Custom Editor class for the LanguageDropdownTMP component.
+/// <summary>
+/// Custom Inspector for LanguageDropdownTMP. Provides an Import Settings button.
+/// </summary>
+[CanEditMultipleObjects]
 [CustomEditor(typeof(LanguageDropdownTMP))]
 public class LanguageDropdownTMPEditor : Editor
 {
+    /// <summary>
+    /// Draws the custom inspector UI and handles the Import Settings functionality.
+    /// </summary>
     public override void OnInspectorGUI()
     {
-        serializedObject.Update(); // Update the serialized properties.
-        var script = (LanguageDropdownTMP)target; // Get reference to the LanguageDropdownTMP script.
-        LanguageEditorUtilities.DrawReadOnlyMonoScriptField(target); // Draw a read-only field for the script.
+        serializedObject.Update();
+        var script = (LanguageDropdownTMP)target;
+
+        // Disable Import Settings button if multiple objects are selected.
+        using (new EditorGUI.DisabledScope(targets.Length > 1))
+        {
+            // Draw Import Settings button with custom style.
+            if (GUILayout.Button("Import Settings", CreateCustomButtonStyle(15), GUILayout.Height(30)))
+            {
+                // Check if any option IDs already exist in the language list.
+                bool alreadyExists = script.options.Exists(opt => IsIDInLanguageList(opt.iD));
+
+                // Ask user if they want to replace existing IDs.
+                if (alreadyExists && !EditorUtility.DisplayDialog("Replace ID", "An ID with this number is already saved. Do you want to replace it?", "Yes", "No"))
+                    return;
+
+                // Retrieve alignment, font size, and font index from the caption text.
+                int alignment = ConvertToAlignmentCode(script.dropdown.captionText.alignment);
+                int fontSize = (int)script.dropdown.captionText.fontSize;
+                int fontListIndex = GetFontIndex(script.dropdown.captionText.font);
+
+                // Open language editor window with style data for the first option.
+                OpenEditorWindowWithComponent(script.options[0].iD, 6, script.options[0].text, alignment, fontSize, fontListIndex);
+
+                // For other options, open editor windows without style metadata.
+                if (script.translateText)
+                {
+                    for (int i = 1; i < script.options.Count; i++)
+                    {
+                        var option = script.options[i];
+                        OpenEditorWindowWithComponent(option.iD, 6, option.text, 0, 0, 0);
+                    }
+                }
+            }
+        }
 
         EditorGUILayout.Space(5);
 
-        // Button to import settings from the language tool to customize the dropdown options.
-        if (GUILayout.Button("Import Settings", LanguageEditorUtilities.CreateCustomButtonStyle(15), GUILayout.Height(30)))
-        {
-            bool alreadySaved = false;
-            foreach (LanguageOptions i in script.options)
-            {
-                if (LanguageEditorUtilities.IsIDInLanguageList(i.iD))
-                {
-                    alreadySaved = true;
-                    break;
-                }
-            }
-
-            // Display a dialog if the options are already saved.
-            if (alreadySaved)
-            {
-                if (!EditorUtility.DisplayDialog("Replace ID", "An ID with this number is already saved. Do you want to replace it?", "Yes", "No"))
-                {
-                    return;
-                }
-            }
-
-            // Retrieve the alignment, font size, and font data from the caption text.
-            int alignment = FontAndAlignmentUtilityTMP.ConvertToAlignmentCode(script.dropdown.captionText.alignment);
-            int fontSize = (int)script.dropdown.captionText.fontSize;
-            int fontListIndex = FontAndAlignmentUtilityTMP.GetFontIndex(script.dropdown.captionText.font);
-
-            // Open the editor window to customize the dropdown's first option.
-            LanguageEditorUtilities.OpenEditorWindowWithComponent(script.options[0].iD, 6, script.options[0].text, alignment, fontSize, fontListIndex, true, true, true, true);
-
-            // Loop through remaining options and open the editor for each.
-            for (int i = 1; i < script.options.Count; i++)
-            {
-                LanguageOptions option = script.options[i];
-                LanguageEditorUtilities.OpenEditorWindowWithComponent(option.iD, 6, option.text, 0, 0, 0, true, false, false, false);
-            }
-        }
-
-        // Display a warning if the dropdown component is not assigned.
-        GUI.color = script.dropdown == null ? Color.red : Color.white;
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("dropdown")); // Dropdown field to assign the TMP_Dropdown component.
-        GUI.color = Color.white;
-
-        // Display the list of dropdown options.
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("options"));
-        foreach (LanguageOptions i in script.options)
-        {
-            // Highlight the option if the ID already exists in the saved list.
-            if (LanguageEditorUtilities.IsIDInLanguageList(i.iD))
-            {
-                GUI.color = Color.yellow;
-                EditorGUILayout.HelpBox($"There is an ID ({i.iD}) with this number Saved!", MessageType.Warning);
-                GUI.color = Color.white;
-            }
-        }
-
-        // Display fields for selecting the file and saving the data.
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("selectedFile"));
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("saveFile"));
-
-        serializedObject.ApplyModifiedProperties(); // Apply any modified properties.
+        // Draw default inspector for remaining serialized fields.
+        DrawDefaultInspector();
+        serializedObject.ApplyModifiedProperties();
     }
 }
 #endif

@@ -1,13 +1,11 @@
 /*
  * ---------------------------------------------------------------------------
- * Description: A utility class for building asset bundles containing Font 
- *              and TMP_FontAsset assets within Unity. It provides a menu option to 
- *              initiate the asset bundle building process, searching for Font and 
- *              TMP_FontAsset files in a designated "AssetBundles" folder. The script 
- *              validates font file types, constructs asset bundle names based on font 
- *              names, and handles the building process with chunk-based compression. 
- *              Successful builds are logged in the console, along with error handling 
- *              for any failures during the process.
+ * Description: A utility class for generating AssetBundles from Font and TMP_FontAsset assets 
+ *              within Unity. It includes an editor menu option that searches for these font types 
+ *              inside a designated "AssetBundles" folder. Each valid asset is bundled individually 
+ *              with a specific naming pattern. The process includes validation, custom naming, 
+ *              chunk-based compression, and success/error logging.
+ * 
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
@@ -19,68 +17,69 @@ using System.Linq;
 using System.IO;
 using System;
 
+/// <summary>
+/// Provides functionality to build AssetBundles for Font and TMP_FontAsset assets from a specific folder.
+/// </summary>
 public static class FontAssetBundleBuilder
 {
-    [MenuItem("Assets/Build Font Asset Bundles [Language Tool Unity]")]
+    /// <summary>
+    /// Searches for Font and TMP_FontAsset assets in the "AssetBundles" folder and creates asset bundles for each.
+    /// </summary>
+    [MenuItem("Assets/Build Font Asset Bundles [Language Tool Unity]", false, 20)]
     public static void BuildFontAssetBundles()
     {
-        // Find all folders labeled as AssetBundles in the project.
+        // Attempt to locate the folder named "AssetBundles" in the project.
         string[] guids = AssetDatabase.FindAssets("AssetBundles t:Folder");
-        if (guids.Length == 0) // Check if any asset bundle folder exists.
+        if (guids.Length == 0)
         {
             Debug.LogError("Source folder does not exist.");
-            return; // Exit if no folders are found.
+            return;
         }
 
-        string fontFolderPath = AssetDatabase.GUIDToAssetPath(guids[0]); // Get the path of the first found asset bundle folder.
+        // Convert the found GUID to an asset path.
+        string folderPath = AssetDatabase.GUIDToAssetPath(guids[0]);
 
-        // Find all Font and TMP_FontAsset assets in the specified folder.
-        string[] fontPaths = AssetDatabase.FindAssets("t:Font", new string[] { fontFolderPath });
-        string[] fontPathsTMP = AssetDatabase.FindAssets("t:TMP_FontAsset", new string[] { fontFolderPath });
+        // Find all regular Font assets inside the folder and build bundles for each.
+        foreach (string guid in AssetDatabase.FindAssets("t:Font", new[] { folderPath }))
+            BuildFontAssetBundle(guid, folderPath, false);
 
-        // Build asset bundles for each found Font asset.
-        foreach (string fontPath in fontPaths)
-        {
-            BuildFontAssetBundle(fontPath, fontFolderPath, false); // False indicates it is not a TMP font.
-        }
+        // Find all TMP_FontAsset assets inside the folder and build bundles for each.
+        foreach (string guid in AssetDatabase.FindAssets("t:TMP_FontAsset", new[] { folderPath }))
+            BuildFontAssetBundle(guid, folderPath, true);
 
-        // Build asset bundles for each found TMP_FontAsset.
-        foreach (string fontPath in fontPathsTMP)
-        {
-            BuildFontAssetBundle(fontPath, fontFolderPath, true); // True indicates it is a TMP font.
-        }
-
-        AssetDatabase.Refresh(); // Refresh the AssetDatabase to reflect changes.
+        AssetDatabase.Refresh(); // Refresh the asset database to reflect the new bundles.
     }
 
-    // Builds a single font asset bundle.
-    private static void BuildFontAssetBundle(string fontPath, string fontFolderPath, bool isTMP)
+    /// <summary>
+    /// Builds an AssetBundle for a specific Font or TMP_FontAsset.
+    /// </summary>
+    /// <param name="fontGuid">The asset GUID of the font.</param>
+    /// <param name="outputPath">The output folder for the asset bundle.</param>
+    /// <param name="isTMP">Whether the font is a TextMeshPro font asset.</param>
+    private static void BuildFontAssetBundle(string fontGuid, string outputPath, bool isTMP)
     {
-        // Convert the font path GUID to its corresponding asset path.
-        string assetPath = AssetDatabase.GUIDToAssetPath(fontPath);
-        string extension = Path.GetExtension(assetPath); // Get the file extension of the font.
+        // Resolve the asset path from the provided GUID.
+        string assetPath = AssetDatabase.GUIDToAssetPath(fontGuid);
+        string extension = Path.GetExtension(assetPath);
 
-        // If it's not a TMP font, check if the file extension is valid.
-        if (!isTMP && !IsValidFontFile(extension)) return; // Exit if the font file is invalid.
+        // Skip the file if it's not a TMP asset and not a valid font file.
+        if (!isTMP && !IsValidFontFile(extension)) return;
 
-        // Determine the asset bundle name based on the font's name and type.
-        string assetBundleName = Path.GetFileNameWithoutExtension(assetPath) + (isTMP ? ".tmpltbundle" : ".ltbundle");
+        // Construct the bundle name with a special extension depending on asset type.
+        string bundleName = Path.GetFileNameWithoutExtension(assetPath) + (isTMP ? ".tmpltbundle" : ".ltbundle");
 
-        // Create a new AssetBundleBuild object with the asset bundle name and asset path.
+        // Prepare the build definition for this asset bundle.
         AssetBundleBuild build = new()
         {
-            assetBundleName = assetBundleName.ToLower(), // Convert the name to lowercase for consistency.
-            assetNames = new string[] { assetPath } // Include the asset path.
+            assetBundleName = bundleName.ToLower(),
+            assetNames = new[] { assetPath }
         };
 
         try
         {
-            // Build the asset bundles with chunk-based compression for the specified platform.
-            BuildPipeline.BuildAssetBundles(fontFolderPath, new AssetBundleBuild[] { build }, BuildAssetBundleOptions.ChunkBasedCompression, BuildTarget.StandaloneWindows);
-
-            // Log success message based on the type of font being processed.
-            string message = isTMP ? "TMP Font Asset Bundle created successfully:" : "Font Asset Bundle created successfully:";
-            Debug.Log($"{message} {build.assetBundleName}");
+            // Use chunk-based compression and build the asset bundle for Windows standalone.
+            BuildPipeline.BuildAssetBundles(outputPath, new[] { build }, BuildAssetBundleOptions.ChunkBasedCompression, BuildTarget.StandaloneWindows);
+            Debug.Log($"{(isTMP ? "TMP Font" : "Font")} Asset Bundle created successfully: {build.assetBundleName}");
         }
         catch (Exception e)
         {
@@ -88,12 +87,14 @@ public static class FontAssetBundleBuilder
         }
     }
 
-    // Validates whether the file has a valid font file extension.
+    /// <summary>
+    /// Checks if a file extension represents a valid font file.
+    /// </summary>
+    /// <param name="extension">File extension to validate.</param>
+    /// <returns>True if the extension is a valid font format; otherwise, false.</returns>
     private static bool IsValidFontFile(string extension)
     {
-        string[] fontExtensions = { ".ttf", ".otf", ".ttc" }; // List of valid font file extensions.
-
-        // Check if the provided extension matches any of the valid font extensions.
-        return fontExtensions.Any(ext => ext.Equals(extension, StringComparison.OrdinalIgnoreCase));
+        // Check against common font file extensions.
+        return new[] { ".ttf", ".otf", ".ttc" }.Any(ext => ext.Equals(extension, StringComparison.OrdinalIgnoreCase));
     }
 }
