@@ -65,6 +65,9 @@ public class LanguageManagerTMP : MonoBehaviour
         int selectedIndex = 0; // Default index to select (0) if no saved culture found.
         string savedCulture = GetSaveCultureCode(); // Retrieve saved culture code to restore dropdown selection.
 
+        // Sort available languages alphabetically by name.
+        availableLanguages.Sort((a, b) => a.name.CompareTo(b.name));
+
         // Populate options with available language names.
         for (int i = 0; i < availableLanguages.Count; i++)
         {
