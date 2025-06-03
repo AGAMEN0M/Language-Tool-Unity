@@ -45,7 +45,7 @@ public class AdjustSizeToDropdownTMP : MonoBehaviour
     private void Start()
     {
         parentRect = GetComponent<RectTransform>(); // Fetch RectTransform of the current UI element.
-        scrollRect = GetComponent<ScrollRect>();
+        scrollRect = GetComponent<ScrollRect>(); // Get the ScrollRect of the current object.
 
         // Traverse up the hierarchy to find the parent Canvas RectTransform.
         var current = transform.parent;

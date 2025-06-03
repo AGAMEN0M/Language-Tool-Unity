@@ -2934,7 +2934,7 @@ MonoBehaviour:
   m_MultiSelect: 0
   m_Options:
     m_Options:
-    - m_Text: ENGLISH
+    - m_Text: English
       m_Image: {fileID: 0}
       m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_OnValueChanged:
@@ -3795,6 +3795,7 @@ MonoBehaviour:
   fitDirection: 1
   parentRect: {fileID: 0}
   canvasRectTransform: {fileID: 0}
+  scrollRect: {fileID: 0}
   canvasWidth: 0
   objectWidth: 0
   textList: []
@@ -5064,6 +5065,7 @@ GameObject:
   - component: {fileID: 6177855080671370304}
   - component: {fileID: 3151245807491225006}
   - component: {fileID: 4099181875903166511}
+  - component: {fileID: 6177855080671370305}
   m_Layer: 5
   m_Name: Item Label
   m_TagString: Untagged
@@ -6092,6 +6094,7 @@ MonoBehaviour:
   fitDirection: 1
   parentRect: {fileID: 0}
   canvasRectTransform: {fileID: 0}
+  scrollRect: {fileID: 0}
   canvasWidth: 0
   objectWidth: 0
   textList: []
@@ -6538,6 +6541,7 @@ GameObject:
   - component: {fileID: 5476998561040899425}
   - component: {fileID: 8339100392581447753}
   - component: {fileID: 7524888789111552403}
+  - component: {fileID: 8339100392581447754}
   m_Layer: 5
   m_Name: Label
   m_TagString: Untagged
@@ -7433,6 +7437,20 @@ RectTransform:
   m_AnchoredPosition: {x: 5, y: -0.5}
   m_SizeDelta: {x: -30, y: -3}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &6177855080671370305
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3485005688628835596}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74bdd638f54794f4495d6b167a416006, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  textComponent: {fileID: 4099181875903166511}
+  isLanguageManager: 1
 --- !u!4 &6194099918736023498
 Transform:
   m_ObjectHideFlags: 0
@@ -7528,6 +7546,7 @@ GameObject:
   - component: {fileID: 3751691045485342331}
   - component: {fileID: 6934055805322810738}
   - component: {fileID: 6914357827808683105}
+  - component: {fileID: 6934055805322810739}
   m_Layer: 5
   m_Name: Label
   m_TagString: Untagged
@@ -7815,6 +7834,7 @@ GameObject:
   - component: {fileID: 9107178239741739207}
   - component: {fileID: 9089697284552620509}
   - component: {fileID: 6176980278977146952}
+  - component: {fileID: 9107178239741739208}
   m_Layer: 5
   m_Name: Item Label
   m_TagString: Untagged
@@ -7842,7 +7862,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: ENGLISH
+  m_text: English
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -7937,6 +7957,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6264242922844999346}
   m_CullTransparentMesh: 1
+--- !u!114 &6934055805322810739
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6264242922844999346}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74bdd638f54794f4495d6b167a416006, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  textComponent: {fileID: 6914357827808683105}
+  isLanguageManager: 1
 --- !u!114 &6952278462011613929
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8011,7 +8045,7 @@ MonoBehaviour:
   m_Value: 0
   m_Options:
     m_Options:
-    - m_Text: ENGLISH
+    - m_Text: English
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
@@ -8527,7 +8561,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: ENGLISH
+  m_Text: English
 --- !u!222 &7540626198974436956
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -8735,6 +8769,7 @@ MonoBehaviour:
   fitDirection: 1
   parentRect: {fileID: 0}
   canvasRectTransform: {fileID: 0}
+  scrollRect: {fileID: 0}
   canvasWidth: 0
   objectWidth: 0
   textList: []
@@ -9241,6 +9276,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5036403060211738265}
   m_CullTransparentMesh: 1
+--- !u!114 &8339100392581447754
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5036403060211738265}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1511cf3760bc470499ea19218c3ffc8b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  textComponent: {fileID: 7524888789111552403}
+  isLanguageManager: 1
 --- !u!114 &8364186493650428813
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9969,6 +10018,20 @@ RectTransform:
   m_AnchoredPosition: {x: 5, y: -0.5}
   m_SizeDelta: {x: -30, y: -3}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &9107178239741739208
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6896104973901457221}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1511cf3760bc470499ea19218c3ffc8b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  textComponent: {fileID: 6176980278977146952}
+  isLanguageManager: 1
 --- !u!114 &9135398795648837506
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9987,6 +10050,7 @@ MonoBehaviour:
   fitDirection: 1
   parentRect: {fileID: 0}
   canvasRectTransform: {fileID: 0}
+  scrollRect: {fileID: 0}
   canvasWidth: 0
   objectWidth: 0
   textList: []

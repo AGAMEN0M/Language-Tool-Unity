@@ -308,6 +308,7 @@ GameObject:
   - component: {fileID: 6177855081169189287}
   - component: {fileID: 3151245806977691721}
   - component: {fileID: 4099181876344872392}
+  - component: {fileID: 7194653959683399203}
   m_Layer: 5
   m_Name: Item Label
   m_TagString: Untagged
@@ -433,6 +434,20 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &7194653959683399203
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3485005689070538987}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74bdd638f54794f4495d6b167a416006, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  textComponent: {fileID: 4099181876344872392}
+  isLanguageManager: 1
 --- !u!1 &3946875743024155565
 GameObject:
   m_ObjectHideFlags: 0
@@ -735,6 +750,7 @@ GameObject:
   - component: {fileID: 3751691045038377884}
   - component: {fileID: 6934055805954846869}
   - component: {fileID: 6914357828469014918}
+  - component: {fileID: 7674444382599905313}
   m_Layer: 5
   m_Name: Label
   m_TagString: Untagged
@@ -789,7 +805,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: ENGLISH
+  m_text: English
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -860,6 +876,20 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &7674444382599905313
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6264242922347195221}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74bdd638f54794f4495d6b167a416006, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  textComponent: {fileID: 6914357828469014918}
+  isLanguageManager: 1
 --- !u!1 &7449724242059873599
 GameObject:
   m_ObjectHideFlags: 0
@@ -1078,7 +1108,7 @@ MonoBehaviour:
   m_MultiSelect: 0
   m_Options:
     m_Options:
-    - m_Text: ENGLISH
+    - m_Text: English
       m_Image: {fileID: 0}
       m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_OnValueChanged:
@@ -1225,6 +1255,7 @@ MonoBehaviour:
   fitDirection: 1
   parentRect: {fileID: 0}
   canvasRectTransform: {fileID: 0}
+  scrollRect: {fileID: 0}
   canvasWidth: 0
   objectWidth: 0
   textList: []

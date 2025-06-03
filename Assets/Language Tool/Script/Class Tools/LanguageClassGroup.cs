@@ -23,6 +23,7 @@ namespace LanguageTools
     public class LanguageAvailable
     {
         public string culture; // Culture code (e.g., "en-US").
+        public string nativeName; // Display native name of the language.
         public string name; // Display name of the language.
         public bool isAvailable; // Whether the language is currently available for use.
         public int columnIndex; // Column index in the localization table.

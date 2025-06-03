@@ -71,7 +71,7 @@ public class LanguageManagerTMP : MonoBehaviour
         // Populate options with available language names.
         for (int i = 0; i < availableLanguages.Count; i++)
         {
-            options.Add(availableLanguages[i].name);
+            options.Add(availableLanguages[i].nativeName);
 
             // Match saved culture to set initial dropdown value.
             if (availableLanguages[i].culture == savedCulture) selectedIndex = i;

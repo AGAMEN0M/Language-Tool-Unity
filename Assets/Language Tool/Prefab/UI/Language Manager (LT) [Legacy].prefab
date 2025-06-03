@@ -202,6 +202,7 @@ MonoBehaviour:
   fitDirection: 1
   parentRect: {fileID: 0}
   canvasRectTransform: {fileID: 0}
+  scrollRect: {fileID: 0}
   canvasWidth: 0
   objectWidth: 0
   textList: []
@@ -620,6 +621,7 @@ GameObject:
   - component: {fileID: 5476998560225653662}
   - component: {fileID: 8339100391767223990}
   - component: {fileID: 7524888789943605100}
+  - component: {fileID: 6192106807083539193}
   m_Layer: 5
   m_Name: Label
   m_TagString: Untagged
@@ -687,7 +689,21 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: ENGLISH
+  m_Text: English
+--- !u!114 &6192106807083539193
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5036403061025933414}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1511cf3760bc470499ea19218c3ffc8b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  textComponent: {fileID: 7524888789943605100}
+  isLanguageManager: 1
 --- !u!1 &5071563153503695892
 GameObject:
   m_ObjectHideFlags: 0
@@ -810,6 +826,7 @@ GameObject:
   - component: {fileID: 9107178238941146680}
   - component: {fileID: 9089697283757250338}
   - component: {fileID: 6176980279811301047}
+  - component: {fileID: 8122710198231862811}
   m_Layer: 5
   m_Name: Item Label
   m_TagString: Untagged
@@ -878,6 +895,20 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: Option A
+--- !u!114 &8122710198231862811
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6896104973051562426}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1511cf3760bc470499ea19218c3ffc8b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  textComponent: {fileID: 6176980279811301047}
+  isLanguageManager: 1
 --- !u!1 &7887187838770596776
 GameObject:
   m_ObjectHideFlags: 0
@@ -1007,7 +1038,7 @@ MonoBehaviour:
   m_Value: 0
   m_Options:
     m_Options:
-    - m_Text: ENGLISH
+    - m_Text: English
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:

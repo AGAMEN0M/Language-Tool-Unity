@@ -140,17 +140,21 @@ namespace TSVTools
         /// <returns>The text in the specified cell, or null if the indices are invalid.</returns>
         public static string GetText(VerticalTable[] table, int columnVertical, int columnHorizontal)
         {
+            // Get the name of the method that called this one.
+            var stackTrace = new System.Diagnostics.StackTrace();
+            string callerInfo = stackTrace.FrameCount > 1 ? stackTrace.GetFrame(1).GetMethod().DeclaringType.Name + "." + stackTrace.GetFrame(1).GetMethod().Name : "UnknownCaller";
+
             // Check if the table is null or if the vertical index is out of bounds. If so, log an error and return null.
             if (table == null || columnVertical < 0 || columnVertical >= table.Length)
             {
-                Debug.LogError("Invalid vertical index.");
+                Debug.LogError($"[{callerInfo}] Invalid vertical index: {columnVertical}.");
                 return null;
             }
 
             // Check if the horizontal index is out of bounds. If so, log an error and return null.
             if (columnHorizontal < 0 || columnHorizontal >= table[columnVertical].horizontalTable.Length)
             {
-                Debug.LogError("Invalid horizontal index.");
+                Debug.LogError($"[{callerInfo}] Invalid horizontal index: {columnHorizontal}.");
                 return null;
             }
 

@@ -43,6 +43,7 @@ public class AdjustSizeToDropdown : MonoBehaviour
     private void Start()
     {
         parentRect = GetComponent<RectTransform>(); // Get the RectTransform of the current object.
+        scrollRect = GetComponent<ScrollRect>(); // Get the ScrollRect of the current object.
 
         // Traverse hierarchy to locate the Canvas component.
         var current = transform.parent;

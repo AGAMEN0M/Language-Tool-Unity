@@ -150,7 +150,7 @@ namespace LanguageTools
 
             // Get the dimensions of the table.
             RowAndColumnCounter(table, out int rowCount, out int columnCount);
-            if (rowCount < 3 || columnCount < 3)
+            if (rowCount < 4 || columnCount < 3)
             {
                 Debug.LogWarning("The table does not have enough columns to extract the expected data.");
                 return;
@@ -164,8 +164,9 @@ namespace LanguageTools
 
                 // Extract values from the current column.
                 var culture = GetText(table, 0, col);
-                var name = GetText(table, 1, col);
-                var isAvailableText = GetText(table, 2, col);
+                var nativeName = GetText(table, 1, col);
+                var name = GetText(table, 2, col);
+                var isAvailableText = GetText(table, 3, col);
                 bool isAvailable = bool.TryParse(isAvailableText, out bool result) && result;
 
                 if (isAvailable)
@@ -174,6 +175,7 @@ namespace LanguageTools
                     languageData.availableLanguages.Add(new()
                     {
                         culture = culture,
+                        nativeName = nativeName,
                         name = name,
                         isAvailable = true,
                         columnIndex = col
@@ -199,7 +201,7 @@ namespace LanguageTools
 
             // Get dimensions.
             RowAndColumnCounter(table, out int rowCount, out int columnCount);
-            if (rowCount < 4 || columnCount < 2)
+            if (rowCount < 5 || columnCount < 2)
             {
                 Debug.LogWarning("The table does not have enough data to extract IDs.");
                 return null;
@@ -215,7 +217,7 @@ namespace LanguageTools
 
             // Extract ID and corresponding localized text.
             List<IdData> ids = new();
-            for (int row = 3; row < rowCount; row++)
+            for (int row = 4; row < rowCount; row++)
             {
                 var idText = GetText(table, row, 1);
                 var text = GetText(table, row, columnIndex);

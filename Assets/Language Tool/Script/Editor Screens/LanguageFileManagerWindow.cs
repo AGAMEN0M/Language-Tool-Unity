@@ -817,7 +817,7 @@ public class LanguageFileManagerWindow : EditorWindow
 
         // Count rows and columns in the table.
         RowAndColumnCounter(languageDataTable, out int rowCount, out int columnCount);
-        if (rowCount < 3 || columnCount < 3)
+        if (rowCount < 4 || columnCount < 3)
         {
             Debug.LogWarning("The table does not have enough rows or columns to extract language data.");
             return;
@@ -827,12 +827,20 @@ public class LanguageFileManagerWindow : EditorWindow
         for (int col = 2; col < columnCount; col++)
         {
             var culture = GetText(languageDataTable, 0, col);
-            var name = GetText(languageDataTable, 1, col);
-            var isAvailableText = GetText(languageDataTable, 2, col);
+            var nativeName = GetText(languageDataTable, 1, col);
+            var name = GetText(languageDataTable, 2, col);
+            var isAvailableText = GetText(languageDataTable, 3, col);
 
             bool isAvailable = bool.TryParse(isAvailableText, out bool result) && result;
 
-            availableLanguages.Add(new() { culture = culture, name = name, isAvailable = isAvailable, columnIndex = col });
+            availableLanguages.Add(new()
+            {
+                culture = culture,
+                nativeName = nativeName,
+                name = name,
+                isAvailable = isAvailable,
+                columnIndex = col
+            });
         }
     }
 

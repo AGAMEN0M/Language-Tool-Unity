@@ -1,9 +1,12 @@
 /*
  * ---------------------------------------------------------------------------
- * Description: Utility class for managing Unity Canvas hierarchies using a 
- *              structured data format. Provides functionality to extract, apply, 
- *              and recreate Canvas layouts along with associated metadata and 
- *              component configurations.
+ * Description: Utility class for serializing, reconstructing and validating 
+ *              Unity Canvas hierarchies. Provides functionality to extract 
+ *              layout metadata, apply saved structures to existing objects, 
+ *              and instantiate canvases programmatically using structured 
+ *              data formats. Ensures hierarchy integrity through duplicate 
+ *              name detection and preserves component configurations such as 
+ *              CanvasScaler and GraphicRaycaster.
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
@@ -18,6 +21,9 @@ namespace LanguageTools
 {
     public class CanvasManager
     {
+        // Name prefix used by TextMeshPro to create internal layout elements; excluded from hierarchy processing.
+        private const string subMeshUI = "TMP SubMeshUI";
+
         /// <summary>
         /// Extracts Canvas metadata and hierarchy from a GameObject into a CanvasStructure.
         /// </summary>
@@ -25,7 +31,7 @@ namespace LanguageTools
         /// <param name="canvasObject">Canvas GameObject source.</param>
         public static void ExtractCanvasData(ref CanvasStructure canvasStructure, GameObject canvasObject)
         {
-            // Initialize an empty canvas structure.
+            // Initialize an empty CanvasStructure instance.
             canvasStructure = new()
             {
                 canvasLayers = new CanvasLayers[0],
@@ -45,11 +51,18 @@ namespace LanguageTools
             // Set canvas name.
             canvasStructure.canvasName = canvasObject.name;
 
+            // Store original active states and temporarily activate all children for hierarchy traversal.
+            Dictionary<GameObject, bool> originalStates = new();
+            ActivateAllChildren(canvasObject.transform, originalStates);
+
             // Extract metadata from core canvas components.
             PopulateCanvasMetadata(ref canvasStructure, canvasObject);
 
             // Extract and build hierarchy layers.
             canvasStructure.canvasLayers = GenerateCanvasLayers(canvasObject);
+
+            // Restore original active states.
+            foreach (var kvp in originalStates) kvp.Key.SetActive(kvp.Value);
         }
 
         /// <summary>
@@ -71,7 +84,7 @@ namespace LanguageTools
 
             var root = canvasObject.GetComponent<RectTransform>();
 
-            // Apply hierarchy and RectTransform data layer by layer.
+            // Traverse the hierarchy and apply RectTransform data to each matching element.
             foreach (var layer in canvasStructure.canvasLayers)
             {
                 var parent = root;
@@ -121,7 +134,7 @@ namespace LanguageTools
                 return;
             }
 
-            // Ensure data consistency before creating.
+            // Validate structural consistency before creating the hierarchy.
             if (canvasStructure.canvasLayers == null || canvasStructure.canvasLayers.Length == 0 || canvasStructure.canvasLayers.Any(l => l.CanvasObjectsLayers.Length != l.rectTransforms.Length))
             {
                 Debug.LogError("Creation failed: Mismatched CanvasObjectsLayers and rectTransforms.");
@@ -172,7 +185,7 @@ namespace LanguageTools
                             rect.pivot = data.pivot;
                         }
 
-                        // Assign debug color to Image for visual clarity.
+                        // Assign a random debug color to the Image component for visual clarity in the Editor.
                         if (go.TryGetComponent(out Image image))
                         {
                             if (!colorMap.ContainsKey(i)) colorMap[i] = new Color(Random.value, Random.value, Random.value);
@@ -195,24 +208,37 @@ namespace LanguageTools
         {
             var paths = new List<List<RectTransform>>();
 
-            // Recursively collect paths from each leaf node.
+            // Recursively collect all RectTransform paths from root to each leaf node.
             void Collect(RectTransform parent, List<RectTransform> path)
             {
+                // Ignore objects whose name starts with subMeshUI.
+                if (parent.name.StartsWith(subMeshUI)) return;
+
                 path.Add(parent);
 
-                if (parent.childCount == 0)
+                bool hasValidChild = false;
+
+                foreach (RectTransform child in parent)
                 {
-                    paths.Add(new(path));
+                    if (!child.name.StartsWith(subMeshUI))
+                    {
+                        hasValidChild = true;
+                        Collect(child, path);
+                    }
                 }
-                else
-                {
-                    foreach (RectTransform child in parent) Collect(child, path);
-                }
+
+                if (!hasValidChild) paths.Add(new(path));
 
                 path.RemoveAt(path.Count - 1);
             }
 
-            foreach (RectTransform child in canvasObject.transform) Collect(child, new());
+            foreach (RectTransform child in canvasObject.transform)
+            {
+                if (!child.name.StartsWith(subMeshUI))
+                {
+                    Collect(child, new());
+                }
+            }
 
             // Convert collected paths into CanvasLayers.
             return paths.Select(p => new CanvasLayers
@@ -223,7 +249,8 @@ namespace LanguageTools
         }
 
         /// <summary>
-        /// Returns true if any sibling in the hierarchy has a duplicate name.
+        /// Returns true if any sibling in the hierarchy has a duplicate name,
+        /// ignoring objects that contain subMeshUI in their name.
         /// </summary>
         private static bool ContainsDuplicateSiblings(RectTransform parent)
         {
@@ -231,7 +258,10 @@ namespace LanguageTools
 
             foreach (RectTransform child in parent)
             {
-                // Check if this name already exists at this level.
+                // Skip children with names that contain subMeshUI.
+                if (child.name.Contains(subMeshUI)) continue;
+
+                // Check for duplicate names among siblings at this level.
                 if (!names.Add(child.name))
                 {
                 #if UNITY_EDITOR
@@ -264,6 +294,29 @@ namespace LanguageTools
         };
 
         /// <summary>
+        /// Recursively activates all children and stores their original active states.
+        /// </summary>
+        /// <param name="parent">Parent transform to start from.</param>
+        /// <param name="states">Dictionary to store original active states.</param>
+        private static void ActivateAllChildren(Transform parent, Dictionary<GameObject, bool> states)
+        {
+            foreach (Transform child in parent)
+            {
+                if (!child.name.StartsWith(subMeshUI))
+                {
+                    GameObject go = child.gameObject;
+                    if (!states.ContainsKey(go))
+                    {
+                        states[go] = go.activeSelf;
+                        if (!go.activeSelf) go.SetActive(true);
+                    }
+
+                    ActivateAllChildren(child, states);
+                }
+            }
+        }
+
+        /// <summary>
         /// Finds a child RectTransform by name.
         /// </summary>
         private static RectTransform FindChildByName(RectTransform parent, string name)
@@ -278,7 +331,7 @@ namespace LanguageTools
         /// </summary>
         private static void PopulateCanvasMetadata(ref CanvasStructure s, GameObject obj)
         {
-            // Extract RectTransform data.
+            // Populate structure with RectTransform data.
             if (obj.TryGetComponent(out RectTransform rt)) s.rectTransform = ConvertToRectTransformData(rt);
 
             // Extract Canvas settings.
