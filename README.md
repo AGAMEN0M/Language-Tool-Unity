@@ -3,9 +3,9 @@ A tool that helps you translate your games and facilitates translation by fans.
 
 # Download
 
-[Language Tool - Package v0.2.4](https://drive.google.com/file/d/1LhwTqQVRaD5EtO32w168nG2EpcfNGeFt/view?usp=drive_link)
+[Language Tool - Package v0.2.4](https://drive.google.com/file/d/1SGBlQvlDCudZvZqRaQXEszrQBEsT6422/view?usp=drive_link)
  / 
-[Documentation](https://drive.google.com/file/d/166HDGSjH9mjfQ6mumZcOKIdBlgMjF7jR/view?usp=drive_link)
+[Documentation](https://drive.google.com/file/d/1-xxLPGUaJElupbneyJuk14rIvSK4CL9t/view?usp=drive_link)
 
 [TSV Tools - Package v0.0.2](https://drive.google.com/file/d/1RSr5jytctQUOtXgmP0Kiag5eqK1-V86s/view?usp=drive_link)
  / 

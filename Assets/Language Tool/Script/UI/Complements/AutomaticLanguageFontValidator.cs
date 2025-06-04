@@ -63,11 +63,12 @@ public class AutomaticLanguageFontValidator : MonoBehaviour
     {
         if (textComponent == null || localizationSettings == null) return;
 
-        // Re-validate only if the text has changed.
-        if (textComponent.text != lastValidatedText)
+        // Use textComponent's internal string reference for comparison to avoid string allocation.
+        string currentText = textComponent.text;
+        if (!ReferenceEquals(currentText, lastValidatedText))
         {
-            lastValidatedText = textComponent.text;
-            ValidateFontSupport(lastValidatedText);
+            lastValidatedText = currentText;
+            ValidateFontSupport(currentText);
         }
     }
 
@@ -87,34 +88,50 @@ public class AutomaticLanguageFontValidator : MonoBehaviour
         var currentFont = textComponent.font;
         var fallbackFonts = localizationSettings.fontListData.fontList;
 
-        foreach (char character in text)
+        // Check if current font supports all characters.
+        bool isCurrentFontValid = true;
+        foreach (char c in text)
         {
-            // If the current font does not support the character.
-            if (!currentFont.HasCharacter(character))
+            if (!currentFont.HasCharacter(c))
             {
-                // Try to find a fallback font that does.
-                foreach (var fallbackFont in fallbackFonts)
-                {
-                    if (fallbackFont != null && fallbackFont.HasCharacter(character))
-                    {
-                        textComponent.font = fallbackFont;
-                        Debug.LogWarning($"AutomaticLanguageFontValidator: Applied fallback font '{fallbackFont.name}'.", this);
-                        return;
-                    }
-                }
+                isCurrentFontValid = false;
+                break;
+            }
+        }
 
-                // If no font supports the character and fallback name resolution is enabled.
-                if (isLanguageManager)
-                {
-                    var matchingLanguage = supportedLanguages.Find(lang => lang.nativeName == text);
-                    if (matchingLanguage != null)
-                    {
-                        textComponent.text = matchingLanguage.name;
-                        Debug.LogWarning($"AutomaticLanguageFontValidator: Unsupported characters detected. Replaced native name with fallback name: '{matchingLanguage.name}'.", this);
-                    }
-                }
+        if (isCurrentFontValid) return; // Current font is valid, no need to change.
 
+        // Try each fallback font to see if any supports all characters.
+        foreach (var fallbackFont in fallbackFonts)
+        {
+            if (fallbackFont == null) continue;
+
+            bool fontSupportsAll = true;
+            foreach (char c in text)
+            {
+                if (!fallbackFont.HasCharacter(c))
+                {
+                    fontSupportsAll = false;
+                    break;
+                }
+            }
+
+            if (fontSupportsAll)
+            {
+                textComponent.font = fallbackFont;
+                Debug.LogWarning($"AutomaticLanguageFontValidator: Applied fallback font '{fallbackFont.name}'.", this);
                 return;
+            }
+        }
+
+        // If no font supports all characters, fallback to language name.
+        if (isLanguageManager)
+        {
+            var matchingLanguage = supportedLanguages.Find(lang => lang.nativeName == text);
+            if (matchingLanguage != null)
+            {
+                textComponent.text = matchingLanguage.name;
+                Debug.LogWarning($"AutomaticLanguageFontValidator: Unsupported characters detected. Replaced native name with fallback name: '{matchingLanguage.name}'.", this);
             }
         }
     }
