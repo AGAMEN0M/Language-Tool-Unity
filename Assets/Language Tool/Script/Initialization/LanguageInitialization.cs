@@ -3,6 +3,7 @@
  * Description: Handles language initialization including loading language settings,
  *              managing font lists for both regular and TMP fonts, saving and 
  *              loading font lists from files, and loading fonts from asset bundles.
+ *              
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
@@ -20,11 +21,16 @@ using static LanguageTools.LanguageFileManager;
 
 public class LanguageInitialization
 {
+    #region === Fields ===
+
     private static LanguageSettingsData settingsData; // Holds the loaded language settings data from resources.
     private static LanguageFontListData fontListData; // Holds the list of regular fonts loaded from asset bundles or resources.
     private static LanguageFontListDataTMP fontListDataTMP; // Holds the list of TMP fonts loaded from asset bundles or resources.
-
     private static string folderPath; // Full system path to the folder where font list files and bundles are stored.
+
+    #endregion
+
+    #region === Initialization ===
 
     /// <summary>
     /// Initializes language settings and font loading on game start.
@@ -52,6 +58,10 @@ public class LanguageInitialization
         LoadFontListsFromFile(); // Reload and validate font list data from saved files.
     #endif
     }
+
+    #endregion
+
+    #region === Language Settings ===
 
     /// <summary>
     /// Loads language settings data from resources.
@@ -100,6 +110,10 @@ public class LanguageInitialization
         GetAllData(); // Load all related language data into memory.
     }
 
+    #endregion
+
+    #region === Font Bundles (Legacy) ===
+
     /// <summary>
     /// Loads regular fonts from asset bundles in the font data folder.
     /// </summary>
@@ -141,6 +155,10 @@ public class LanguageInitialization
         }
     }
 
+    #endregion
+
+    #region === Font Bundles (TMP) ===
+
     /// <summary>
     /// Loads TMP fonts from asset bundles in the font data folder.
     /// </summary>
@@ -181,6 +199,10 @@ public class LanguageInitialization
             }
         }
     }
+
+    #endregion
+
+    #region === Font List Files ===
 
     /// <summary>
     /// Saves current font lists to text files in the font data folder if not already present.
@@ -242,4 +264,6 @@ public class LanguageInitialization
             fontListDataTMP.TMPFontList.AddRange(updatedFontListTMP);
         }
     }
+
+    #endregion
 }

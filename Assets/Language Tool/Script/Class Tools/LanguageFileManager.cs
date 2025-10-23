@@ -2,26 +2,33 @@
  * ---------------------------------------------------------------------------
  * Description: Manages loading, saving, and parsing of language data in the application.
  *              Handles localization files, user preferences, and extraction of translated strings.
+ *              
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
 */
 
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using System.IO;
 using TSVTools;
 
 using static TSVTools.TabTableUtility;
-using System.Linq;
 
 namespace LanguageTools
 {
     public class LanguageFileManager
     {
+        #region === Cached Data & Constants ===
+
         private static LanguageSettingsData cachedLanguageData = null; // Stores the loaded language settings.
         private static readonly string CultureCodeKey = "SelectedCulture"; // Key for storing the culture code in PlayerPrefs.
         private static string assetsPath = null; // Cached path to the folder containing language assets.
+
+        #endregion
+
+        #region === Language Settings Loading ===
 
         /// <summary>
         /// Loads the language settings from the Resources folder and caches them for future use.
@@ -44,6 +51,10 @@ namespace LanguageTools
             cachedLanguageData = languageData;
             return languageData;
         }
+
+        #endregion
+
+        #region === Culture Code Management ===
 
         /// <summary>
         /// Retrieves the currently saved or default culture code from PlayerPrefs.
@@ -82,6 +93,10 @@ namespace LanguageTools
             PlayerPrefs.Save();
         }
 
+        #endregion
+
+        #region === Asset Path Utilities ===
+
         /// <summary>
         /// Gets the full path to the folder where language files are stored.
         /// </summary>
@@ -103,6 +118,10 @@ namespace LanguageTools
             return assetsPath;
         }
 
+        #endregion
+
+        #region === Table Utilities ===
+
         /// <summary>
         /// Determines the number of rows and columns in a vertical table structure.
         /// </summary>
@@ -122,6 +141,10 @@ namespace LanguageTools
                 columnCount = 0;
             }
         }
+
+        #endregion
+
+        #region === Available Languages Parsing ===
 
         /// <summary>
         /// Parses the LanguageData.tsv file and populates available languages in the settings.
@@ -184,6 +207,10 @@ namespace LanguageTools
             }
         }
 
+        #endregion
+
+        #region === ID Extraction ===
+
         /// <summary>
         /// Extracts a list of localized ID data from a given table and culture code.
         /// </summary>
@@ -234,6 +261,10 @@ namespace LanguageTools
 
             return ids;
         }
+
+        #endregion
+
+        #region === Data Loading ===
 
         /// <summary>
         /// Loads and parses all localization-related TSV files into the language settings structure.
@@ -310,6 +341,10 @@ namespace LanguageTools
             languageData.idMetaData = metaData; // Assign parsed metadata.
         }
 
+        #endregion
+
+        #region === Data Retrieval ===
+
         /// <summary>
         /// Retrieves the localized string for a given ID from the list.
         /// </summary>
@@ -347,5 +382,7 @@ namespace LanguageTools
             // Find and return metadata for the given ID.
             return ids.Find(data => data.iD == id);
         }
+
+        #endregion
     }
 }

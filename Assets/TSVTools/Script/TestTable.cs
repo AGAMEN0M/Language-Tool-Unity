@@ -1,10 +1,7 @@
 /*
  * ---------------------------------------------------------------------------
- * Description: This script provides a Unity editor interface for testing the 
- *              functionality of the TabTableUtility class. It allows loading, 
- *              saving, modifying, and viewing content in TSV tables. Operations 
- *              such as adding and removing rows or columns, and setting or getting 
- *              text in specific cells are available through the Unity Editor.
+ * Description: Unity editor test script for TSV tables. Provides buttons in
+ *              the Inspector to load, save, read, and modify TSV table content.
  *              
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
@@ -12,124 +9,276 @@
 */
 
 using UnityEngine;
-using TSVTools;
 
 #if UNITY_EDITOR
 using UnityEditor;
+using TSVTools;
+
+using static TSVTools.TabTableUtility;
 #endif
 
+[AddComponentMenu("Test Script/TSV Tools/Test Table")]
 public class TestTable : MonoBehaviour
 {
 #if UNITY_EDITOR
-    public VerticalTable[] table; // Array to hold the loaded table data.
-    public string filePath; // Path to the TSV file.
-    [Space(10)]
-    [TextArea] public string text; // Text input for setting a specific cell's content.
-    // Indices for selecting a specific cell in the table.
-    public int columnVertical;
-    public int columnHorizontal;
-    [Space(10)]
-    public TabTableUtility.LineDirection direction; // Direction for adding/removing rows/columns.
-    public int AddColumn; // Position for adding or removing a column or row.
 
-    // Context menu to open a file selection dialog and load a TSV file into the table.
-    [ContextMenu("Get File")]
-    private void GetFile()
+    #region === Serialized Fields ===
+
+    [Header("Table Data")]
+    [SerializeField, Tooltip("Array holding the loaded table data.")]
+    private VerticalTable[] table;
+
+    [SerializeField, Tooltip("Path to the TSV file.")]
+    private string filePath;
+
+    [Header("Cell Operations")]
+    [SerializeField, TextArea, Tooltip("Text input for setting a specific cell's content.")]
+    private string text;
+
+    [SerializeField, Tooltip("Row index for the selected cell.")]
+    private int columnVertical;
+
+    [SerializeField, Tooltip("Column index for the selected cell.")]
+    private int columnHorizontal;
+
+    [Header("Add/Remove Operations")]
+    [SerializeField, Tooltip("Direction for adding or removing rows/columns.")]
+    private LineDirection direction;
+
+    [SerializeField, Tooltip("Position for adding or removing a row/column.")]
+    private int addColumn;
+
+    #endregion
+
+    #region === Properties ===
+
+    /// <summary>
+    /// Gets or sets the table data array.
+    /// </summary>
+    public VerticalTable[] Table
     {
-        // Open a file panel for the user to select a TSV file.
+        get => table;
+        set => table = value;
+    }
+
+    /// <summary>
+    /// Gets or sets the path of the TSV file currently loaded.
+    /// </summary>
+    public string FilePath
+    {
+        get => filePath;
+        set => filePath = value;
+    }
+
+    /// <summary>
+    /// Gets or sets the text content for cell operations.
+    /// </summary>
+    public string Text
+    {
+        get => text;
+        set => text = value;
+    }
+
+    /// <summary>
+    /// Gets or sets the row index of the selected cell.
+    /// </summary>
+    public int ColumnVertical
+    {
+        get => columnVertical;
+        set => columnVertical = value;
+    }
+
+    /// <summary>
+    /// Gets or sets the column index of the selected cell.
+    /// </summary>
+    public int ColumnHorizontal
+    {
+        get => columnHorizontal;
+        set => columnHorizontal = value;
+    }
+
+    /// <summary>
+    /// Gets or sets the direction used for adding or removing lines (row/column).
+    /// </summary>
+    public LineDirection Direction
+    {
+        get => direction;
+        set => direction = value;
+    }
+
+    /// <summary>
+    /// Gets or sets the index used for adding or removing a row/column.
+    /// </summary>
+    public int AddColumn
+    {
+        get => addColumn;
+        set => addColumn = value;
+    }
+
+    #endregion
+
+    #region === Public Methods ===
+
+    /// <summary>
+    /// Opens a file panel to select a TSV file and loads its content into the table.
+    /// </summary>
+    public void GetFile()
+    {
+        // Open file panel to select a TSV file.
         filePath = EditorUtility.OpenFilePanel("Select TSV File", Application.dataPath, "tsv");
 
         if (!string.IsNullOrEmpty(filePath))
         {
-            // Load the table using the selected file path.
-            TabTableUtility.LoadTableFile(filePath, ref table);
-            Debug.Log("File loaded successfully.");
+            LoadTableFile(filePath, ref table); // Load the table content.
+            Debug.Log("File loaded successfully.", this);
         }
         else
         {
-            Debug.LogWarning("No file selected.");
+            Debug.LogWarning("No file selected.", this);
         }
     }
 
-    // Helper function to check if the table is loaded and valid.
+    /// <summary>
+    /// Checks if the table is loaded and valid.
+    /// Returns true if the table is invalid (null or empty).
+    /// </summary>
     private bool Checking()
     {
-        // If the table is empty or null, log an error and return true.
         if (table == null || table.Length == 0)
         {
-            Debug.LogError("Table is empty. Load a file first.");
+            Debug.LogError("Table is empty. Load a file first.", this);
             return true;
         }
 
         return false;
     }
 
-    // Context menu to save the current table to a file.
-    [ContextMenu("Save File")]
-    private void SaveFile()
+    /// <summary>
+    /// Opens a save file panel and saves the current table to a TSV file.
+    /// </summary>
+    public void SaveFile()
     {
         if (Checking()) return;
 
-        // Open a save file dialog and get the save path.
+        // Open save file dialog.
         string savePath = EditorUtility.SaveFilePanel("Save TSV File", Application.dataPath, "table", "tsv");
 
         if (!string.IsNullOrEmpty(savePath))
         {
-            // Save the table to the selected path.
-            TabTableUtility.SaveTableFile(savePath, table);
-            Debug.Log($"File saved successfully at: {savePath}");
+            SaveTableFile(savePath, table); // Save table.
+            Debug.Log($"File saved successfully at: {savePath}", this);
         }
         else
         {
-            Debug.LogWarning("Save operation cancelled.");
+            Debug.LogWarning("Save operation cancelled.", this);
         }
     }
 
-    // Context menu to get the text from a specific cell in the table.
-    [ContextMenu("Get Text")]
-    private void GetText()
+    /// <summary>
+    /// Retrieves text from a specific cell in the table and logs it to the console.
+    /// </summary>
+    public void GetText()
     {
         if (Checking()) return;
 
-        // Retrieve the text from the specified cell.
+        // Get the text from the specified cell.
         string cellText = TabTableUtility.GetText(table, columnVertical, columnHorizontal);
 
         if (cellText != null)
         {
-            // Log the text from the specified cell.
-            Debug.Log($"Text at ({columnVertical}, {columnHorizontal}): {cellText}");
+            text = cellText;
+            Debug.Log($"Text at ({columnVertical}, {columnHorizontal}): {cellText}", this);
         }
     }
 
-    // Context menu to set the text of a specific cell in the table.
-    [ContextMenu("Set Text")]
-    private void SetText()
+    /// <summary>
+    /// Sets text for a specific cell in the table.
+    /// </summary>
+    public void SetText()
     {
         if (Checking()) return;
 
         // Set the text in the specified cell.
         TabTableUtility.SetText(ref table, columnVertical, columnHorizontal, text);
-        Debug.Log($"Text set at ({columnVertical}, {columnHorizontal}): {text}");
+        Debug.Log($"Text set at ({columnVertical}, {columnHorizontal}): {text}", this);
     }
 
-    // Context menu to add a row or column in the table at the specified position.
-    [ContextMenu("Add Column")]
-    private void AddColumnInTable()
+    /// <summary>
+    /// Adds a row or column in the table at the specified position.
+    /// </summary>
+    public void AddColumnInTable()
     {
         if (Checking()) return;
 
-        // Add a row or column depending on the direction.
-        TabTableUtility.AddLine(ref table, AddColumn, direction);
+        // Add a line in the given direction.
+        AddLine(ref table, addColumn, direction);
     }
 
-    // Context menu to remove a row or column from the table at the specified position.
-    [ContextMenu("Remove Column")]
-    private void RemoveColumnInTable()
+    /// <summary>
+    /// Removes a row or column from the table at the specified position.
+    /// </summary>
+    public void RemoveColumnInTable()
     {
         if (Checking()) return;
 
-        // Remove a row or column depending on the direction.
-        TabTableUtility.RemoveLine(ref table, AddColumn, direction);
+        // Remove a line in the given direction.
+        RemoveLine(ref table, addColumn, direction);
     }
+
+    #endregion
+
 #endif
 }
+
+#if UNITY_EDITOR
+
+#region === Inspector ===
+
+[CanEditMultipleObjects]
+[CustomEditor(typeof(TestTable))]
+public class TestTableInspector : Editor
+{
+    /// <summary>
+    /// Draws custom Inspector GUI with buttons for all TestTable context menu methods.
+    /// </summary>
+    public override void OnInspectorGUI()
+    {
+        var script = (TestTable)target;
+
+        // Row 1: File operations.
+        GUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
+        if (GUILayout.Button("Get File", GUILayout.Width(200))) script.GetFile();
+        GUILayout.Space(10);
+        if (GUILayout.Button("Save File", GUILayout.Width(200))) script.SaveFile();
+        GUILayout.FlexibleSpace();
+        GUILayout.EndHorizontal();
+
+        // Row 2: Cell operations.
+        GUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
+        if (GUILayout.Button("Get Text", GUILayout.Width(200))) script.GetText();
+        GUILayout.Space(10);
+        if (GUILayout.Button("Set Text", GUILayout.Width(200))) script.SetText();
+        GUILayout.FlexibleSpace();
+        GUILayout.EndHorizontal();
+
+        // Row 3: Add/Remove operations.
+        GUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
+        if (GUILayout.Button("Add Column", GUILayout.Width(200))) script.AddColumnInTable();
+        GUILayout.Space(10);
+        if (GUILayout.Button("Remove Column", GUILayout.Width(200))) script.RemoveColumnInTable();
+        GUILayout.FlexibleSpace();
+        GUILayout.EndHorizontal();
+
+        GUILayout.Space(10);
+
+        // Draw the default inspector below the custom buttons.
+        DrawDefaultInspector();
+    }
+}
+
+#endregion
+
+#endif

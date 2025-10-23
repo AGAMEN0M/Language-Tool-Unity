@@ -6,26 +6,51 @@
  *              selected language, and stores the user's choice for future 
  *              sessions. It also triggers a global language update when the 
  *              selection changes.
+ *              
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
 */
 
 using System.Collections.Generic;
+using UnityEngine.UI;
 using LanguageTools;
 using UnityEngine;
-using UnityEngine.UI;
 
 using static LanguageTools.LanguageFileManager;
 
 [AddComponentMenu("Language/UI/Legacy/Language Manager (Legacy)")]
 public class LanguageManager : MonoBehaviour
 {
+    #region === Serialized Fields ===
+
     [Header("UI Components")]
-    [SerializeField] private Dropdown languageDropdown; // UI Dropdown used for selecting the current language.
+    [SerializeField, Tooltip("UI Dropdown used for selecting the current language.")]
+    private Dropdown languageDropdown;
+
+    #endregion
+
+    #region === Private Fields ===
 
     private List<LanguageAvailable> availableLanguages; // Cached list of available languages loaded from LanguageSettingsData.
     private LanguageSettingsData languageData; // Language configuration loaded from resources.
+
+    #endregion
+
+    #region === Properties ===
+
+    /// <summary>
+    /// Reference to the Dropdown UI for language selection.
+    /// </summary>
+    public Dropdown LanguageDropdown
+    {
+        get => languageDropdown;
+        set => languageDropdown = value;
+    }
+
+    #endregion
+
+    #region === Unity Events ===
 
     /// <summary>
     /// Initializes language data and populates the dropdown with available options.
@@ -55,6 +80,10 @@ public class LanguageManager : MonoBehaviour
         SetupDropdownSelection(); // Set up event listener to handle user language selection changes.
     }
 
+    #endregion
+
+    #region === Dropdown Population ===
+
     /// <summary>
     /// Populates the dropdown with the list of available languages and restores the saved selection.
     /// </summary>
@@ -81,6 +110,10 @@ public class LanguageManager : MonoBehaviour
         languageDropdown.AddOptions(options); // Add all language names to the dropdown options.
         languageDropdown.SetValueWithoutNotify(selectedIndex); // Set dropdown to saved or default selection index without firing events.
     }
+
+    #endregion
+
+    #region === Dropdown Selection Handling ===
 
     /// <summary>
     /// Registers the event listener to respond when the user selects a new language.
@@ -110,4 +143,6 @@ public class LanguageManager : MonoBehaviour
         GetAllData(); // Reload all language data based on new selection.
         LanguageManagerDelegate.NotifyLanguageUpdate(); // Notify other components to update localized content.
     }
+
+    #endregion
 }

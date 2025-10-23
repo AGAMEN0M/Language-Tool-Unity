@@ -12,28 +12,32 @@
 #if UNITY_EDITOR
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using LanguageTools;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using TSVTools;
 using System.IO;
+using TSVTools;
 using System;
 
 using static LanguageTools.Editor.LanguageEditorUtilities;
 using static LanguageTools.LanguageFileManager;
-using static TSVTools.TabTableUtility;
 using static UnityEditor.EditorGUILayout;
+using static TSVTools.TabTableUtility;
 
 public class LanguageFileManagerWindow : EditorWindow
 {
+    #region === Fields ===
+
     public string languageForEditing = "en"; // The language currently selected for editing in the dropdown.
 
-    public List<LanguageForEditingSave> componentSave = new(); // List of saved language component data used for localization.
-    public List<CanvasForEditingSave> canvasSave = new(); // List of saved canvas component data for UI elements.
+    [Tooltip("List of saved language component data used for localization.")]
+    public List<LanguageForEditingSave> componentSave = new();
+
+    [Tooltip("List of saved canvas component data for UI elements.")]
+    public List<CanvasForEditingSave> canvasSave = new();
 
     public List<LanguageAvailable> availableLanguages = new(); // List of languages that are available and detected from disk.
-
     public Vector2 scrollPosition = Vector2.zero; // Current scroll position for the window’s scroll view.
     public bool firstTime = false; // Whether the window is being initialized for the first time.
     public int idIndex; // Current index of the ID being edited or searched.
@@ -50,12 +54,14 @@ public class LanguageFileManagerWindow : EditorWindow
     private SerializedObject serializedObject; // Serialized representation of this EditorWindow for Unity’s property drawer system.
     private List<int> duplicateID = new(); // List of duplicate IDs found in the language components.
     private List<int> canvasID = new(); // List of duplicate canvas IDs found in the canvas components.
-
     private string[] cultureNames; // Display names of available cultures.
     private CultureInfo[] cultures; // Array of all CultureInfo supported by .NET.
     private int selectedCultureIndex; // Index of the currently selected culture in the dropdown.
-
     private Texture2D trashImage; // Cached trash icon used in UI for delete buttons.
+
+    #endregion
+
+    #region === Unity Methods ===
 
     /// <summary>
     /// Adds a menu item to open the Language File Manager editor window.
@@ -154,9 +160,9 @@ public class LanguageFileManagerWindow : EditorWindow
         // Toggle checkboxes to show/hide Text or Canvas data.
         BeginHorizontal();
         Space(60);
-        showTextData = ToggleLeft("Show Text Component Data", showTextData);
+        showTextData = ToggleLeft(new GUIContent("Show Text Component Data", "Toggle this option to display or hide all localization entries related to Text components."), showTextData);
         Space(10);
-        showCanvasData = ToggleLeft("Show Canvas Component Data", showCanvasData);
+        showCanvasData = ToggleLeft(new GUIContent("Show Canvas Component Data", "Toggle this option to display or hide all localization entries related to Canvas components."), showCanvasData);
         GUILayout.FlexibleSpace();
         EndHorizontal();
 
@@ -173,6 +179,10 @@ public class LanguageFileManagerWindow : EditorWindow
         serializedObject.ApplyModifiedProperties(); // Apply any modified properties in the serialized object.
     }
 
+    #endregion
+
+    #region === GUI Draw Methods ===
+
     /// <summary>
     /// Draws buttons for saving, loading, opening folder, rebuilding canvas, organizing items, and Search by ID.
     /// </summary>
@@ -180,13 +190,13 @@ public class LanguageFileManagerWindow : EditorWindow
     {
         BeginHorizontal();
         Space(20);
-        DrawButton("Open Folder", () => Application.OpenURL(assetsPath)); // Button to open the folder containing the TSV files.
+        DrawButton("Open Folder", () => Application.OpenURL(assetsPath), "Open the folder containing the language TSV files.");
         Space(10);
         GUI.backgroundColor = fileIsSaved ? Color.white : Color.yellow; // Highlight the Save button if there are unsaved changes.
-        DrawButton("Save File", SaveLanguageFile); // Button to save current language and canvas data to file.
+        DrawButton("Save File", SaveLanguageFile, "Save the current language and canvas data to TSV files.");
         GUI.backgroundColor = Color.white; // Reset background color after drawing Save button.
         Space(10);
-        DrawButton("Load File", LoadLanguageFile); // Button to load language and canvas data from file.
+        DrawButton("Load File", LoadLanguageFile, "Load the language and canvas data from TSV files.");
         GUILayout.FlexibleSpace();
         EndHorizontal();
 
@@ -194,7 +204,6 @@ public class LanguageFileManagerWindow : EditorWindow
 
         BeginHorizontal();
         Space(20);
-        // Button to trigger canvas rebuild process by adding the RebuildCanvas component.
         DrawButton("Rebuild Canvas", () =>
         {
             SaveDataJson(); // Save current state before rebuild.
@@ -205,9 +214,8 @@ public class LanguageFileManagerWindow : EditorWindow
 
             // Add the component responsible for rebuilding canvas structure.
             Undo.AddComponent<RebuildCanvas>(rebuildCanvas);
-        });
+        }, "Rebuild the canvas by creating a new RebuildCanvas object.");
         Space(10);
-        // Button to organize all language and canvas items (e.g., sort and compare IDs).
         DrawButton("Organize All Items", () =>
         {
             Undo.RecordObject(this, "Organize All Items");
@@ -217,9 +225,9 @@ public class LanguageFileManagerWindow : EditorWindow
             // Mark the file as needing save and flag this object as dirty.
             fileIsSaved = false;
             EditorUtility.SetDirty(this);
-        });
+        }, "Organize all language and canvas items (sort and compare IDs).");
         Space(10);
-        DrawButton($"Search by ID: {idIndex}", () => SearchByID(idIndex)); // Button to trigger ID-based search and highlight in the editor.
+        DrawButton($"Search by ID: {idIndex}", () => SearchByID(idIndex), "Search and highlight the component with the current ID.");
         GUILayout.FlexibleSpace();
         EndHorizontal();
     }
@@ -232,7 +240,7 @@ public class LanguageFileManagerWindow : EditorWindow
         BeginHorizontal();
 
         // Label for dropdown.
-        LabelField("Language for Editing:", GUILayout.Width(130));
+        LabelField(new GUIContent("Language for Editing:", "Select the language used when editing language files in the editor."), GUILayout.Width(130));
 
         string previousLanguage = languageForEditing;
 
@@ -265,9 +273,9 @@ public class LanguageFileManagerWindow : EditorWindow
 
         // Display selected culture and system default culture.
         Space(5);
-        GUILayout.Label($"({languageForEditing})");
+        GUILayout.Label(new GUIContent($"({languageForEditing})", "Currently active editing language (culture code)."));
         Space(10);
-        GUILayout.Label($"You: '{CultureInfo.InstalledUICulture.DisplayName}'");
+        GUILayout.Label(new GUIContent($"You: '{CultureInfo.InstalledUICulture.DisplayName}'", "System default display language of this computer."));
 
         GUILayout.FlexibleSpace();
         EndHorizontal();
@@ -296,7 +304,7 @@ public class LanguageFileManagerWindow : EditorWindow
             // Show current index range in center.
             BeginHorizontal();
             GUILayout.FlexibleSpace();
-            LabelField($"{minID}/{maxID}", CreateLabelStyle(13, true, true));
+            LabelField(new GUIContent($"{minID}/{maxID}", "Manual ID index entry field."), CreateLabelStyle(13, true, true));
             GUILayout.FlexibleSpace();
             EndHorizontal();
 
@@ -304,8 +312,13 @@ public class LanguageFileManagerWindow : EditorWindow
             BeginHorizontal();
             GUILayout.FlexibleSpace();
 
+            // Jump backward button (<<).
+            DrawArrowButton(true, new GUIContent("<<", "Jump to previous valid ID."), ref idIndex, minID, maxID, this, () => idIndex = FindNearestValidID(idIndex, true, componentSave));
+
+            Space(10);
+
             // Backward arrow to decrement ID index.
-            DrawArrowButton("<--", ref idIndex, minID, maxID, this, () => idIndex--);
+            DrawArrowButton(true, new GUIContent("<--", "Go to previous ID."), ref idIndex, minID, maxID, this, () => idIndex--);
 
             Space(10);
 
@@ -322,7 +335,12 @@ public class LanguageFileManagerWindow : EditorWindow
             Space(10);
 
             // Forward arrow to increment ID index.
-            DrawArrowButton("-->", ref idIndex, minID, maxID, this, () => idIndex++);
+            DrawArrowButton(false, new GUIContent("-->", "Go to next ID."), ref idIndex, minID, maxID, this, () => idIndex++);
+
+            Space(10);
+
+            // Jump forward button (>>).
+            DrawArrowButton(false, new GUIContent(">>", "Jump to next valid ID."), ref idIndex, minID, maxID, this, () => idIndex = FindNearestValidID(idIndex, false, componentSave));
             GUILayout.FlexibleSpace();
             EndHorizontal();
         }
@@ -358,7 +376,7 @@ public class LanguageFileManagerWindow : EditorWindow
 
                         // Draw delete button for this item.
                         GUI.backgroundColor = Color.red;
-                        if (GUILayout.Button(new GUIContent(trashImage), GUILayout.Width(30), GUILayout.Height(30)))
+                        if (GUILayout.Button(new GUIContent(trashImage, "Remove this item from the list."), GUILayout.Width(30), GUILayout.Height(30)))
                         {
                             itemToRemove = item;
                             itemRemoved = true;
@@ -414,7 +432,7 @@ public class LanguageFileManagerWindow : EditorWindow
 
         // Display and allow editing of the ID field.
         int previousInt = component.iD;
-        previousInt = DrawLabeledIntField("ID:", previousInt, 20, 50);
+        previousInt = DrawLabeledIntField(new GUIContent("ID:", "Unique identifier for this language entry used to link localized text and metadata."), previousInt, 20, 50);
         if (component.iD != previousInt)
         {
             Undo.RecordObject(this, "Change item.iD");
@@ -427,7 +445,7 @@ public class LanguageFileManagerWindow : EditorWindow
 
         // Display and allow editing of the text context field.
         string previousTextContext = component.textContext;
-        previousTextContext = DrawLabeledTextField("Text Context:", previousTextContext, 80, 305);
+        previousTextContext = DrawLabeledTextField(new GUIContent("Text Context:", "Contextual label for the text (for example: 'Main Menu', 'Settings', etc.)."), previousTextContext, 80, 305);
         if (component.textContext != previousTextContext)
         {
             Undo.RecordObject(this, "Change item.textContext");
@@ -441,7 +459,7 @@ public class LanguageFileManagerWindow : EditorWindow
         // Delete button (disabled if there are duplicates).
         GUI.enabled = duplicateID.Count == 0;
         GUI.backgroundColor = Color.red;
-        if (GUILayout.Button(new GUIContent(trashImage), GUILayout.Width(30f), GUILayout.Height(30f)))
+        if (GUILayout.Button(new GUIContent(trashImage, "Remove this item from the list."), GUILayout.Width(30f), GUILayout.Height(30f)))
         {
             RemoveID();
         }
@@ -465,7 +483,7 @@ public class LanguageFileManagerWindow : EditorWindow
         if (valid3 || valid2 || valid1)
         {
             string previousText = component.text;
-            previousText = DrawLabeledTextField("Text:", previousText, 40, 430);
+            previousText = DrawLabeledTextField(new GUIContent("Text:", "The localized text associated with this component."), previousText, 40, 430);
             if (component.text != previousText)
             {
                 Undo.RecordObject(this, "Change item.text");
@@ -482,7 +500,7 @@ public class LanguageFileManagerWindow : EditorWindow
         if (valid3)
         {
             int previousAlignment = component.alignment;
-            previousAlignment = DrawLabeledIntField("Alignment:", previousAlignment, 70, 50);
+            previousAlignment = DrawLabeledIntField(new GUIContent("Alignment:", "Text alignment value (0=UpperLeft, 1=UpperCenter, 2=UpperRight, etc.)."), previousAlignment, 70, 50);
             if (component.alignment != previousAlignment)
             {
                 Undo.RecordObject(this, "Change item.alignment");
@@ -496,7 +514,7 @@ public class LanguageFileManagerWindow : EditorWindow
         if (valid3 || valid2)
         {
             int previousIndex = component.fontSize;
-            previousIndex = DrawLabeledIntField("Font Size:", previousIndex, 70, 50);
+            previousIndex = DrawLabeledIntField(new GUIContent("Font Size:", "Font size value applied to this text component."), previousIndex, 70, 50);
             if (component.fontSize != previousIndex)
             {
                 Undo.RecordObject(this, "Change item.fontSize");
@@ -510,7 +528,7 @@ public class LanguageFileManagerWindow : EditorWindow
         if (valid3 || valid2)
         {
             int previousFont = component.fontListIndex;
-            previousFont = DrawLabeledIntField("Font Index:", previousFont, 70, 50);
+            previousFont = DrawLabeledIntField(new GUIContent("Font Index:", "Index referring to the font in the language settings font list."), previousFont, 70, 50);
             if (component.fontListIndex != previousFont)
             {
                 Undo.RecordObject(this, "Change item.fontListIndex");
@@ -535,15 +553,19 @@ public class LanguageFileManagerWindow : EditorWindow
     /// </summary>
     /// <param name="label">The button's label text.</param>
     /// <param name="action">The action to perform when clicked.</param>
-    private void DrawButton(string label, Action action)
+    private void DrawButton(string label, Action action , string tooltip = "")
     {
         // Draw button with custom style.
-        if (GUILayout.Button(label, CreateCustomButtonStyle(15), GUILayout.Width(160), GUILayout.Height(30)))
+        if (GUILayout.Button(new GUIContent(label, tooltip), CreateCustomButtonStyle(15), GUILayout.Width(160), GUILayout.Height(30)))
         {
             action(); // Execute provided action on click.
             GUI.FocusControl(null); // Remove focus to avoid accidental repeats.
         }
     }
+
+    #endregion
+
+    #region === Data Management Methods ===
 
     /// <summary>
     /// Sorts componentSave and canvasSave lists by their IDs in ascending order.
@@ -974,5 +996,7 @@ public class LanguageFileManagerWindow : EditorWindow
         SaveDataJson();
         EditorUtility.SetDirty(this);
     }
+
+    #endregion
 }
 #endif

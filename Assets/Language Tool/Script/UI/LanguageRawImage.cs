@@ -4,6 +4,7 @@
  *              RawImage component. It dynamically constructs the path to the 
  *              image file based on the selected language and loads it asynchronously. 
  *              If the file cannot be found or fails to load, an error is logged.
+ *              
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
@@ -18,20 +19,57 @@ using System.IO;
 
 using static LanguageTools.LanguageFileManager;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 [AddComponentMenu("Language/UI/Language Raw Image")]
 public class LanguageRawImage : MonoBehaviour
 {
+    #region === Serialized Fields ===
+
     [Header("Settings")]
-    [Tooltip("Do not use characters outside the basic ASCII Table.")]
-    [SerializeField] private string fileName = "Example.png"; // Name of the image file to load.
-    [SerializeField] private bool useRawImage = true; // Whether to apply the texture to a RawImage component.
+    [SerializeField, Tooltip("Name of the image file (with extension) to load.")]
+    private string fileName = "Example.png";
+
+    [SerializeField, Tooltip("Determines whether to use and update the RawImage component.")]
+    private bool useRawImage = true;
+
     [Space(5)]
-    public RawImage rawImage; // Reference to the RawImage component to display the texture.
-    public Texture2D imageTexture; // Loaded texture from disk.
+
+    [SerializeField, Tooltip("RawImage component to display the loaded texture.")]
+    private RawImage rawImage;
+
+    [SerializeField, Tooltip("Texture loaded from disk.")]
+    private Texture2D imageTexture;
+
+    #endregion
+
+    #region === Private Fields ===
 
     private LanguageSettingsData languageData; // Stores the loaded language configuration.
     private string previousFilePath; // Stores the last used file path to avoid reloading the same image.
     private string filePath; // Full path to the localized image file for the selected culture.
+
+    #endregion
+
+    #region === Properties ===
+
+    /// <summary>Gets or sets the image file name.</summary>
+    public string FileName { get => fileName; set => fileName = value; }
+
+    /// <summary>Gets or sets whether the RawImage component should be used.</summary>
+    public bool UseRawImage { get => useRawImage; set => useRawImage = value; }
+
+    /// <summary>Gets or sets the target RawImage component.</summary>
+    public RawImage RawImage { get => rawImage; set => rawImage = value; }
+
+    /// <summary>Gets or sets the loaded Texture2D.</summary>
+    public Texture2D ImageTexture { get => imageTexture; set => imageTexture = value; }
+
+    #endregion
+
+    #region === Unity Events ===
 
     /// <summary>
     /// Subscribes to the language update event and triggers image update when the component is enabled.
@@ -46,6 +84,10 @@ public class LanguageRawImage : MonoBehaviour
     /// Unsubscribes from the language update event when the component is disabled.
     /// </summary>
     private void OnDisable() => LanguageManagerDelegate.OnLanguageUpdate -= LanguageUpdate;
+
+    #endregion
+
+    #region === Language Update ===
 
     /// <summary>
     /// Updates the displayed image based on the currently selected language.
@@ -109,4 +151,40 @@ public class LanguageRawImage : MonoBehaviour
         // Assign the texture to the RawImage if enabled.
         if (imageTexture != null && useRawImage) rawImage.texture = imageTexture;
     }
+
+    #endregion
 }
+
+#if UNITY_EDITOR
+
+#region === Custom Inspector ===
+
+/// <summary>
+/// Custom inspector for LanguageRawImage to enhance usability within Unity Editor.
+/// </summary>
+[CanEditMultipleObjects]
+[CustomEditor(typeof(LanguageRawImage))]
+public class LanguageRawImageEditor : Editor
+{
+    /// <summary>
+    /// Draws the custom inspector layout.
+    /// </summary>
+    public override void OnInspectorGUI()
+    {
+        serializedObject.Update();
+
+        // Display warning about file naming.
+        GUI.color = Color.yellow;
+        EditorGUILayout.HelpBox("Do not use characters outside the basic ASCII Table in the 'File Name'.", MessageType.Warning);
+        GUI.color = Color.white;
+
+        EditorGUILayout.Space(10);
+
+        DrawDefaultInspector(); // Draw default inspector fields.
+        serializedObject.ApplyModifiedProperties();
+    }
+}
+
+#endregion
+
+#endif

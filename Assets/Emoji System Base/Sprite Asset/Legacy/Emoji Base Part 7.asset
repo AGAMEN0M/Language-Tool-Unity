@@ -41,6 +41,7 @@ Material:
     - _ClipRect: {r: -32767, g: -32767, b: 32767, a: 32767}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3776,4 +3777,10 @@ MonoBehaviour:
     m_AtlasIndex: 0
     m_ClassDefinitionType: 0
     sprite: {fileID: 461493607, guid: 054908037bd058947bac95d4c79e4199, type: 3}
-  fallbackSpriteAssets: []
+  fallbackSpriteAssets:
+  - {fileID: 11400000, guid: 7e219809f0b42ed4ba6493adb9c0c7b7, type: 2}
+  - {fileID: 11400000, guid: b8910c7371250064caa86f97ba58e4ea, type: 2}
+  - {fileID: 11400000, guid: e8acfa11e2287d046917de77e76f7e10, type: 2}
+  - {fileID: 11400000, guid: f3f5a17d629f8b04a83d09fcee79ca9e, type: 2}
+  - {fileID: 11400000, guid: b4d0054281ad20e408afe4d250a5c414, type: 2}
+  - {fileID: 11400000, guid: 45798a33b157510488bf8d0d0a409730, type: 2}

@@ -16,6 +16,8 @@ using UnityEditor;
 using UnityEngine;
 using System.IO;
 
+#region === LanguageData Asset Creator ===
+
 /// <summary>
 /// Provides a Unity Editor menu option to create the LanguageSettingsData asset in the Resources folder.
 /// </summary>
@@ -56,6 +58,10 @@ public class LanguageDataCreator
     }
 }
 
+#endregion
+
+#region === Automatic Asset Initializer ===
+
 /// <summary>
 /// Automatically creates the LanguageSettingsData asset on project load if it doesn't exist.
 /// </summary>
@@ -74,3 +80,5 @@ public static class LanguageDataAutoInitializer
         };
     }
 }
+
+#endregion

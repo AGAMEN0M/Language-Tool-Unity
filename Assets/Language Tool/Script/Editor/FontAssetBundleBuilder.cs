@@ -22,6 +22,8 @@ using System;
 /// </summary>
 public static class FontAssetBundleBuilder
 {
+    #region === Menu Command ===
+
     /// <summary>
     /// Searches for Font and TMP_FontAsset assets in the "AssetBundles" folder and creates asset bundles for each.
     /// </summary>
@@ -49,6 +51,10 @@ public static class FontAssetBundleBuilder
 
         AssetDatabase.Refresh(); // Refresh the asset database to reflect the new bundles.
     }
+
+    #endregion
+
+    #region === Build Logic ===
 
     /// <summary>
     /// Builds an AssetBundle for a specific Font or TMP_FontAsset.
@@ -97,4 +103,6 @@ public static class FontAssetBundleBuilder
         // Check against common font file extensions.
         return new[] { ".ttf", ".otf", ".ttc" }.Any(ext => ext.Equals(extension, StringComparison.OrdinalIgnoreCase));
     }
+    
+    #endregion
 }

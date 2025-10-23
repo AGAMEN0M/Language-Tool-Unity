@@ -3,6 +3,7 @@
  * Description: Provides Unity Editor tools to build and manage canvas hierarchies 
  *              based on language-specific JSON data. Enables loading canvas configurations, 
  *              rebuilding hierarchies in the scene, and saving updated layouts.
+ *              
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
@@ -11,26 +12,38 @@
 using UnityEngine;
 
 #if UNITY_EDITOR
-using static LanguageTools.Editor.LanguageEditorUtilities;
-using static LanguageTools.CanvasManager;
-
 using System.Collections.Generic;
 using LanguageTools;
 using UnityEditor;
 using System.Linq;
 using System.IO;
+
+using static LanguageTools.Editor.LanguageEditorUtilities;
+using static LanguageTools.CanvasManager;
 #endif
 
 [AddComponentMenu("Language/Editing Tools/Rebuild Canvas")]
 public class RebuildCanvas : MonoBehaviour
 {
 #if UNITY_EDITOR
-    [Header("Canvas Settings")]
-    public GameObject canvasObject; // The GameObject that will hold the generated canvas hierarchy in the scene.
-    [Space(10)]
-    public CanvasStructure canvasStructure = new(); // Data structure representing the canvas hierarchy, parsed from or serialized to JSON.
 
-    [HideInInspector] public int canvasID = 0; // Identifier used to track or reference the currently selected canvas data entry.
+    #region === Inspector Fields ===
+
+    [Header("Canvas Settings")]
+    [Tooltip("The GameObject that will hold the generated canvas hierarchy in the scene.")]
+    public GameObject canvasObject;
+
+    [Space(10)]
+
+    [Tooltip("Data structure representing the canvas hierarchy, parsed from or serialized to JSON.")]
+    public CanvasStructure canvasStructure = new();
+
+    [HideInInspector, Tooltip("Identifier used to track or reference the currently selected canvas data entry.")]
+    public int canvasID = 0;
+
+    #endregion
+
+    #region === Canvas Creation ===
 
     /// <summary>
     /// Parses a JSON string and generates the corresponding canvas hierarchy in the scene.
@@ -67,6 +80,10 @@ public class RebuildCanvas : MonoBehaviour
         Undo.RegisterCreatedObjectUndo(canvasObject, "Create Canvas Object");
     }
 
+    #endregion
+
+    #region === Canvas Saving ===
+
     /// <summary>
     /// Extracts the current canvas structure from the scene and returns it as a JSON string.
     /// </summary>
@@ -82,6 +99,9 @@ public class RebuildCanvas : MonoBehaviour
         // Convert the structure to JSON if extraction was successful.
         return canvasStructure != null ? JsonUtility.ToJson(canvasStructure) : null;
     }
+
+    #endregion
+
 #else
     private void Start() => Destroy(this);
 #endif
@@ -92,9 +112,15 @@ public class RebuildCanvas : MonoBehaviour
 [CustomEditor(typeof(RebuildCanvas))]
 public class RebuildCanvasEditor : Editor
 {
+    #region === Fields ===
+
     private const string fileData = "ProjectSettings/LanguageFileData.json"; // Path to the JSON file containing canvas configuration data.
     private List<CanvasForEditingSave> canvasSave = new(); // List storing all canvas structures loaded from the external JSON file, used to populate the selection dropdown.
     private RebuildCanvas script; // Reference to the currently edited RebuildCanvas component in the Inspector.
+    
+    #endregion
+
+    #region === Custom Inspector ===
 
     /// <summary>
     /// Draws the custom inspector GUI for the RebuildCanvas component.
@@ -119,7 +145,7 @@ public class RebuildCanvasEditor : Editor
         if (targets.Length == 1)
         {
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("Select Canvas ID", EditorStyles.boldLabel, GUILayout.Width(100));
+            EditorGUILayout.LabelField(new GUIContent("Select Canvas ID", "Select which Canvas ID to rebuild from the loaded data."), EditorStyles.boldLabel, GUILayout.Width(100));
 
             string[] options = canvasSave.Select(c => $"ID {c.canvasID}: {c.textContext}").ToArray();
             selectedIndex = Mathf.Max(0, canvasSave.FindIndex(c => c.canvasID == script.canvasID));
@@ -140,7 +166,7 @@ public class RebuildCanvasEditor : Editor
             script.canvasID = canvasSave[selectedIndex].canvasID;
 
             // Button to create canvas hierarchy from selected data.
-            if (GUILayout.Button("Create Canvas Hierarchy", CreateCustomButtonStyle(15), GUILayout.Height(30)))
+            if (GUILayout.Button(new GUIContent("Create Canvas Hierarchy", "Generate a Canvas hierarchy in the scene based on the selected Canvas ID data."), CreateCustomButtonStyle(15), GUILayout.Height(30)))
             {
                 script.CreateCanvasData(canvasSave[selectedIndex].json);
             }
@@ -156,7 +182,7 @@ public class RebuildCanvasEditor : Editor
             GUI.enabled = script.canvasObject != null;
 
             // Button to save the current canvas state.
-            if (GUILayout.Button($"Replace canvasID: {script.canvasID}", CreateCustomButtonStyle(15), GUILayout.Height(30)))
+            if (GUILayout.Button(new GUIContent($"Replace canvasID: {script.canvasID}", "Save and replace the data of the selected Canvas ID with the current scene hierarchy."), CreateCustomButtonStyle(15), GUILayout.Height(30)))
             {
                 // Confirm before overwriting existing data.
                 if (!EditorUtility.DisplayDialog("Replace canvasID", "Are you sure you want to save the current state of the canvas?", "Yes", "No"))
@@ -176,6 +202,10 @@ public class RebuildCanvasEditor : Editor
         serializedObject.ApplyModifiedProperties();
     }
 
+    #endregion
+
+    #region === JSON Loading ===
+
     /// <summary>
     /// Loads canvas configuration data from a JSON file stored in ProjectSettings.
     /// </summary>
@@ -191,5 +221,7 @@ public class RebuildCanvasEditor : Editor
         canvasSave.Clear();
         canvasSave = data.canvasSave;
     }
+
+    #endregion
 }
 #endif

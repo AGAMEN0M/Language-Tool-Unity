@@ -4,6 +4,7 @@
  *              sprite based on the current language. The component constructs
  *              the appropriate image path and loads the asset asynchronously
  *              from disk when the language changes.
+ *              
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
@@ -18,21 +19,63 @@ using System.IO;
 
 using static LanguageTools.LanguageFileManager;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 [AddComponentMenu("Language/UI/Language Image")]
 public class LanguageImage : MonoBehaviour
 {
+    #region === Serialized Fields ===
+
     [Header("Settings")]
-    [Tooltip("Do not use characters outside the basic ASCII Table.")]
-    [SerializeField] private string fileName = "Example.png"; // Name of the image file (with extension) to load.
-    [SerializeField] private bool useImage = true; // Flag to determine whether to use and update the Image component.
+    [SerializeField, Tooltip("Name of the image file (with extension) to load.")]
+    private string fileName = "Example.png";
+
+    [SerializeField, Tooltip("Determines whether to use and update the Image component.")]
+    private bool useImage = true;
+
     [Space(5)]
-    public Image image; // Unity UI Image component to which the loaded sprite will be assigned.
-    public Texture2D imageTexture; // Holds the loaded texture data from disk.
-    public Sprite spriteTexture; // Sprite created from the loaded texture to be used by the Image component.
+    
+    [SerializeField, Tooltip("Unity UI Image component to assign the loaded sprite.")]
+    private Image image;
+    
+    [SerializeField, Tooltip("Texture loaded from disk.")]
+    private Texture2D imageTexture;
+    
+    [SerializeField, Tooltip("Sprite created from the loaded texture.")]
+    private Sprite spriteTexture;
+
+    #endregion
+
+    #region === Private Fields ===
 
     private LanguageSettingsData languageData; // Holds the current language settings for determining the culture-specific path.
     private string previousFilePath; // Stores the last loaded file path to prevent redundant reloads.
     private string filePath; // Full file path to the localized image based on the selected language.
+
+    #endregion
+
+    #region === Properties ===
+
+    /// <summary>Gets or sets the image file name.</summary>
+    public string FileName { get => fileName; set => fileName = value; }
+
+    /// <summary>Gets or sets whether the Image component should be used.</summary>
+    public bool UseImage { get => useImage; set => useImage = value; }
+
+    /// <summary>Gets or sets the target Image component.</summary>
+    public Image Image { get => image; set => image = value; }
+
+    /// <summary>Gets or sets the loaded Texture2D.</summary>
+    public Texture2D ImageTexture { get => imageTexture; set => imageTexture = value; }
+
+    /// <summary>Gets or sets the generated Sprite from the texture.</summary>
+    public Sprite SpriteTexture { get => spriteTexture; set => spriteTexture = value; }
+
+    #endregion
+
+    #region === Unity Events ===
 
     /// <summary>
     /// Subscribes to the language update event and immediately updates the image when the object is enabled.
@@ -47,6 +90,10 @@ public class LanguageImage : MonoBehaviour
     /// Unsubscribes from the language update event when the object is disabled.
     /// </summary>
     private void OnDisable() => LanguageManagerDelegate.OnLanguageUpdate -= LanguageUpdate;
+
+    #endregion
+
+    #region === Language Update ===
 
     /// <summary>
     /// Updates the image based on the selected language.
@@ -116,4 +163,40 @@ public class LanguageImage : MonoBehaviour
         // Assign the sprite to the Image component if enabled.
         if (useImage && imageTexture != null) image.sprite = spriteTexture;
     }
+
+    #endregion
 }
+
+#if UNITY_EDITOR
+
+#region === Custom Inspector ===
+
+/// <summary>
+/// Custom inspector for LanguageImage to enhance usability within Unity Editor.
+/// </summary>
+[CanEditMultipleObjects]
+[CustomEditor(typeof(LanguageImage))]
+public class LanguageImageEditor : Editor
+{
+    /// <summary>
+    /// Draws the custom inspector layout.
+    /// </summary>
+    public override void OnInspectorGUI()
+    {
+        serializedObject.Update();
+
+        // Display warning about file naming.
+        GUI.color = Color.yellow;
+        EditorGUILayout.HelpBox("Do not use characters outside the basic ASCII Table in the 'File Name'.", MessageType.Warning);
+        GUI.color = Color.white;
+
+        EditorGUILayout.Space(10);
+
+        DrawDefaultInspector(); // Draw default inspector fields.
+        serializedObject.ApplyModifiedProperties();
+    }
+}
+
+#endregion
+
+#endif

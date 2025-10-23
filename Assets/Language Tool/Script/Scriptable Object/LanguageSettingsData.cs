@@ -3,6 +3,7 @@
  * Description: ScriptableObject that stores localization settings for Unity projects.
  *              Includes folder paths, default language, font configuration, culture,
  *              available languages, and metadata for text and canvas localization.
+ *              
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
@@ -23,28 +24,70 @@ using UnityEditor;
 /// </summary>
 public class LanguageSettingsData : ScriptableObject
 {
+    #region === Folder and Language Settings ===
+
     [Header("Archives Location")]
-    public string folderName = "Languages"; // Directory containing the language files.
+    [Tooltip("Directory containing the language files.")]
+    public string folderName = "Languages";
+    
     [Space(10)]
+    
     [Header("Default Language")]
-    public string defaultLanguage = "en"; // Default language used when no user preference is stored.
+    [Tooltip("Default language used when no user preference is stored.")]
+    public string defaultLanguage = "en";
+
+    #endregion
+
+    #region === Font Configuration ===
+
     [Space(10)]
+    
     [Header("Font List Data")]
-    public LanguageFontListData fontListData; // Stores the list of fonts used for standard Unity UI elements.
-    public LanguageFontListDataTMP fontListDataTMP; // Stores the list of TMP fonts used for TextMeshPro UI elements.
+    [Tooltip("Stores the list of fonts used for standard Unity UI elements.")]
+    public LanguageFontListData fontListData;
+
+    [Tooltip("Stores the list of TMP fonts used for TextMeshPro UI elements.")]
+    public LanguageFontListDataTMP fontListDataTMP;
+    
+    #endregion
+
+    #region === Canvas Configuration ===
+
     [Space(10)]
+    
     [Header("Canvas Log")]
-    public GameObject errorLanguageTool; // UI prefab shown when language loading or configuration fails.
+    [Tooltip("UI prefab shown when language loading or configuration fails.")]
+    public GameObject errorLanguageTool;
+
+    #endregion
+
+    #region === Extracted Data ===
+
     [Space(10)]
+    
     [Header("Extracted Data")]
-    public string selectedCulture; // The current language culture selected by the player (e.g., "en-US").
-    public List<LanguageAvailable> availableLanguages = new(); // All languages defined and optionally available in the build.
-    public List<IdData> idData = new(); // Text elements for dynamic localization in non-canvas components.
-    public List<IdMetaData> idMetaData = new(); // Additional information or attributes related to each localized ID (e.g., font size or tags).
-    public List<IdData> idCanvasData = new(); // Text elements specifically used within Unity Canvas UI components.
+    [Tooltip("The current language culture selected by the player (e.g., \"en-US\").")]
+    public string selectedCulture;
+
+    [Tooltip("All languages defined and optionally available in the build.")]
+    public List<LanguageAvailable> availableLanguages = new();
+
+    [Tooltip("Text elements for dynamic localization in non-canvas components.")]
+    public List<IdData> idData = new();
+
+    [Tooltip("Additional information or attributes related to each localized ID (e.g., font size or tags).")]
+    public List<IdMetaData> idMetaData = new();
+
+    [Tooltip("Text elements specifically used within Unity Canvas UI components.")]
+    public List<IdData> idCanvasData = new();
+
+    #endregion
 }
 
 #if UNITY_EDITOR
+
+#region === Menu Item ===
+
 /// <summary>
 /// Provides a menu option to quickly open the LanguageSettingsData asset in the Unity Editor.
 /// </summary>
@@ -74,4 +117,7 @@ public class LanguageSettingsEditor
         }
     }
 }
+
+#endregion
+
 #endif

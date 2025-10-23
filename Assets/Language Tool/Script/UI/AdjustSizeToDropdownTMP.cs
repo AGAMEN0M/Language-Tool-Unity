@@ -6,6 +6,7 @@
  *              the Canvas by changing its fit direction when content overflows.
  *              Also adjusts scroll sensitivity based on content length and auto-scrolls
  *              to the selected item within the ScrollRect.
+ *              
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
@@ -14,30 +15,90 @@
 using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine;
+using System;
 using TMPro;
 
 [RequireComponent(typeof(ScrollRect))]
 [AddComponentMenu("Language/UI/TextMesh Pro/Adjust Size To Dropdown (TMP)")]
 public class AdjustSizeToDropdownTMP : MonoBehaviour
 {
-    [Header("Settings")]
-    [SerializeField] private float manualSizeAdjustment; // Additional manual adjustment applied to the width.
-    [SerializeField] private int sizeMultiplier = 10; // Value added when text breaks into multiple lines.
-    [SerializeField] private float margin = 1.0f; // Canvas boundary margin to prevent clipping.
-    [Space(5)]
-    [SerializeField] private FitDirection fitDirection = FitDirection.Right; // Default fit direction.
-    [Space(10)]
-    [Header("Automatic Settings")]
-    [SerializeField] private RectTransform parentRect; // Target RectTransform for size adjustments.
-    [SerializeField] private RectTransform canvasRectTransform; // Canvas RectTransform used for boundary checks.
-    [SerializeField] private ScrollRect scrollRect; // Reference to the ScrollRect component controlling vertical scrolling.
-    [SerializeField] private float canvasWidth; // Cached canvas width.
-    [SerializeField] private float objectWidth; // Cached UI object width.
-    [SerializeField] private List<BrokenTextsTMP> textList; // List of TMP_Text components and their line status.
-    [SerializeField] private bool textIsBroken; // Indicates if any text component wrapped lines.
-    [SerializeField] private float sizeAdjustment; // Dynamic size adjustment based on wrapping.
+    #region === Nested Classes ===
 
+    /// <summary>
+    /// Stores a TMP_Text reference and a flag indicating whether the text wraps to multiple lines.
+    /// </summary>
+    [Serializable]
+    private class BrokenTextsTMP
+    {
+        [Tooltip("Reference to the UI TMP_Text component to monitor for line breaks.")]
+        public TMP_Text itemLabel; // Reference to the TMP_Text component.
+
+        [Tooltip("Indicates whether the text has broken into multiple lines.")]
+        public bool brokenText; // Indicates if the text wraps to a second line.
+    }
+
+    #endregion
+
+    #region === Enums ===
+
+    /// <summary>
+    /// Defines the direction in which the element expands when adjusting its size.
+    /// </summary>
     public enum FitDirection { Left, Right } // Enum for fit direction.
+
+    #endregion
+
+    #region === Inspector Fields (Settings) ===
+
+    [Header("Settings")]
+    [SerializeField, Tooltip("Extra width manually added to the automatic size calculation.")]
+    private float manualSizeAdjustment; // Manual value added to automatic sizing.
+
+    [SerializeField, Tooltip("Additional width applied when any text wraps to a new line.")]
+    private int sizeMultiplier = 10; // Value added when text is broken.
+
+    [SerializeField, Tooltip("Minimum horizontal margin to maintain from the canvas edge.")]
+    private float margin = 1.0f; // Minimum margin from canvas edge.
+
+    [Space(5)]
+
+    [SerializeField, Tooltip("Defines the initial direction for expansion when resizing the element.")]
+    private FitDirection fitDirection = FitDirection.Right; // Initial direction to expand.
+
+    #endregion
+
+    #region === Inspector Fields (Automatic Settings) ===
+
+    [Space(10)]
+
+    [Header("Automatic Settings")]
+    [SerializeField, Tooltip("RectTransform of the element being resized.")]
+    private RectTransform parentRect; // RectTransform being resized.
+
+    [SerializeField, Tooltip("RectTransform of the parent Canvas used for boundary checks.")]
+    private RectTransform canvasRectTransform; // Canvas RectTransform.
+
+    [SerializeField, Tooltip("ScrollRect component responsible for controlling vertical scroll behavior.")]
+    private ScrollRect scrollRect; // Reference to the ScrollRect component controlling vertical scrolling.
+
+    [SerializeField, Tooltip("Current width of the parent Canvas in pixels.")]
+    private float canvasWidth; // Current canvas width.
+
+    [SerializeField, Tooltip("Current width of the object being adjusted.")]
+    private float objectWidth; // Current object width.
+
+    [SerializeField, Tooltip("List of Text elements and whether each has wrapped into multiple lines.")]
+    private List<BrokenTextsTMP> textList; // TMP_Text components and wrap info.
+
+    [SerializeField, Tooltip("True if any Text component has wrapped to multiple lines.")]
+    private bool textIsBroken; // True if any text wraps lines.
+
+    [SerializeField, Tooltip("Final computed adjustment value based on wrapping and manual offsets.")]
+    private float sizeAdjustment; // Calculated width adjustment.
+
+    #endregion
+
+    #region === Unity Methods ===
 
     /// <summary>
     /// Initializes component references and gathers child TMP_Text objects for line check.
@@ -137,6 +198,10 @@ public class AdjustSizeToDropdownTMP : MonoBehaviour
         }
     }
 
+    #endregion
+
+    #region === Utility Methods ===
+
     /// <summary>
     /// Checks whether any child text component wraps to a new line.
     /// </summary>
@@ -149,10 +214,5 @@ public class AdjustSizeToDropdownTMP : MonoBehaviour
         }
     }
 
-    [System.Serializable]
-    private class BrokenTextsTMP
-    {
-        public TMP_Text itemLabel; // Reference to the TMP_Text component.
-        public bool brokenText; // Indicates if the text wraps to a second line.
-    }
+    #endregion
 }

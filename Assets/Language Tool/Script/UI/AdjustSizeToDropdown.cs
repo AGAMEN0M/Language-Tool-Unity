@@ -5,6 +5,7 @@
  *              realigns the element to prevent overflow outside the Canvas.
  *              Also adjusts scroll sensitivity based on content length and auto-scrolls
  *              to the selected item within the ScrollRect.
+ *              
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
@@ -13,29 +14,89 @@
 using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine;
+using System;
 
 [RequireComponent(typeof(ScrollRect))]
 [AddComponentMenu("Language/UI/Legacy/Adjust Size To Dropdown (Legacy)")]
 public class AdjustSizeToDropdown : MonoBehaviour
 {
-    [Header("Settings")]
-    [SerializeField] private float manualSizeAdjustment; // Manual value added to automatic sizing.
-    [SerializeField] private int sizeMultiplier = 10; // Value added when text is broken.
-    [SerializeField] private float margin = 1.0f; // Minimum margin from canvas edge.
-    [Space(5)]
-    [SerializeField] private FitDirection fitDirection = FitDirection.Right; // Initial direction to expand.
-    [Space(10)]
-    [Header("Automatic Settings")]
-    [SerializeField] private RectTransform parentRect; // RectTransform being resized.
-    [SerializeField] private RectTransform canvasRectTransform; // Canvas RectTransform.
-    [SerializeField] private ScrollRect scrollRect; // Reference to the ScrollRect component controlling vertical scrolling.
-    [SerializeField] private float canvasWidth; // Current canvas width.
-    [SerializeField] private float objectWidth; // Current object width.
-    [SerializeField] private List<BrokenTexts> textList; // Text components and wrap info.
-    [SerializeField] private bool textIsBroken; // True if any text wraps lines.
-    [SerializeField] private float sizeAdjustment; // Calculated width adjustment.
+    #region === Nested Classes ===
 
+    /// <summary>
+    /// Stores a Text reference and a flag indicating whether the text wraps to multiple lines.
+    /// </summary>
+    [Serializable]
+    private class BrokenTexts
+    {
+        [Tooltip("Reference to the legacy UI Text component to monitor for line breaks.")]
+        public Text itemLabel; // Reference to the UI Text component.
+
+        [Tooltip("Indicates whether the text has broken into multiple lines.")]
+        public bool brokenText; // True if the text spans multiple lines.
+    }
+
+    #endregion
+
+    #region === Enums ===
+
+    /// <summary>
+    /// Defines the direction in which the element expands when adjusting its size.
+    /// </summary>
     public enum FitDirection { Left, Right } // Direction options for UI expansion.
+
+    #endregion
+
+    #region === Inspector Fields (Settings) ===
+
+    [Header("Settings")]
+    [SerializeField, Tooltip("Extra width manually added to the automatic size calculation.")]
+    private float manualSizeAdjustment; // Manual value added to automatic sizing.
+
+    [SerializeField, Tooltip("Additional width applied when any text wraps to a new line.")]
+    private int sizeMultiplier = 10; // Value added when text is broken.
+
+    [SerializeField, Tooltip("Minimum horizontal margin to maintain from the canvas edge.")]
+    private float margin = 1.0f; // Minimum margin from canvas edge.
+
+    [Space(5)]
+
+    [SerializeField, Tooltip("Defines the initial direction for expansion when resizing the element.")]
+    private FitDirection fitDirection = FitDirection.Right; // Initial direction to expand.
+
+    #endregion
+
+    #region === Inspector Fields (Automatic Settings) ===
+
+    [Space(10)]
+
+    [Header("Automatic Settings")]
+    [SerializeField, Tooltip("RectTransform of the element being resized.")]
+    private RectTransform parentRect; // RectTransform being resized.
+
+    [SerializeField, Tooltip("RectTransform of the parent Canvas used for boundary checks.")]
+    private RectTransform canvasRectTransform; // Canvas RectTransform.
+
+    [SerializeField, Tooltip("ScrollRect component responsible for controlling vertical scroll behavior.")]
+    private ScrollRect scrollRect; // Reference to the ScrollRect component controlling vertical scrolling.
+
+    [SerializeField, Tooltip("Current width of the parent Canvas in pixels.")]
+    private float canvasWidth; // Current canvas width.
+
+    [SerializeField, Tooltip("Current width of the object being adjusted.")]
+    private float objectWidth; // Current object width.
+
+    [SerializeField, Tooltip("List of Text elements and whether each has wrapped into multiple lines.")]
+    private List<BrokenTexts> textList; // Text components and wrap info.
+
+    [SerializeField, Tooltip("True if any Text component has wrapped to multiple lines.")]
+    private bool textIsBroken; // True if any text wraps lines.
+
+    [SerializeField, Tooltip("Final computed adjustment value based on wrapping and manual offsets.")]
+    private float sizeAdjustment; // Calculated width adjustment.
+
+    #endregion
+
+    #region === Unity Methods ===
 
     /// <summary>
     /// Initializes necessary components and collects child Text elements.
@@ -59,7 +120,7 @@ public class AdjustSizeToDropdown : MonoBehaviour
 
         if (canvasRectTransform == null)
         {
-            Debug.LogError("AdjustSizeToDropdownTMP: No Canvas found in hierarchy.", this);
+            Debug.LogError("AdjustSizeToDropdown: No Canvas found in hierarchy.", this);
             return;
         }
 
@@ -134,6 +195,10 @@ public class AdjustSizeToDropdown : MonoBehaviour
         }
     }
 
+    #endregion
+
+    #region === Utility Methods ===
+
     /// <summary>
     /// Checks if any legacy Text component exceeds one line.
     /// </summary>
@@ -142,14 +207,9 @@ public class AdjustSizeToDropdown : MonoBehaviour
         foreach (var item in textList)
         {
             item.brokenText = item.itemLabel.cachedTextGenerator.lineCount > 1;
-            if (item.brokenText) Debug.LogWarning("AdjustSizeToDropdownTMP: Text wrapped to multiple lines.", this);
+            if (item.brokenText) Debug.LogWarning("AdjustSizeToDropdown: Text wrapped to multiple lines.", this);
         }
     }
 
-    [System.Serializable]
-    private class BrokenTexts
-    {
-        public Text itemLabel; // Reference to the UI Text component.
-        public bool brokenText; // True if the text spans multiple lines.
-    }
+    #endregion
 }

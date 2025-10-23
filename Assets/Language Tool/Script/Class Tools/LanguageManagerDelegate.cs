@@ -3,6 +3,7 @@
  * Description: Handles language update notifications within the application.
  *              Provides a static delegate and event mechanism so that external
  *              components can subscribe and respond when a language change occurs.
+ *              
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------

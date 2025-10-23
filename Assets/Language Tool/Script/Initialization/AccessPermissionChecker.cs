@@ -3,6 +3,7 @@
  * Description: Verifies runtime access permissions to critical Unity project
  *              directories (Assets and StreamingAssets). Displays an in-game
  *              warning if access is denied.
+ *              
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
@@ -14,12 +15,18 @@ using System.IO;
 
 public class AccessPermissionChecker : MonoBehaviour
 {
+    #region === Runtime Initialization ===
+
     /// <summary>
     /// Automatically called on game start to verify folder access permissions.
     /// Displays a warning if access to necessary directories is restricted.
     /// </summary>
     [RuntimeInitializeOnLoadMethod]
     public static void InitializeCheckSettings() => CheckAccessPermissions();
+
+    #endregion
+
+    #region === Folder Access Verification ===
 
     // Checks folder access for Assets and StreamingAssets directories.
     private static void CheckAccessPermissions()
@@ -41,6 +48,10 @@ public class AccessPermissionChecker : MonoBehaviour
             Debug.Log("Folder access check passed.");
         }
     }
+
+    #endregion
+
+    #region === Folder Access Test ===
 
     // Attempts to create and delete a temporary file in the given directory.
     // Returns true if both operations succeed.
@@ -69,6 +80,10 @@ public class AccessPermissionChecker : MonoBehaviour
         return false;
     }
 
+    #endregion
+
+    #region === Warning Display ===
+
     // Loads the warning UI from language settings and ensures it persists between scenes.
     private static void ShowWarning()
     {
@@ -95,4 +110,6 @@ public class AccessPermissionChecker : MonoBehaviour
             Debug.LogError("Failed to instantiate warning GameObject.");
         }
     }
+
+    #endregion
 }

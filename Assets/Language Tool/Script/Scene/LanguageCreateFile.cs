@@ -4,6 +4,7 @@
  *              predefined lines, optionally translated, based on current 
  *              language settings. Supports multilingual file creation for 
  *              both Editor and runtime environments.
+ *              
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
@@ -14,31 +15,100 @@ using LanguageTools;
 using UnityEngine;
 using System.IO;
 
-#if UNITY_EDITOR
-using static LanguageTools.Editor.LanguageEditorUtilities;
-using UnityEditor;
-#endif
-
 using static LanguageTools.LanguageFileManager;
+
+#if UNITY_EDITOR
+using UnityEditor;
+using static LanguageTools.Editor.LanguageEditorUtilities;
+#endif
 
 [AddComponentMenu("Language/3D Object/Language Create File")]
 public class LanguageCreateFile : MonoBehaviour
 {
+    #region === Serialized Fields ===
+
     [Header("File Creator Settings")]
-    public string fileName = "Test File"; // Output file name.
-    public string fileExtension = ".txt"; // Output file extension.
+    [SerializeField, Tooltip("Output file name.")]
+    private string fileName = "Test File";
+
+    [SerializeField, Tooltip("Output file extension.")]
+    private string fileExtension = ".txt";
+
     #pragma warning disable CS0414
-    [SerializeField] private string folderInUnity = "Editor"; // Folder path in Unity Editor.
-    [SerializeField] private string folderInBuild = "StreamingAssets"; // Folder path in builds.
+    [SerializeField, Tooltip("Folder path in Unity Editor.")]
+    private string folderInUnity = "Editor";
+
+    [SerializeField, Tooltip("Folder path in builds.")]
+    private string folderInBuild = "StreamingAssets";
     #pragma warning restore CS0414
+
     [Space(5)]
-    public List<LanguageLines> fileLines = new()
+
+    [SerializeField, Tooltip("List of lines to include in the generated file.")]
+    private List<LanguageLines> fileLines = new()
     {
         new() { text = "Language Create File:" },
         new() { iD = -5, text = "Test Language", translateText = true }
     }; // List of file lines, some of which may be localized.
+    
+    #endregion
+
+    #region === Private Fields ===
 
     private LanguageSettingsData languageData; // Current language settings.
+
+    #endregion
+
+    #region === Properties ===
+
+    /// <summary>
+    /// Gets or sets the file name.
+    /// </summary>
+    public string FileName
+    {
+        get => fileName;
+        set => fileName = value;
+    }
+
+    /// <summary>
+    /// Gets or sets the file extension.
+    /// </summary>
+    public string FileExtension
+    {
+        get => fileExtension;
+        set => fileExtension = value;
+    }
+
+    /// <summary>
+    /// Gets or sets the folder path used in the Unity Editor.
+    /// </summary>
+    public string FolderInUnity
+    {
+        get => folderInUnity;
+        set => folderInUnity = value;
+    }
+
+    /// <summary>
+    /// Gets or sets the folder path used in builds.
+    /// </summary>
+    public string FolderInBuild
+    {
+        get => folderInBuild;
+        set => folderInBuild = value;
+    }
+
+    /// <summary>
+    /// Gets or sets the list of lines to include in the generated file.
+    /// </summary>
+    public List<LanguageLines> FileLines
+    {
+        get => fileLines;
+        set => fileLines = value;
+    }
+
+    #endregion
+
+    #region === Unity Events ===
 
     /// <summary>
     /// Subscribes to language update event when enabled.
@@ -53,6 +123,10 @@ public class LanguageCreateFile : MonoBehaviour
     /// Unsubscribes from language update event when disabled.
     /// </summary>
     private void OnDisable() => LanguageManagerDelegate.OnLanguageUpdate -= LanguageUpdate;
+    
+    #endregion
+
+    #region === Core Methods ===
 
     /// <summary>
     /// Updates translated lines and writes them to a file based on current language settings.
@@ -79,6 +153,10 @@ public class LanguageCreateFile : MonoBehaviour
 
         CreateFile(GetFolderPath()); // Create or overwrite the output file with translated content.
     }
+
+    #endregion
+
+    #region === Helper Methods ===
 
     /// <summary>
     /// Returns the appropriate folder path depending on build environment.
@@ -107,9 +185,14 @@ public class LanguageCreateFile : MonoBehaviour
         using StreamWriter writer = new(filePath);
         foreach (var line in fileLines) writer.WriteLine(line.text);
     }
+
+    #endregion
 }
 
 #if UNITY_EDITOR
+
+#region === Custom Editor ===
+
 /// <summary>
 /// Draws the custom inspector with file preview and import functionality.
 /// </summary>
@@ -125,19 +208,22 @@ public class LanguageCreateFileEditor : Editor
         serializedObject.Update();
         script = (LanguageCreateFile)target;
 
+        // Create GUIContent with tooltip for the Import Settings button.
+        GUIContent importButtonContent = new("Import Settings", "Imports or updates translatable lines based on LanguageSettingsData.\nIf an existing ID is found, you will be prompted to confirm replacement.");
+
         using (new EditorGUI.DisabledScope(targets.Length > 1))
         {
             // Button to import settings into the fileLines list.
-            if (GUILayout.Button("Import Settings", CreateCustomButtonStyle(15), GUILayout.Height(30)))
+            if (GUILayout.Button(importButtonContent, CreateCustomButtonStyle(15), GUILayout.Height(30)))
             {
                 // Prevent accidental overwrite of existing IDs.
-                if (script.fileLines.Exists(line => IsIDInLanguageList(line.iD)) && !EditorUtility.DisplayDialog("Replace ID", "An ID already exists. Do you want to replace it?", "Yes", "No"))
+                if (script.FileLines.Exists(line => IsIDInLanguageList(line.iD)) && !EditorUtility.DisplayDialog("Replace ID", "An ID already exists. Do you want to replace it?", "Yes", "No"))
                 {
                     return;
                 }
 
                 // Open editor window for each translatable line.
-                foreach (var line in script.fileLines)
+                foreach (var line in script.FileLines)
                 {
                     if (line.translateText) OpenEditorWindowWithComponent(line.iD, 5, line.text, 0, 0, 0);
                 }
@@ -180,7 +266,7 @@ public class LanguageCreateFileEditor : Editor
         DrawColoredBox(() =>
         {
             EditorGUILayout.Space(10);
-            EditorGUILayout.LabelField($"{script.fileName}{script.fileExtension}", CreateLabelStyle(13, true));
+            EditorGUILayout.LabelField($"{script.FileName}{script.FileExtension}", CreateLabelStyle(13, true));
             EditorGUILayout.Space(10);
         }, color);
 
@@ -190,9 +276,12 @@ public class LanguageCreateFileEditor : Editor
         DrawColoredBox(() =>
         {
             EditorGUILayout.Space(10);
-            foreach (var line in script.fileLines) EditorGUILayout.LabelField(line.text, labelStyle);
+            foreach (var line in script.FileLines) EditorGUILayout.LabelField(line.text, labelStyle);
             EditorGUILayout.Space(10);
         }, color);
     }
 }
+
+#endregion
+
 #endif

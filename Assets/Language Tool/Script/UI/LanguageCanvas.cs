@@ -4,6 +4,7 @@
  *              Loads localized canvas configuration (position, scale, layout)
  *              from language settings and applies it at runtime. Also supports
  *              saving canvas layout during development via a custom editor.
+ *              
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
@@ -17,19 +18,54 @@ using static LanguageTools.LanguageFileManager;
 using static LanguageTools.CanvasManager;
 
 #if UNITY_EDITOR
-using static LanguageTools.Editor.LanguageEditorUtilities;
 using UnityEditor;
+using static LanguageTools.Editor.LanguageEditorUtilities;
 #endif
 
+/// <summary>
+/// Controls localization behavior for a Unity Canvas.  
+/// Loads canvas layout data for the active language and updates it dynamically when the language changes.
+/// </summary>
 [RequireComponent(typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler))]
 [RequireComponent(typeof(GraphicRaycaster))]
 [AddComponentMenu("Language/UI/Language Canvas")]
 public class LanguageCanvas : MonoBehaviour
 {
+    #region === Serialized Fields ===
+
     [Header("Settings")]
-    [IDExists(true)] public int canvasID = 0; // Identifier for linking this canvas with localized layout data.
+    [SerializeField, IDExists(true), Tooltip("Identifier that links this canvas with its corresponding localized layout data.")]
+    private int canvasID = 0;
+
     [Header("Canvas Data")]
-    public CanvasStructure canvasStructure = new(); // Holds the current structure/layout data of this canvas.
+    [SerializeField, Tooltip("Stores the layout, hierarchy, and configuration data of this canvas.")]
+    private CanvasStructure canvasStructure = new();
+
+    #endregion
+
+    #region === Public Properties ===
+
+    /// <summary>
+    /// Gets or sets the unique identifier used to locate the corresponding localized layout data for this canvas.
+    /// </summary>
+    public int CanvasID
+    {
+        get => canvasID;
+        set => canvasID = value;
+    }
+
+    /// <summary>
+    /// Gets or sets the current layout and structure data for this canvas.
+    /// </summary>
+    public CanvasStructure CanvasStructure
+    {
+        get => canvasStructure;
+        set => canvasStructure = value;
+    }
+
+    #endregion
+
+    #region === Unity Events ===
 
     /// <summary>
     /// Subscribes to language updates and applies localized canvas data on enable.
@@ -44,6 +80,10 @@ public class LanguageCanvas : MonoBehaviour
     /// Unsubscribes from language update event on disable.
     /// </summary>
     private void OnDisable() => LanguageManagerDelegate.OnLanguageUpdate -= LanguageUpdate;
+
+    #endregion
+
+    #region === Language Management ===
 
     /// <summary>
     /// Loads and applies localized canvas data based on current language.
@@ -80,7 +120,12 @@ public class LanguageCanvas : MonoBehaviour
         ApplyCanvasData(canvasStructure, gameObject);
     }
 
+    #endregion
+
 #if UNITY_EDITOR
+
+    #region === Editor Utilities ===
+
     /// <summary>
     /// Extracts canvas data from the GameObject and returns it as a JSON string.
     /// </summary>
@@ -91,43 +136,58 @@ public class LanguageCanvas : MonoBehaviour
         ExtractCanvasData(ref canvasStructure, gameObject); // Extract the current layout data into the canvasStructure object.
         return canvasStructure != null ? JsonUtility.ToJson(canvasStructure) : null; // Return the serialized JSON, or null if extraction failed.
     }
+
+    #endregion
+
 #endif
 }
 
 #if UNITY_EDITOR
+
+#region === Custom Editor ===
+
+/// <summary>
+/// Custom inspector for the LanguageCanvas component.  
+/// Provides editor tools for importing and managing localized canvas layouts.
+/// </summary>
 [CanEditMultipleObjects]
 [CustomEditor(typeof(LanguageCanvas))]
 public class LanguageCanvasEditor : Editor
 {
+    /// <summary>
+    /// Draws the inspector interface for LanguageCanvas with localization tools.
+    /// </summary>
     public override void OnInspectorGUI()
     {
         serializedObject.Update();
-        var script = (LanguageCanvas)target;
+        var script = (LanguageCanvas)target; // Reference to the current inspected component.
 
         // Display a helpful message for proper data capture.
         EditorGUILayout.HelpBox("For accurate capture, activate all objects within the Canvas before importing.", MessageType.Info);
-        EditorGUILayout.Space(5);
+        EditorGUILayout.Space(10);
 
         using (new EditorGUI.DisabledScope(targets.Length > 1))
         {
             // Draw the "Import Settings" button.
-            if (GUILayout.Button("Import Settings", CreateCustomButtonStyle(15), GUILayout.Height(30)))
+            if (GUILayout.Button(new GUIContent("Import Settings", "Imports the layout configuration for this canvas."), CreateCustomButtonStyle(15), GUILayout.Height(30)))
             {
                 // Check for duplicate ID and prompt user confirmation.
-                if (IsIDInCanvasList(script.canvasID) && !EditorUtility.DisplayDialog("Replace ID", "An ID with this number is already saved. Do you want to replace it?", "Yes", "No"))
+                if (IsIDInCanvasList(script.CanvasID) && !EditorUtility.DisplayDialog("Replace ID", "An ID with this number is already saved. Do you want to replace it?", "Yes", "No"))
                     return;
 
                 // Save current canvas layout and open the editor window for editing.
                 var data = script.SaveCanvasData();
-                if (data != null) OpenEditorWindowWithCanvas(script.canvasID, data);
+                if (data != null) OpenEditorWindowWithCanvas(script.CanvasID, data);
             }
         }
 
-        EditorGUILayout.Space(5);
+        EditorGUILayout.Space(10);
 
-        // Draw default inspector fields.
-        DrawDefaultInspector();
+        DrawDefaultInspector(); // Draw default inspector fields.
         serializedObject.ApplyModifiedProperties();
     }
 }
+
+#endregion
+
 #endif

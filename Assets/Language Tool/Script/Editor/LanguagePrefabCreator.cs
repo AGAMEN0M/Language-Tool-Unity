@@ -21,6 +21,8 @@ using static LanguageTools.Editor.LanguageEditorUtilities;
 
 public static class LanguagePrefabCreator
 {
+    #region === Canvas & Prefab Setup Utilities ===
+
     /// <summary>
     /// Creates a new Canvas with all required UI components and an EventSystem.
     /// </summary>
@@ -118,7 +120,9 @@ public static class LanguagePrefabCreator
         };
     }
 
-    // ---------------------------- 3D Prefab Menu ----------------------------
+    #endregion
+
+    #region === 3D Prefab Menu ===
 
     /// <summary>Creates a Language Create File (LT) prefab.</summary>
     [MenuItem("GameObject/Language/3D Object/Language Create File (LT)", false, 1)]
@@ -140,7 +144,9 @@ public static class LanguagePrefabCreator
     [MenuItem("GameObject/Language/3D Object/New Text (LT) [TMP]", false, 5)]
     public static void CreateTMPTextPrefab() => CreateAndConfigurePrefab("New Text (LT) [TMP]", Selection.activeGameObject);
 
-    // ---------------------------- UI Prefab Menu ----------------------------
+    #endregion
+
+    #region === UI Prefab Menu ===
 
     /// <summary>Creates a RawImage (LT) UI prefab.</summary>
     [MenuItem("GameObject/Language/UI/RawImage (LT)", false, 1)]
@@ -174,7 +180,13 @@ public static class LanguagePrefabCreator
     [MenuItem("GameObject/Language/UI/Text (LT) [TMP]", false, 8)]
     public static void CreateTMPTextUIPrefab() => CreateAndConfigurePrefab("Text (LT) [TMP]", Selection.activeGameObject, true);
 
-    // ---------------------------- UI Legacy Prefab Menu ----------------------------
+    /// <summary>Creates a Force Import of Fonts prefab.</summary>
+    [MenuItem("GameObject/Language/UI/Force Import of Fonts [TMP] (Complement)", false, 9)]
+    public static void CreateForceImportofFontsPrefab() => CreateAndConfigurePrefab("{Force Import of Fonts}", null);
+
+    #endregion
+
+    #region === UI Legacy Prefab Menu ===
 
     /// <summary>Creates a Legacy Language Manager UI prefab.</summary>
     [MenuItem("GameObject/Language/UI/Legacy/Language Manager (LT) [Legacy]", false, 1)]
@@ -199,4 +211,6 @@ public static class LanguagePrefabCreator
     /// <summary>Creates a Legacy Text UI prefab.</summary>
     [MenuItem("GameObject/Language/UI/Legacy/Text (LT) [Legacy]", false, 6)]
     public static void CreateTextUIPrefab() => CreateAndConfigurePrefab("Text (LT) [Legacy]", Selection.activeGameObject, true);
+
+    #endregion
 }

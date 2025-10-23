@@ -2,6 +2,7 @@
  * ---------------------------------------------------------------------------
  * Description: Automatically validates and updates a UI Text component's font
  *              to ensure all characters in the current language are supported.
+ *              
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
@@ -9,9 +10,9 @@
 
 using System.Collections.Generic;
 using UnityEngine.UI;
+using LanguageTools;
 using UnityEngine;
 
-using LanguageTools;
 using static LanguageTools.LanguageFileManager;
 
 /// <summary>
@@ -20,16 +21,49 @@ using static LanguageTools.LanguageFileManager;
 [AddComponentMenu("Language/UI/Complements/Automatic Language Font Validator (Legacy)")]
 public class AutomaticLanguageFontValidator : MonoBehaviour
 {
+    #region === Serialized Fields ===
+
     [Header("Target Text to Monitor")]
-    [SerializeField] private Text textComponent; // Target Text component to monitor and validate font characters for.
+    [SerializeField, Tooltip("Reference to the UI Text component to validate and update automatically.")]
+    private Text textComponent; // Target Text component to monitor and validate font characters for.
 
     [Header("Enable language fallback name resolution")]
-    [SerializeField] private bool isLanguageManager; // Whether to allow replacing native names with fallback names based on supported languages.
+    [SerializeField, Tooltip("Determines whether native language names can be replaced with fallback names if characters are unsupported.")]
+    private bool isLanguageManager; // Whether to allow replacing native names with fallback names based on supported languages.
+
+    #endregion
+
+    #region === Private Fields ===
 
     private List<LanguageAvailable> supportedLanguages; // List of languages available from settings, used for fallback logic.
     private LanguageSettingsData localizationSettings; // Loaded localization configuration data including font settings.
-
     private string lastValidatedText; // Stores the last validated text to prevent redundant validation.
+
+    #endregion
+
+    #region === Properties ===
+
+    /// <summary>
+    /// Gets or sets the target Text component monitored by this validator.
+    /// </summary>
+    public Text TextComponent
+    {
+        get => textComponent;
+        set => textComponent = value;
+    }
+
+    /// <summary>
+    /// Gets or sets whether the validator should allow replacing native names with fallback names.
+    /// </summary>
+    public bool IsLanguageManager
+    {
+        get => isLanguageManager;
+        set => isLanguageManager = value;
+    }
+
+    #endregion
+
+    #region === Unity Events ===
 
     /// <summary> Loads language settings and initializes the validator. </summary>
     private void Start()
@@ -72,6 +106,10 @@ public class AutomaticLanguageFontValidator : MonoBehaviour
         }
     }
 
+    #endregion
+
+    #region === Font Validation ===
+
     /// <summary>
     /// Validates that the font supports all characters in the provided text.
     /// Falls back to alternate fonts or language names as necessary.
@@ -81,7 +119,7 @@ public class AutomaticLanguageFontValidator : MonoBehaviour
     {
         if (textComponent == null || localizationSettings == null || localizationSettings.fontListData == null)
         {
-            Debug.LogWarning("AutomaticLanguageFontValidator: Missing textComponent or font list.");
+            Debug.LogWarning("AutomaticLanguageFontValidator: Missing textComponent or font list.", this);
             return;
         }
 
@@ -135,4 +173,6 @@ public class AutomaticLanguageFontValidator : MonoBehaviour
             }
         }
     }
+
+    #endregion
 }

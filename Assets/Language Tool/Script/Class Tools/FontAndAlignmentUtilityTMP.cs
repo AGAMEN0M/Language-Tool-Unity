@@ -5,6 +5,7 @@
  *              It provides font lookup by index or asset, and bidirectional
  *              conversion between integer alignment codes and TMP's 
  *              TextAlignmentOptions enum values.
+ *              
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
@@ -19,6 +20,8 @@ namespace LanguageTools.TMP
 {
     public static class FontAndAlignmentUtilityTMP
     {
+        #region === Font Retrieval ===
+
         /// <summary>
         /// Retrieves a TMP_FontAsset from the language settings by its index.
         /// </summary>
@@ -51,6 +54,10 @@ namespace LanguageTools.TMP
 
             return 0; // Return 0 if font not found.
         }
+
+        #endregion
+
+        #region === Alignment Conversion ===
 
         /// <summary>
         /// Converts an integer alignment code to TextAlignmentOptions.
@@ -166,5 +173,7 @@ namespace LanguageTools.TMP
 
             return alignmentValue;
         }
+
+        #endregion
     }
 }

@@ -3,6 +3,7 @@
  * Description: ScriptableObject containing a list of legacy Unity Font objects 
  *              used for localization purposes in Unity. Includes a custom 
  *              inspector that supports drag-and-drop for easier font management.
+ *              
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
@@ -13,6 +14,7 @@ using UnityEngine;
 
 #if UNITY_EDITOR
 using UnityEditor;
+using static LanguageTools.Editor.LanguageEditorUtilities;
 #endif
 
 /// <summary>
@@ -21,11 +23,18 @@ using UnityEditor;
 [CreateAssetMenu(fileName = "New Language Font List (Legacy)", menuName = "Language/Language Font List Data (Legacy)", order = 2)]
 public class LanguageFontListData : ScriptableObject
 {
+    #region === Fields ===
+
     [Tooltip("List of Unity legacy Font objects used for localization.")]
     public List<Font> fontList = new(); // Initialized to prevent null errors.
+
+    #endregion
 }
 
 #if UNITY_EDITOR
+
+#region === Custom Editor ===
+
 /// <summary>
 /// Custom inspector that enables drag-and-drop for adding Font assets to the list.
 /// </summary>
@@ -44,9 +53,9 @@ public class LanguageFontListDataInspector : Editor
             // Create a large area for drag-and-drop input.
             Rect dropArea = GUILayoutUtility.GetRect(0, 100, GUILayout.ExpandWidth(true));
             EditorGUI.DrawRect(dropArea, new Color(0.15f, 0.15f, 0.15f, 0.5f));
-            EditorGUI.DropShadowLabel(dropArea, "Drop Font Assets Here");
+            EditorGUI.DropShadowLabel(dropArea, "Drop Font Assets Here", CreateLabelStyle(13, true, true));
 
-            Event evt = Event.current;
+            var evt = Event.current;
 
             // Handle drag and drop interaction inside the defined area.
             if ((evt.type == EventType.DragUpdated || evt.type == EventType.DragPerform) && dropArea.Contains(evt.mousePosition))
@@ -59,7 +68,7 @@ public class LanguageFontListDataInspector : Editor
                     Undo.RecordObject(script, "Add Fonts");
 
                     // Add unique Font objects to the list.
-                    foreach (Object obj in DragAndDrop.objectReferences)
+                    foreach (var obj in DragAndDrop.objectReferences)
                     {
                         if (obj is Font font && !script.fontList.Contains(font))
                         {
@@ -82,4 +91,7 @@ public class LanguageFontListDataInspector : Editor
         serializedObject.ApplyModifiedProperties();
     }
 }
+
+#endregion
+
 #endif

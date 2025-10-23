@@ -3,6 +3,7 @@
  * Description: Localizes UnityEngine.UI.Text components using the LanguageTools
  *              system. Automatically updates the text, font, font size, and
  *              alignment according to the active language configuration.
+ *              
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
@@ -12,24 +13,71 @@ using UnityEngine.UI;
 using LanguageTools;
 using UnityEngine;
 
-#if UNITY_EDITOR
-using static LanguageTools.Editor.LanguageEditorUtilities;
-using UnityEditor;
-#endif
-
-using static LanguageTools.LanguageFileManager;
 using static LanguageTools.Legacy.FontAndAlignmentUtility;
+using static LanguageTools.LanguageFileManager;
+
+#if UNITY_EDITOR
+using UnityEditor;
+using static LanguageTools.Editor.LanguageEditorUtilities;
+#endif
 
 [AddComponentMenu("Language/UI/Legacy/Language Text (Legacy)")]
 public class LanguageText : MonoBehaviour
 {
+    #region === Serialized Fields ===
+
     [Header("UI Components")]
-    public Text textComponent; // Reference to the Text component that will be localized.
-    [SerializeField] private bool translateText = true; // Determines whether the component should automatically translate the text content.
+    [SerializeField, Tooltip("The Text component that will be localized.")]
+    private Text textComponent;
+
+    [SerializeField, Tooltip("Enable automatic translation of the text content.")]
+    private bool translateText = true;
+
     [Space(10)]
-    [IDExists] public int iD = -7; // Identifier used to retrieve localized strings and metadata from language files.
+
+    [SerializeField, IDExists, Tooltip("ID used to retrieve localized text and metadata.")]
+    private int iD = -7;
+
+    #endregion
+
+    #region === Private Fields ===
 
     private LanguageSettingsData languageData; // Cached instance of the loaded language configuration.
+
+    #endregion
+
+    #region === Properties ===
+
+    /// <summary>
+    /// Gets or sets the Text component that will be localized.
+    /// </summary>
+    public Text TextComponent
+    {
+        get => textComponent;
+        set => textComponent = value;
+    }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the text should be automatically translated.
+    /// </summary>
+    public bool TranslateText
+    {
+        get => translateText;
+        set => translateText = value;
+    }
+
+    /// <summary>
+    /// Gets or sets the ID used to retrieve localized text and metadata from language files.
+    /// </summary>
+    public int ID
+    {
+        get => iD;
+        set => iD = value;
+    }
+
+    #endregion
+
+    #region === Unity Events ===
 
     /// <summary>
     /// Subscribes to the language update event and immediately applies localization.
@@ -44,6 +92,10 @@ public class LanguageText : MonoBehaviour
     /// Unsubscribes from the language update event.
     /// </summary>
     private void OnDisable() => LanguageManagerDelegate.OnLanguageUpdate -= LanguageUpdate;
+
+    #endregion
+
+    #region === Localization ===
 
     /// <summary>
     /// Applies localized text, font, alignment, and font size to the Text component.
@@ -78,9 +130,14 @@ public class LanguageText : MonoBehaviour
         if (meta.fontSize != 0) textComponent.fontSize = meta.fontSize;
         if (meta.fontListIndex != 0) textComponent.font = GetFontByIndex(meta.fontListIndex);
     }
+
+    #endregion
 }
 
 #if UNITY_EDITOR
+
+#region === Custom Inspector ===
+
 /// <summary>
 /// Custom editor for the LanguageText component.
 /// </summary>
@@ -99,19 +156,19 @@ public class LanguageTextEditor : Editor
         using (new EditorGUI.DisabledScope(targets.Length > 1))
         {
             // Button to import the current Text component settings into the language editor.
-            if (GUILayout.Button("Import Settings", CreateCustomButtonStyle(15), GUILayout.Height(30)))
+            if (GUILayout.Button(new GUIContent("Import Settings", "Imports the current Text settings into the language editor"), CreateCustomButtonStyle(15), GUILayout.Height(30)))
             {
-                if (IsIDInLanguageList(script.iD) && !EditorUtility.DisplayDialog("Replace ID", "An ID with this number is already saved. Do you want to replace it?", "Yes", "No"))
+                if (IsIDInLanguageList(script.ID) && !EditorUtility.DisplayDialog("Replace ID", "An ID with this number is already saved. Do you want to replace it?", "Yes", "No"))
                     return;
 
                 // Extract properties from the assigned Text component.
-                string text = script.textComponent.text;
-                int alignment = ConvertToAlignmentCode(script.textComponent.alignment);
-                int fontSize = script.textComponent.fontSize;
-                int fontListIndex = GetFontIndex(script.textComponent.font);
+                string text = script.TextComponent.text;
+                int alignment = ConvertToAlignmentCode(script.TextComponent.alignment);
+                int fontSize = script.TextComponent.fontSize;
+                int fontListIndex = GetFontIndex(script.TextComponent.font);
 
                 // Open the editor window with the retrieved component values.
-                OpenEditorWindowWithComponent(script.iD, 1, text, alignment, fontSize, fontListIndex);
+                OpenEditorWindowWithComponent(script.ID, 1, text, alignment, fontSize, fontListIndex);
             }
         }
 
@@ -120,4 +177,7 @@ public class LanguageTextEditor : Editor
         serializedObject.ApplyModifiedProperties();
     }
 }
+
+#endregion
+
 #endif

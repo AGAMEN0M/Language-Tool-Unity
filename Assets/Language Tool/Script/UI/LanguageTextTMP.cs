@@ -3,6 +3,7 @@
  * Description: This component localizes TMP_Text components using the
  *              LanguageTools system. It automatically updates text content,
  *              alignment, font, and font size based on the selected language.
+ *              
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
@@ -12,24 +13,71 @@ using LanguageTools;
 using UnityEngine;
 using TMPro;
 
-#if UNITY_EDITOR
-using static LanguageTools.Editor.LanguageEditorUtilities;
-using UnityEditor;
-#endif
-
-using static LanguageTools.LanguageFileManager;
 using static LanguageTools.TMP.FontAndAlignmentUtilityTMP;
+using static LanguageTools.LanguageFileManager;
+
+#if UNITY_EDITOR
+using UnityEditor;
+using static LanguageTools.Editor.LanguageEditorUtilities;
+#endif
 
 [AddComponentMenu("Language/UI/TextMesh Pro/Language Text (TMP)")]
 public class LanguageTextTMP : MonoBehaviour
 {
+    #region === Serialized Fields ===
+
     [Header("UI Components")]
-    public TMP_Text textComponent; // Reference to the TMP_Text component that will be localized.
-    [SerializeField] private bool translateText = true; // Indicates whether the text should be translated using language data.
+    [SerializeField, Tooltip("The TMP_Text component that will be localized.")]
+    private TMP_Text textComponent;
+    
+    [SerializeField, Tooltip("Enable automatic translation of the text content.")]
+    private bool translateText = true;
+    
     [Space(10)]
-    [IDExists] public int iD = -7; // Unique identifier used to fetch localized content and metadata.
+    
+    [SerializeField, IDExists, Tooltip("ID used to retrieve localized text and metadata.")]
+    private int iD = -7;
+
+    #endregion
+
+    #region === Private Fields ===
 
     private LanguageSettingsData languageData; // Stores loaded language settings for use during updates.
+
+    #endregion
+
+    #region === Properties ===
+
+    /// <summary>
+    /// Gets or sets the TMP_Text component that will be localized.
+    /// </summary>
+    public TMP_Text TextComponent
+    {
+        get => textComponent;
+        set => textComponent = value;
+    }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the text should be automatically translated.
+    /// </summary>
+    public bool TranslateText
+    {
+        get => translateText;
+        set => translateText = value;
+    }
+
+    /// <summary>
+    /// Gets or sets the ID used to retrieve localized text and metadata from language files.
+    /// </summary>
+    public int ID
+    {
+        get => iD;
+        set => iD = value;
+    }
+
+    #endregion
+
+    #region === Unity Events ===
 
     /// <summary>
     /// Subscribes to language update event and immediately applies localization.
@@ -44,6 +92,10 @@ public class LanguageTextTMP : MonoBehaviour
     /// Unsubscribes from the language update event.
     /// </summary>
     private void OnDisable() => LanguageManagerDelegate.OnLanguageUpdate -= LanguageUpdate;
+
+    #endregion
+
+    #region === Localization ===
 
     //// <summary>
     /// Applies localized text, font, alignment, and font size to the TMP_Text component.
@@ -78,9 +130,14 @@ public class LanguageTextTMP : MonoBehaviour
         if (meta.fontSize != 0) textComponent.fontSize = meta.fontSize;
         if (meta.fontListIndex != 0) textComponent.font = GetFontByIndex(meta.fontListIndex);
     }
+
+    #endregion
 }
 
 #if UNITY_EDITOR
+
+#region === Custom Inspector ===
+
 /// <summary>
 /// Custom editor for the LanguageTextTMP component.
 /// </summary>
@@ -99,19 +156,19 @@ public class LanguageTextTMPEditor : Editor
         using (new EditorGUI.DisabledScope(targets.Length > 1))
         {
             // Button to import current TMP_Text settings into the language editor.
-            if (GUILayout.Button("Import Settings", CreateCustomButtonStyle(15), GUILayout.Height(30)))
+            if (GUILayout.Button(new GUIContent("Import Settings", "Imports the current Text settings into the language editor"), CreateCustomButtonStyle(15), GUILayout.Height(30)))
             {
-                if (IsIDInLanguageList(script.iD) && !EditorUtility.DisplayDialog("Replace ID", "An ID with this number is already saved. Do you want to replace it?", "Yes", "No"))
+                if (IsIDInLanguageList(script.ID) && !EditorUtility.DisplayDialog("Replace ID", "An ID with this number is already saved. Do you want to replace it?", "Yes", "No"))
                     return;
 
                 // Extract text, alignment, font size, and font index from TMP_Text.
-                string text = script.textComponent.text;
-                int alignment = ConvertToAlignmentCode(script.textComponent.alignment);
-                int fontSize = (int)script.textComponent.fontSize;
-                int fontListIndex = GetFontIndex(script.textComponent.font);
+                string text = script.TextComponent.text;
+                int alignment = ConvertToAlignmentCode(script.TextComponent.alignment);
+                int fontSize = (int)script.TextComponent.fontSize;
+                int fontListIndex = GetFontIndex(script.TextComponent.font);
 
                 // Open the language editor with the current component values.
-                OpenEditorWindowWithComponent(script.iD, 1, text, alignment, fontSize, fontListIndex);
+                OpenEditorWindowWithComponent(script.ID, 1, text, alignment, fontSize, fontListIndex);
             }
         }
 
@@ -120,4 +177,7 @@ public class LanguageTextTMPEditor : Editor
         serializedObject.ApplyModifiedProperties();
     }
 }
+
+#endregion
+
 #endif

@@ -2,16 +2,17 @@
  * ---------------------------------------------------------------------------
  * Description: Automatically validates and updates a TMP Text component's font
  *              to ensure all characters in the current language are supported.
+ *              
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
 */
 
 using System.Collections.Generic;
+using LanguageTools;
 using UnityEngine;
 using TMPro;
 
-using LanguageTools;
 using static LanguageTools.LanguageFileManager;
 
 /// <summary>
@@ -20,16 +21,49 @@ using static LanguageTools.LanguageFileManager;
 [AddComponentMenu("Language/UI/Complements/Automatic Language Font Validator (TMP)")]
 public class AutomaticLanguageFontValidatorTMP : MonoBehaviour
 {
+    #region === Serialized Fields ===
+
     [Header("Target Text to Monitor")]
-    [SerializeField] private TMP_Text textComponent; // Target TMP_Text component to monitor and validate font characters for.
+    [SerializeField, Tooltip("Reference to the UI TMP_Text component to validate and update automatically.")]
+    private TMP_Text textComponent; // Target TMP_Text component to monitor and validate font characters for.
 
     [Header("Enable language fallback name resolution")]
-    [SerializeField] private bool isLanguageManager; // Whether to allow replacing native names with fallback names based on supported languages.
+    [SerializeField, Tooltip("Determines whether native language names can be replaced with fallback names if characters are unsupported.")]
+    private bool isLanguageManager; // Whether to allow replacing native names with fallback names based on supported languages.
+
+    #endregion
+
+    #region === Private Fields ===
 
     private List<LanguageAvailable> supportedLanguages; // List of languages available from settings, used for fallback logic.
     private LanguageSettingsData localizationSettings; // Loaded localization configuration data including TMP font settings.
-
     private string lastValidatedText; // Stores the last validated text to avoid redundant checks.
+
+    #endregion
+
+    #region === Properties ===
+
+    /// <summary>
+    /// Gets or sets the target TMP_Text component monitored by this validator.
+    /// </summary>
+    public TMP_Text TextComponent
+    {
+        get => textComponent;
+        set => textComponent = value;
+    }
+
+    /// <summary>
+    /// Gets or sets whether the validator should allow replacing native names with fallback names.
+    /// </summary>
+    public bool IsLanguageManager
+    {
+        get => isLanguageManager;
+        set => isLanguageManager = value;
+    }
+
+    #endregion
+
+    #region === Unity Events ===
 
     /// <summary> Loads language settings and initializes the validator. </summary>
     private void Start()
@@ -72,6 +106,10 @@ public class AutomaticLanguageFontValidatorTMP : MonoBehaviour
         }
     }
 
+    #endregion
+
+    #region === Font Validation ===
+
     /// <summary>
     /// Validates that the font supports all characters in the provided text.
     /// Falls back to alternate fonts or language names as necessary.
@@ -81,7 +119,7 @@ public class AutomaticLanguageFontValidatorTMP : MonoBehaviour
     {
         if (textComponent == null || localizationSettings == null || localizationSettings.fontListData == null)
         {
-            Debug.LogWarning("AutomaticLanguageFontValidatorTMP: Missing textComponent or font list.");
+            Debug.LogWarning("AutomaticLanguageFontValidatorTMP: Missing textComponent or font list.", this);
             return;
         }
 
@@ -135,4 +173,6 @@ public class AutomaticLanguageFontValidatorTMP : MonoBehaviour
             }
         }
     }
+
+    #endregion
 }

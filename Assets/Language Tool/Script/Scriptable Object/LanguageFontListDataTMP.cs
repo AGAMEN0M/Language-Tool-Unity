@@ -3,6 +3,7 @@
  * Description: ScriptableObject containing a list of TMP_FontAsset objects 
  *              used for localization purposes in Unity. Includes a custom 
  *              inspector that supports drag-and-drop for easier font management.
+ *              
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
@@ -14,6 +15,7 @@ using TMPro;
 
 #if UNITY_EDITOR
 using UnityEditor;
+using static LanguageTools.Editor.LanguageEditorUtilities;
 #endif
 
 /// <summary>
@@ -22,11 +24,18 @@ using UnityEditor;
 [CreateAssetMenu(fileName = "New Language Font List (TMP)", menuName = "Language/Language Font List Data (TMP)", order = 3)]
 public class LanguageFontListDataTMP : ScriptableObject
 {
+    #region === Fields ===
+
     [Tooltip("List of TMP_FontAsset objects used for localization.")]
     public List<TMP_FontAsset> TMPFontList = new(); // Initialized to prevent null errors.
+
+    #endregion
 }
 
 #if UNITY_EDITOR
+
+#region === Custom Editor ===
+
 /// <summary>
 /// Custom inspector that enables drag-and-drop for adding TMP_FontAssets to the list.
 /// </summary>
@@ -45,9 +54,9 @@ public class LanguageFontListDataTMPInspector : Editor
             // Create a large area for drag-and-drop input.
             Rect dropArea = GUILayoutUtility.GetRect(0, 100, GUILayout.ExpandWidth(true));
             EditorGUI.DrawRect(dropArea, new Color(0.15f, 0.15f, 0.15f, 0.5f));
-            EditorGUI.DropShadowLabel(dropArea, "Drop TMP Font Assets Here");
+            EditorGUI.DropShadowLabel(dropArea, "Drop TMP Font Assets Here", CreateLabelStyle(13, true, true));
 
-            Event evt = Event.current;
+            var evt = Event.current;
 
             // Handle drag and drop interaction inside the defined area.
             if ((evt.type == EventType.DragUpdated || evt.type == EventType.DragPerform) && dropArea.Contains(evt.mousePosition))
@@ -60,7 +69,7 @@ public class LanguageFontListDataTMPInspector : Editor
                     Undo.RecordObject(script, "Add TMP Fonts");
 
                     // Add unique TMP_FontAsset objects to the list.
-                    foreach (Object obj in DragAndDrop.objectReferences)
+                    foreach (var obj in DragAndDrop.objectReferences)
                     {
                         if (obj is TMP_FontAsset font && !script.TMPFontList.Contains(font))
                         {
@@ -83,4 +92,7 @@ public class LanguageFontListDataTMPInspector : Editor
         serializedObject.ApplyModifiedProperties();
     }
 }
+
+#endregion
+
 #endif

@@ -7,6 +7,7 @@
  *              data formats. Ensures hierarchy integrity through duplicate 
  *              name detection and preserves component configurations such as 
  *              CanvasScaler and GraphicRaycaster.
+ *              
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
@@ -21,8 +22,17 @@ namespace LanguageTools
 {
     public class CanvasManager
     {
-        // Name prefix used by TextMeshPro to create internal layout elements; excluded from hierarchy processing.
-        private const string subMeshUI = "TMP SubMeshUI";
+        #region === Constants and Ignored Prefixes ===
+
+        /// <summary>
+        /// Name prefixes used by TextMeshPro or other UI systems to create internal layout elements.
+        /// Objects whose names start with any of these prefixes are excluded from hierarchy processing.
+        /// </summary>
+        private static readonly List<string> ignoredPrefixes = new() { "TMP SubMeshUI" , "Dropdown List", "Blocker" };
+
+        #endregion
+
+        #region === Public Methods ===
 
         /// <summary>
         /// Extracts Canvas metadata and hierarchy from a GameObject into a CanvasStructure.
@@ -44,7 +54,7 @@ namespace LanguageTools
             // Validate uniqueness of sibling names to prevent hierarchy issues.
             if (ContainsDuplicateSiblings(canvasObject.GetComponent<RectTransform>()))
             {
-                Debug.LogError("Extraction failed: Duplicate layer names in hierarchy.");
+                Debug.LogError("Extraction failed: Duplicate layer names in hierarchy.", canvasObject);
                 return;
             }
 
@@ -75,7 +85,7 @@ namespace LanguageTools
             // Validate data consistency before applying.
             if (canvasStructure.canvasLayers == null || canvasStructure.canvasLayers.Length == 0 || canvasStructure.canvasLayers.Any(l => l.CanvasObjectsLayers.Length != l.rectTransforms.Length))
             {
-                Debug.LogError("Invalid layers: Mismatched CanvasObjectsLayers and rectTransforms.");
+                Debug.LogError("Invalid layers: Mismatched CanvasObjectsLayers and rectTransforms.", canvasObject);
                 return;
             }
 
@@ -112,7 +122,7 @@ namespace LanguageTools
                     }
                     else
                     {
-                        Debug.LogWarning($"Missing layer: '{name}' not found.");
+                        Debug.LogWarning($"Missing layer: '{name}' not found.", canvasObject);
                     }
                 }
             }
@@ -130,14 +140,14 @@ namespace LanguageTools
             // Ensure valid canvas name.
             if (string.IsNullOrEmpty(canvasStructure.canvasName))
             {
-                Debug.LogError("Creation failed: Canvas name is not defined.");
+                Debug.LogError("Creation failed: Canvas name is not defined.", canvasObject);
                 return;
             }
 
             // Validate structural consistency before creating the hierarchy.
             if (canvasStructure.canvasLayers == null || canvasStructure.canvasLayers.Length == 0 || canvasStructure.canvasLayers.Any(l => l.CanvasObjectsLayers.Length != l.rectTransforms.Length))
             {
-                Debug.LogError("Creation failed: Mismatched CanvasObjectsLayers and rectTransforms.");
+                Debug.LogError("Creation failed: Mismatched CanvasObjectsLayers and rectTransforms.", canvasObject);
                 return;
             }
 
@@ -201,6 +211,10 @@ namespace LanguageTools
             }
         }
 
+        #endregion
+
+        #region === Hierarchy Processing ===
+
         /// <summary>
         /// Generates CanvasLayers from a Canvas GameObject hierarchy.
         /// </summary>
@@ -211,16 +225,16 @@ namespace LanguageTools
             // Recursively collect all RectTransform paths from root to each leaf node.
             void Collect(RectTransform parent, List<RectTransform> path)
             {
-                // Ignore objects whose name starts with subMeshUI.
-                if (parent.name.StartsWith(subMeshUI)) return;
+                // Ignore objects whose names start with any ignored prefix.
+                if (IsIgnoredName(parent.name)) return;
 
                 path.Add(parent);
-
                 bool hasValidChild = false;
 
                 foreach (RectTransform child in parent)
                 {
-                    if (!child.name.StartsWith(subMeshUI))
+                    // Only include children that are not ignored.
+                    if (!IsIgnoredName(child.name))
                     {
                         hasValidChild = true;
                         Collect(child, path);
@@ -232,12 +246,10 @@ namespace LanguageTools
                 path.RemoveAt(path.Count - 1);
             }
 
+            // Start collecting from the root children.
             foreach (RectTransform child in canvasObject.transform)
             {
-                if (!child.name.StartsWith(subMeshUI))
-                {
-                    Collect(child, new());
-                }
+                if (!IsIgnoredName(child.name)) Collect(child, new());
             }
 
             // Convert collected paths into CanvasLayers.
@@ -258,8 +270,8 @@ namespace LanguageTools
 
             foreach (RectTransform child in parent)
             {
-                // Skip children with names that contain subMeshUI.
-                if (child.name.Contains(subMeshUI)) continue;
+                // Skip children whose names start with any ignored prefix.
+                if (IsIgnoredName(child.name)) continue;
 
                 // Check for duplicate names among siblings at this level.
                 if (!names.Add(child.name))
@@ -277,6 +289,10 @@ namespace LanguageTools
 
             return false;
         }
+
+        #endregion
+
+        #region === Utility Methods ===
 
         /// <summary>
         /// Converts a RectTransform into RectTransformData.
@@ -302,17 +318,20 @@ namespace LanguageTools
         {
             foreach (Transform child in parent)
             {
-                if (!child.name.StartsWith(subMeshUI))
-                {
-                    GameObject go = child.gameObject;
-                    if (!states.ContainsKey(go))
-                    {
-                        states[go] = go.activeSelf;
-                        if (!go.activeSelf) go.SetActive(true);
-                    }
+                // Skip children whose names start with ignored prefixes.
+                if (IsIgnoredName(child.name)) continue;
 
-                    ActivateAllChildren(child, states);
+                var go = child.gameObject;
+
+                // Store and activate if necessary.
+                if (!states.ContainsKey(go))
+                {
+                    states[go] = go.activeSelf;
+                    if (!go.activeSelf) go.SetActive(true);
                 }
+
+                // Recurse into deeper children.
+                ActivateAllChildren(child, states);
             }
         }
 
@@ -325,6 +344,23 @@ namespace LanguageTools
                 if (child.name == name) return child;
             return null;
         }
+
+        /// <summary>
+        /// Returns true if the given name starts with any ignored prefix.
+        /// </summary>
+        /// <param name="name">Object name to check.</param>
+        /// <returns>True if name starts with any prefix in ignoredPrefixes.</returns>
+        private static bool IsIgnoredName(string name)
+        {
+            // Check if the name starts with any of the ignored prefixes.
+            foreach (var prefix in ignoredPrefixes)
+                if (name.StartsWith(prefix)) return true;
+            return false;
+        }
+
+        #endregion
+
+        #region === Metadata Extraction and Application ===
 
         /// <summary>
         /// Populates CanvasStructure with metadata from a Canvas GameObject.
@@ -434,5 +470,7 @@ namespace LanguageTools
                 raycaster.blockingMask = g.blockingMask;
             }
         }
+
+        #endregion
     }
 }

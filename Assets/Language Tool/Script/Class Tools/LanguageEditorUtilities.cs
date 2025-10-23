@@ -3,20 +3,22 @@
  * Description: Utility class for managing localization data within Unity Editor.
  *              Provides prefab search, custom GUI styles, TSV validation and parsing,
  *              and manipulation of multilingual tables for editing and display.
+ *              
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
 */
 
 #if UNITY_EDITOR
+using UnityEngine.SceneManagement;
 using System.Collections.Generic;
+using System.Reflection;
+using UnityEditor;
+using UnityEngine;
 using System.Linq;
 using System.IO;
-using System;
-using UnityEngine.SceneManagement;
-using UnityEngine;
-using UnityEditor;
 using TSVTools;
+using System;
 
 using static LanguageTools.LanguageFileManager;
 using static TSVTools.TabTableUtility;
@@ -25,7 +27,13 @@ namespace LanguageTools.Editor
 {
     public class LanguageEditorUtilities
     {
+        #region === Constants & File Paths ===
+
         private const string fileData = "ProjectSettings/LanguageFileData.json"; // file location.
+
+        #endregion
+
+        #region === Prefab Utilities ===
 
         /// <summary>
         /// Searches the asset database for a prefab by its name and returns the loaded GameObject.
@@ -33,9 +41,9 @@ namespace LanguageTools.Editor
         public static GameObject FindPrefabByName(string prefabName)
         {
             // Search for all prefab assets matching the given name.
-            string[] guids = AssetDatabase.FindAssets($"{prefabName} t:Prefab");
+            var guids = AssetDatabase.FindAssets($"{prefabName} t:Prefab");
 
-            foreach (string guid in guids)
+            foreach (var guid in guids)
             {
                 // Convert the GUID to a full asset path.
                 string path = AssetDatabase.GUIDToAssetPath(guid);
@@ -49,6 +57,10 @@ namespace LanguageTools.Editor
             Debug.LogError($"Prefab with the name '{prefabName}' not found.");
             return null;
         }
+
+        #endregion
+
+        #region === GUI Styles ===
 
         /// <summary>
         /// Creates a custom GUI label style with specified font size, optional bold and center alignment.
@@ -66,6 +78,28 @@ namespace LanguageTools.Editor
                 alignment = centerAlignment ? TextAnchor.MiddleCenter : TextAnchor.MiddleLeft
             };
         }
+
+        /// <summary>
+        /// Creates a GUIStyle for custom buttons with specified font size and formatting.
+        /// </summary>
+        /// <param name="fontSize">Font size to use in the button style.</param>
+        /// <returns>Custom GUIStyle object.</returns>
+        public static GUIStyle CreateCustomButtonStyle(int fontSize)
+        {
+            // Create and return a GUIStyle object with custom formatting.
+            return new GUIStyle(GUI.skin.button)
+            {
+                fontSize = fontSize,
+                fontStyle = FontStyle.Bold,
+                alignment = TextAnchor.MiddleCenter,
+                normal = { textColor = Color.white },
+                hover = { textColor = Color.red }
+            };
+        }
+
+        #endregion
+
+        #region === TSV Utilities ===
 
         /// <summary>
         /// Checks whether the provided file path is a valid TSV file.
@@ -228,6 +262,10 @@ namespace LanguageTools.Editor
             }
         }
 
+        #endregion
+
+        #region === Table Builders ===
+
         /// <summary>
         /// Builds a localized table header from a list of available languages.
         /// </summary>
@@ -295,10 +333,11 @@ namespace LanguageTools.Editor
 
         /// <summary>
         /// Opens the Language File Manager and adds a language component for editing.
+        /// Ensures the window is fully initialized before injecting the component.
         /// </summary>
         public static void OpenEditorWindowWithComponent(int iD, int type, string text, int alignment, int size, int fontIndex)
         {
-            // Create a new component configuration for editing.
+            // Prepare the data to be added.
             var data = new LanguageForEditingSave
             {
                 iD = iD,
@@ -309,24 +348,59 @@ namespace LanguageTools.Editor
                 fontListIndex = fontIndex
             };
 
-            // Open the editor window and inject the component into it.
+            // Open the window.
             LanguageFileManagerWindow.ShowEditorWindow();
-            EditorWindow.GetWindow<LanguageFileManagerWindow>().AddComponent(data);
+
+            // Schedule AddComponent to run on the next editor update (next frame), ensuring the window has finished initializing.
+            EditorApplication.delayCall += () =>
+            {
+                var window = EditorWindow.GetWindow<LanguageFileManagerWindow>();
+                if (window != null)
+                {
+                    window.AddComponent(data);
+                }
+                else
+                {
+                    Debug.LogWarning("LanguageFileManagerWindow could not be found after opening.");
+                }
+            };
         }
 
         /// <summary>
-        /// Opens the Language File Manager and loads a saved canvas from JSON.
+        /// Opens the Language File Manager and loads a saved canvas from JSON data.
+        /// Ensures the editor window is fully initialized before injecting the canvas.
         /// </summary>
+        /// <param name="iD">The unique ID of the canvas to load.</param>
+        /// <param name="json">The JSON string containing the canvas data.</param>
         public static void OpenEditorWindowWithCanvas(int iD, string json)
         {
             // Create a new CanvasForEditingSave instance with the provided ID and JSON data.
-            var data = new CanvasForEditingSave { canvasID = iD, json = json };
+            var data = new CanvasForEditingSave
+            {
+                canvasID = iD,
+                json = json
+            };
 
-            // Show the Language File Manager editor window.
+            // Open the Language File Manager editor window.
             LanguageFileManagerWindow.ShowEditorWindow();
 
-            // Retrieve the opened window and add the canvas data to it.
-            EditorWindow.GetWindow<LanguageFileManagerWindow>().AddCanvas(data);
+            // Schedule the canvas injection to occur in the next editor frame.
+            // This ensures the window has completed its initialization before we modify it.
+            EditorApplication.delayCall += () =>
+            {
+                // Try to retrieve the existing LanguageFileManagerWindow instance.
+                var window = EditorWindow.GetWindow<LanguageFileManagerWindow>();
+
+                // Only proceed if the window exists and is valid.
+                if (window != null)
+                {
+                    window.AddCanvas(data); // Inject the saved canvas data into the editor window.
+                }
+                else
+                {
+                    Debug.LogWarning("LanguageFileManagerWindow could not be found after opening. Canvas data was not applied.");
+                }
+            };
         }
 
         /// <summary>
@@ -340,30 +414,12 @@ namespace LanguageTools.Editor
             var tableData = new VerticalTable[]
             {
                 new() { horizontalTable = new string[] { "Do not modify '% tab %' and '% newline %'. They are components to avoid reading and writing errors.", "[=]", "ar", "bg", "ca", "zh-Hans", "zh-CHS", "cs", "da", "de", "el", "en", "es", "fi", "fr", "he", "hu", "is", "it", "ja", "ko", "nl", "no", "pl", "pt", "rm", "ro", "ru", "hr", "sk", "sq", "sv", "th", "tr", "ur", "id", "uk", "be", "sl", "et", "lv", "lt", "tg", "fa", "vi", "hy", "az", "eu", "hsb", "mk", "st", "ts", "tn", "xh", "zu", "af", "ka", "fo", "hi", "mt", "se", "ga", "ms", "kk", "ky", "sw", "tk", "uz", "tt", "bn", "pa", "gu", "or", "ta", "te", "kn", "ml", "as", "mr", "mn", "bo", "cy", "km", "lo", "my", "gl", "kok", "si", "chr", "am", "tzm", "ne", "fy", "ps", "fil", "ff", "ha", "yo", "nso", "lb", "kl", "ig", "om", "ti", "haw", "so", "ii", "br", "ug", "gsw", "sah", "rw", "gd", "ar-SA", "bg-BG", "ca-ES", "zh-TW", "cs-CZ", "da-DK", "de-DE", "el-GR", "en-US", "fi-FI", "fr-FR", "he-IL", "hu-HU", "is-IS", "it-IT", "ja-JP", "ko-KR", "nl-NL", "nb-NO", "pl-PL", "pt-BR", "rm-CH", "ro-RO", "ru-RU", "hr-HR", "sk-SK", "sq-AL", "sv-SE", "th-TH", "tr-TR", "ur-PK", "id-ID", "uk-UA", "be-BY", "sl-SI", "et-EE", "lv-LV", "lt-LT", "tg-Cyrl-TJ", "fa-IR", "vi-VN", "hy-AM", "az-Latn-AZ", "eu-ES", "hsb-DE", "mk-MK", "st-ZA", "ts-ZA", "tn-ZA", "xh-ZA", "zu-ZA", "af-ZA", "ka-GE", "fo-FO", "hi-IN", "mt-MT", "se-NO", "ms-MY", "kk-KZ", "ky-KG", "sw-KE", "tk-TM", "uz-Latn-UZ", "tt-RU", "bn-IN", "gu-IN", "or-IN", "ta-IN", "te-IN", "kn-IN", "ml-IN", "as-IN", "mr-IN", "mn-MN", "bo-CN", "cy-GB", "km-KH", "lo-LA", "my-MM", "gl-ES", "kok-IN", "si-LK", "am-ET", "ne-NP", "fy-NL", "ps-AF", "fil-PH", "ha-Latn-NG", "yo-NG", "nso-ZA", "lb-LU", "kl-GL", "ig-NG", "om-ET", "ti-ET", "haw-US", "so-SO", "ii-CN", "br-FR", "ug-CN", "gsw-FR", "sah-RU", "rw-RW", "gd-GB", "ar-IQ", "ca-ES-valencia", "zh-CN", "de-CH", "en-GB", "es-MX", "fr-BE", "it-CH", "nl-BE", "nn-NO", "pt-PT", "ro-MD", "ru-MD", "sv-FI", "ur-IN", "az-Cyrl-AZ", "dsb-DE", "tn-BW", "se-SE", "ga-IE", "ms-BN", "uz-Cyrl-UZ", "bn-BD", "pa-Arab-PK", "ta-LK", "ne-IN", "ti-ER", "ar-EG", "zh-HK", "de-AT", "en-AU", "es-ES", "fr-CA", "se-FI", "ar-LY", "zh-SG", "de-LU", "en-CA", "es-GT", "fr-CH", "hr-BA", "ar-DZ", "zh-MO", "de-LI", "en-NZ", "es-CR", "fr-LU", "bs-Latn-BA", "ar-MA", "en-IE", "es-PA", "fr-MC", "sr-Latn-BA", "ar-TN", "en-ZA", "es-DO", "sr-Cyrl-BA", "ar-OM", "en-JM", "es-VE", "fr-RE", "bs-Cyrl-BA", "ar-YE", "es-CO", "fr-CD", "sr-Latn-RS", "smn-FI", "ar-SY", "en-BZ", "es-PE", "fr-SN", "sr-Cyrl-RS", "ar-JO", "en-TT", "es-AR", "fr-CM", "sr-Latn-ME", "ar-LB", "en-ZW", "es-EC", "fr-CI", "sr-Cyrl-ME", "ar-KW", "en-PH", "es-CL", "fr-ML", "ar-AE", "es-UY", "fr-MA", "ar-BH", "en-HK", "es-PY", "fr-HT", "ar-QA", "en-IN", "es-BO", "en-MY", "es-SV", "en-SG", "es-HN", "es-NI", "es-PR", "es-US", "es-CU", "bs-Cyrl", "bs-Latn", "sr-Cyrl", "sr-Latn", "smn", "az-Cyrl", "zh", "nn", "bs", "az-Latn", "uz-Cyrl", "mn-Cyrl", "zh-Hant", "zh-CHT", "nb", "sr", "tg-Cyrl", "dsb", "uz-Latn", "pa-Arab", "tzm-Latn", "ha-Latn" } },
-                new() { horizontalTable = new string[] { "[=]", "[=]", "العربية", "български", "català", "中文", "中文", "čeština", "dansk", "Deutsch", "Ελληνικά", "English", "español", "suomi", "français", "עברית", "magyar", "íslenska", "italiano", "日本語", "한국어", "Nederlands", "norsk", "polski", "português", "rumantsch", "română", "русский", "hrvatski", "slovenčina", "shqip", "svenska", "ไทย", "Türkçe", "اردو", "Indonesia", "українська", "беларуская", "slovenščina", "eesti", "latviešu", "lietuvių", "Тоҷикӣ", "فارسی", "Tiếng Việt", "հայերեն", "azərbaycan", "euskara", "hornjoserbšćina", "македонски", "Sesotho", "Xitsonga", "Setswana", "isiXhosa", "isiZulu", "Afrikaans", "ქართული", "føroyskt", "हिन्दी", "Malti", "davvisámegiella", "Gaeilge", "Bahasa Melayu", "қазақ тілі", "кыргызча", "Kiswahili", "türkmençe", "o‘zbek", "татар", "বাংলা", "ਪੰਜਾਬੀ", "ગુજરાતી", "ଓଡ଼ିଆ", "தமிழ்", "తెలుగు", "ಕನ್ನಡ", "മലയാളം", "অসমীয়া", "मराठी", "монгол", "བོད་སྐད་", "Cymraeg", "ខ្មែរ", "ລາວ", "မြန်မာ", "galego", "कोंकणी", "සිංහල", "ᏣᎳᎩ", "አማርኛ", "Tamaziɣt n laṭlaṣ", "नेपाली", "West-Frysk", "پښتو", "Filipino", "Pulaar", "Hausa", "Èdè Yorùbá", "Sesotho sa Leboa", "Lëtzebuergesch", "kalaallisut", "Igbo", "Oromoo", "ትግርኛ", "ʻŌlelo Hawaiʻi", "Soomaali", "ꆈꌠꉙ", "brezhoneg", "ئۇيغۇرچە", "Schwiizertüütsch", "саха тыла", "Kinyarwanda", "Gàidhlig", "العربية (المملكة العربية السعودية)", "български (България)", "català (Espanya)", "中文 (台湾)", "čeština (Česká republika)", "dansk (Danmark)", "Deutsch (Deutschland)", "Ελληνικά (Ελλάδα)", "English (United States)", "suomi (Suomi)", "français (France)", "עברית (ישראל)", "magyar (Magyarország)", "íslenska (Ísland)", "italiano (Italia)", "日本語 (日本)", "한국어 (대한민국)", "Nederlands (Nederland)", "norsk bokmål (Norge)", "polski (Polska)", "português (Brasil)", "rumantsch (Svizra)", "română (România)", "русский (Россия)", "hrvatski (Hrvatska)", "slovenčina (Slovensko)", "shqip (Shqipëri)", "svenska (Sverige)", "ไทย (ไทย)", "Türkçe (Türkiye)", "اردو (پاکستان)", "Indonesia (Indonesia)", "українська (Україна)", "беларуская (Беларусь)", "slovenščina (Slovenija)", "eesti (Eesti)", "latviešu (Latvija)", "lietuvių (Lietuva)", "Тоҷикӣ (Тоҷикистон)", "فارسی (ایران)", "Tiếng Việt (Việt Nam)", "հայերեն (Հայաստան)", "azərbaycan (Azərbaycan)", "euskara (Espainia)", "hornjoserbšćina (Němska)", "македонски (Македонија)", "Sesotho", "Xitsonga", "Setswana", "isiXhosa", "isiZulu (i-South Africa)", "Afrikaans (Suid-Afrika)", "ქართული (საქართველო)", "føroyskt (Føroyar)", "हिन्दी (भारत)", "Malti (Malta)", "davvisámegiella (Norga)", "Bahasa Melayu (Malaysia)", "қазақ тілі (Қазақстан)", "кыргызча (Кыргызстан)", "Kiswahili (Kenya)", "türkmençe (Türkmenistan)", "o‘zbek (Oʻzbekiston)", "татар (Россия)", "বাংলা (ভারত)", "ગુજરાતી (ભારત)", "ଓଡ଼ିଆ (ଭାରତ)", "தமிழ் (இந்தியா)", "తెలుగు (భారత దేశం)", "ಕನ್ನಡ (ಭಾರತ)", "മലയാളം (ഇന്ത്യ)", "অসমীয়া (ভাৰত)", "मराठी (भारत)", "монгол (Монгол)", "བོད་སྐད་ (རྒྱ་ནག)", "Cymraeg (Y Deyrnas Unedig)", "ខ្មែរ (កម្ពុជា)", "ລາວ (ລາວ)", "မြန်မာ (မြန်မာ)", "galego (España)", "कोंकणी (भारत)", "සිංහල (ශ්‍රී ලංකාව)", "አማርኛ (ኢትዮጵያ)", "नेपाली (नेपाल)", "West-Frysk (Nederlân)", "پښتو (افغانستان)", "Filipino (Pilipinas)", "Hausa (Najeriya)", "Èdè Yorùbá (Orílẹ́ède Nàìjíríà)", "Sesotho sa Leboa", "Lëtzebuergesch (Lëtzebuerg)", "kalaallisut (Kalaallit Nunaat)", "Igbo (Nigeria)", "Oromoo (Itoophiyaa)", "ትግርኛ (ኢትዮጵያ)", "ʻŌlelo Hawaiʻi (ʻAmelika Hui Pū ʻIa)", "Soomaali (Soomaaliya)", "ꆈꌠꉙ (ꍏꇩ)", "brezhoneg (Frañs)", "ئۇيغۇرچە (جۇڭگو)", "Schwiizertüütsch (Frankriich)", "саха тыла (Арассыыйа)", "Kinyarwanda (Rwanda)", "Gàidhlig (An Rìoghachd Aonaichte)", "العربية (العراق)", "català (Espanya)", "中文 (中国)", "Deutsch (Schweiz)", "English (United Kingdom)", "español (México)", "français (Belgique)", "italiano (Svizzera)", "Nederlands (België)", "nynorsk (Noreg)", "português (Portugal)", "română (Republica Moldova)", "русский (Молдова)", "svenska (Finland)", "اردو (بھارت)", "azərbaycan (Azərbaycan)", "dolnoserbšćina (Nimska)", "Setswana", "davvisámegiella (Ruoŧŧa)", "Gaeilge (Éire)", "Bahasa Melayu (Brunei)", "o‘zbek (Oʻzbekiston)", "বাংলা (বাংলাদেশ)", "ਪੰਜਾਬੀ (ਪਾਕਿਸਤਾਨ)", "தமிழ் (இலங்கை)", "नेपाली (भारत)", "ትግርኛ (ኤርትራ)", "العربية (مصر)", "中文 (中国香港特别行政区)", "Deutsch (Österreich)", "English (Australia)", "español (España)", "français (Canada)", "davvisámegiella (Suopma)", "العربية (ليبيا)", "中文 (新加坡)", "Deutsch (Luxemburg)", "English (Canada)", "español (Guatemala)", "français (Suisse)", "hrvatski (Bosna i Hercegovina)", "العربية (الجزائر)", "中文 (中国澳门特别行政区)", "Deutsch (Liechtenstein)", "English (New Zealand)", "español (Costa Rica)", "français (Luxembourg)", "bosanski (Bosna i Hercegovina)", "العربية (المغرب)", "English (Ireland)", "español (Panamá)", "français (Monaco)", "српски (Босна и Херцеговина)", "العربية (تونس)", "English (South Africa)", "español (República Dominicana)", "српски (Босна и Херцеговина)", "العربية (عُمان)", "English (Jamaica)", "español (Venezuela)", "français (La Réunion)", "bosanski (Bosna i Hercegovina)", "العربية (اليمن)", "español (Colombia)", "français (Congo-Kinshasa)", "српски (Србија)", "anarâškielâ (Suomâ)", "العربية (سوريا)", "English (Belize)", "español (Perú)", "français (Sénégal)", "српски (Србија)", "العربية (الأردن)", "English (Trinidad & Tobago)", "español (Argentina)", "français (Cameroun)", "српски (Црна Гора)", "العربية (لبنان)", "English (Zimbabwe)", "español (Ecuador)", "français (Côte d’Ivoire)", "српски (Црна Гора)", "العربية (الكويت)", "English (Philippines)", "español (Chile)", "français (Mali)", "العربية (الإمارات العربية المتحدة)", "español (Uruguay)", "français (Maroc)", "العربية (البحرين)", "English (Hong Kong SAR China)", "español (Paraguay)", "français (Haïti)", "العربية (قطر)", "English (India)", "español (Bolivia)", "English (Malaysia)", "español (El Salvador)", "English (Singapore)", "español (Honduras)", "español (Nicaragua)", "español (Puerto Rico)", "español (Estados Unidos)", "español (Cuba)", "bosanski", "bosanski", "српски", "српски", "anarâškielâ", "azərbaycan", "中文", "nynorsk", "bosanski", "azərbaycan", "o‘zbek", "монгол", "中文", "中文", "norsk bokmål", "српски", "Тоҷикӣ", "dolnoserbšćina", "o‘zbek", "ਪੰਜਾਬੀ", "Tamaziɣt n laṭlaṣ", "Hausa" } },
+                new() { horizontalTable = new string[] { "[=]", "[=]", "العربية", "Български", "Català", "中文", "中文", "Čeština", "Dansk", "Deutsch", "Ελληνικά", "English", "Español", "Suomi", "Français", "עברית", "Magyar", "Íslenska", "Italiano", "日本語", "한국어", "Nederlands", "Norsk", "Polski", "Português", "Rumantsch", "Română", "Русский", "Hrvatski", "Slovenčina", "Shqip", "Svenska", "ไทย", "Türkçe", "اردو", "Indonesia", "Українська", "Беларуская", "Slovenščina", "Eesti", "Latviešu", "Lietuvių", "Тоҷикӣ", "فارسی", "Tiếng Việt", "Հայերեն", "Azərbaycan", "Euskara", "Hornjoserbšćina", "Македонски", "Sesotho", "Xitsonga", "Setswana", "IsiXhosa", "IsiZulu", "Afrikaans", "ქართული", "Føroyskt", "हिन्दी", "Malti", "Davvisámegiella", "Gaeilge", "Bahasa Melayu", "Қазақ тілі", "Кыргызча", "Kiswahili", "Türkmençe", "O‘zbek", "Татар", "বাংলা", "ਪੰਜਾਬੀ", "ગુજરાતી", "ଓଡ଼ିଆ", "தமிழ்", "తెలుగు", "ಕನ್ನಡ", "മലയാളം", "অসমীয়া", "मराठी", "Монгол", "བོད་སྐད་", "Cymraeg", "ខ្មែរ", "ລາວ", "မြန်မာ", "Galego", "कोंकणी", "සිංහල", "ᏣᎳᎩ", "አማርኛ", "Tamaziɣt n laṭlaṣ", "नेपाली", "West-Frysk", "پښتو", "Filipino", "Pulaar", "Hausa", "Èdè Yorùbá", "Sesotho sa Leboa", "Lëtzebuergesch", "Kalaallisut", "Igbo", "Oromoo", "ትግርኛ", "ʻŌlelo Hawaiʻi", "Soomaali", "ꆈꌠꉙ", "Brezhoneg", "ئۇيغۇرچە", "Schwiizertüütsch", "Саха тыла", "Kinyarwanda", "Gàidhlig", "العربية (المملكة العربية السعودية)", "Български (България)", "Català (Espanya)", "中文 (台湾)", "Čeština (Česká republika)", "Dansk (Danmark)", "Deutsch (Deutschland)", "Ελληνικά (Ελλάδα)", "English (United States)", "Suomi (Suomi)", "Français (France)", "עברית (ישראל)", "Magyar (Magyarország)", "Íslenska (Ísland)", "Italiano (Italia)", "日本語 (日本)", "한국어 (대한민국)", "Nederlands (Nederland)", "Norsk bokmål (Norge)", "Polski (Polska)", "Português (Brasil)", "Rumantsch (Svizra)", "Română (România)", "Русский (Россия)", "Hrvatski (Hrvatska)", "Slovenčina (Slovensko)", "Shqip (Shqipëri)", "Svenska (Sverige)", "ไทย (ไทย)", "Türkçe (Türkiye)", "اردو (پاکستان)", "Indonesia (Indonesia)", "Українська (Україна)", "Беларуская (Беларусь)", "Slovenščina (Slovenija)", "Eesti (Eesti)", "Latviešu (Latvija)", "Lietuvių (Lietuva)", "Тоҷикӣ (Тоҷикистон)", "فارسی (ایران)", "Tiếng Việt (Việt Nam)", "Հայերեն (Հայաստան)", "Azərbaycan (Azərbaycan)", "Euskara (Espainia)", "Hornjoserbšćina (Němska)", "Македонски (Македонија)", "Sesotho", "Xitsonga", "Setswana", "IsiXhosa", "IsiZulu (i-South Africa)", "Afrikaans (Suid-Afrika)", "ქართული (საქართველო)", "Føroyskt (Føroyar)", "हिन्दी (भारत)", "Malti (Malta)", "Davvisámegiella (Norga)", "Bahasa Melayu (Malaysia)", "Қазақ тілі (Қазақстан)", "Кыргызча (Кыргызстан)", "Kiswahili (Kenya)", "Türkmençe (Türkmenistan)", "O‘zbek (Oʻzbekiston)", "Татар (Россия)", "বাংলা (ভারত)", "ગુજરાતી (ભારત)", "ଓଡ଼ିଆ (ଭାରତ)", "தமிழ் (இந்தியா)", "తెలుగు (భారత దేశం)", "ಕನ್ನಡ (ಭಾರತ)", "മലയാളം (ഇന്ത്യ)", "অসমীয়া (ভাৰত)", "मराठी (भारत)", "Монгол (Монгол)", "བོད་སྐད་ (རྒྱ་ནག)", "Cymraeg (Y Deyrnas Unedig)", "ខ្មែរ (កម្ពុជា)", "ລາວ (ລາວ)", "မြန်မာ (မြန်မာ)", "Galego (España)", "कोंकणी (भारत)", "සිංහල (ශ්‍රී ලංකාව)", "አማርኛ (ኢትዮጵያ)", "नेपाली (नेपाल)", "West-Frysk (Nederlân)", "پښتو (افغانستان)", "Filipino (Pilipinas)", "Hausa (Najeriya)", "Èdè Yorùbá (Orílẹ́ède Nàìjíríà)", "Sesotho sa Leboa", "Lëtzebuergesch (Lëtzebuerg)", "Kalaallisut (Kalaallit Nunaat)", "Igbo (Nigeria)", "Oromoo (Itoophiyaa)", "ትግርኛ (ኢትዮጵያ)", "ʻŌlelo Hawaiʻi (ʻAmelika Hui Pū ʻIa)", "Soomaali (Soomaaliya)", "ꆈꌠꉙ (ꍏꇩ)", "Brezhoneg (Frañs)", "ئۇيغۇرچە (جۇڭگو)", "Schwiizertüütsch (Frankriich)", "Саха тыла (Арассыыйа)", "Kinyarwanda (Rwanda)", "Gàidhlig (An Rìoghachd Aonaichte)", "العربية (العراق)", "Català (Espanya)", "中文 (中国)", "Deutsch (Schweiz)", "English (United Kingdom)", "Español (México)", "Français (Belgique)", "Italiano (Svizzera)", "Nederlands (België)", "Nynorsk (Noreg)", "Português (Portugal)", "Română (Republica Moldova)", "Русский (Молдова)", "Svenska (Finland)", "اردو (بھارت)", "Azərbaycan (Azərbaycan)", "Dolnoserbšćina (Nimska)", "Setswana", "Davvisámegiella (Ruoŧŧa)", "Gaeilge (Éire)", "Bahasa Melayu (Brunei)", "O‘zbek (Oʻzbekiston)", "বাংলা (বাংলাদেশ)", "ਪੰਜਾਬੀ (ਪਾਕਿਸਤਾਨ)", "தமிழ் (இலங்கை)", "नेपाली (भारत)", "ትግርኛ (ኤርትራ)", "العربية (مصر)", "中文 (中国香港特别行政区)", "Deutsch (Österreich)", "English (Australia)", "Español (España)", "Français (Canada)", "Davvisámegiella (Suopma)", "العربية (ليبيا)", "中文 (新加坡)", "Deutsch (Luxemburg)", "English (Canada)", "Español (Guatemala)", "Français (Suisse)", "Hrvatski (Bosna i Hercegovina)", "العربية (الجزائر)", "中文 (中国澳门特别行政区)", "Deutsch (Liechtenstein)", "English (New Zealand)", "Español (Costa Rica)", "Français (Luxembourg)", "Bosanski (Bosna i Hercegovina)", "العربية (المغرب)", "English (Ireland)", "Español (Panamá)", "Français (Monaco)", "Српски (Босна и Херцеговина)", "العربية (تونس)", "English (South Africa)", "Español (República Dominicana)", "Српски (Босна и Херцеговина)", "العربية (عُمان)", "English (Jamaica)", "Español (Venezuela)", "Français (La Réunion)", "Bosanski (Bosna i Hercegovina)", "العربية (اليمن)", "Español (Colombia)", "Français (Congo-Kinshasa)", "Српски (Србија)", "Anarâškielâ (Suomâ)", "العربية (سوريا)", "English (Belize)", "Español (Perú)", "Français (Sénégal)", "Српски (Србија)", "العربية (الأردن)", "English (Trinidad & Tobago)", "Español (Argentina)", "Français (Cameroun)", "Српски (Црна Гора)", "العربية (لبنان)", "English (Zimbabwe)", "Español (Ecuador)", "Français (Côte d’Ivoire)", "Српски (Црна Гора)", "العربية (الكويت)", "English (Philippines)", "Español (Chile)", "Français (Mali)", "العربية (الإمارات العربية المتحدة)", "Español (Uruguay)", "Français (Maroc)", "العربية (البحرين)", "English (Hong Kong SAR China)", "Español (Paraguay)", "Français (Haïti)", "العربية (قطر)", "English (India)", "Español (Bolivia)", "English (Malaysia)", "Español (El Salvador)", "English (Singapore)", "Español (Honduras)", "Español (Nicaragua)", "Español (Puerto Rico)", "Español (Estados Unidos)", "Español (Cuba)", "Bosanski", "Bosanski", "Српски", "Српски", "Anarâškielâ", "Azərbaycan", "中文", "Nynorsk", "Bosanski", "Azərbaycan", "O‘zbek", "Монгол", "中文", "中文", "Norsk bokmål", "Српски", "Тоҷикӣ", "Dolnoserbšćina", "O‘zbek", "ਪੰਜਾਬੀ", "Tamaziɣt n laṭlaṣ", "Hausa" } },
                 new() { horizontalTable = new string[] { "[=]", "[=]", "Arabic", "Bulgarian", "Catalan", "Chinese (Simplified)", "Chinese (Simplified) Legacy", "Czech", "Danish", "German", "Greek", "English", "Spanish", "Finnish", "French", "Hebrew", "Hungarian", "Icelandic", "Italian", "Japanese", "Korean", "Dutch", "Norwegian", "Polish", "Portuguese", "Romansh", "Romanian", "Russian", "Croatian", "Slovak", "Albanian", "Swedish", "Thai", "Turkish", "Urdu", "Indonesian", "Ukrainian", "Belarusian", "Slovenian", "Estonian", "Latvian", "Lithuanian", "Tajik", "Persian", "Vietnamese", "Armenian", "Azerbaijani", "Basque", "Upper Sorbian", "Macedonian", "Southern Sotho", "Tsonga", "Tswana", "Xhosa", "Zulu", "Afrikaans", "Georgian", "Faroese", "Hindi", "Maltese", "Northern Sami", "Irish", "Malay", "Kazakh", "Kyrgyz", "Swahili", "Turkmen", "Uzbek", "Tatar", "Bangla", "Punjabi", "Gujarati", "Odia", "Tamil", "Telugu", "Kannada", "Malayalam", "Assamese", "Marathi", "Mongolian", "Tibetan", "Welsh", "Khmer", "Lao", "Burmese", "Galician", "Konkani", "Sinhala", "Cherokee", "Amharic", "Central Atlas Tamazight", "Nepali", "Western Frisian", "Pashto", "Filipino", "Fulah", "Hausa", "Yoruba", "Northern Sotho", "Luxembourgish", "Kalaallisut", "Igbo", "Oromo", "Tigrinya", "Hawaiian", "Somali", "Sichuan Yi", "Breton", "Uyghur", "Swiss German", "Sakha", "Kinyarwanda", "Scottish Gaelic", "Arabic (Saudi Arabia)", "Bulgarian (Bulgaria)", "Catalan (Spain)", "Chinese (Traditional)", "Czech (Czech Republic)", "Danish (Denmark)", "German (Germany)", "Greek (Greece)", "English (United States)", "Finnish (Finland)", "French (France)", "Hebrew (Israel)", "Hungarian (Hungary)", "Icelandic (Iceland)", "Italian (Italy)", "Japanese (Japan)", "Korean (South Korea)", "Dutch (Netherlands)", "Norwegian Bokm\u00e5l (Norway)", "Polish (Poland)", "Portuguese (Brazil)", "Romansh (Switzerland)", "Romanian (Romania)", "Russian (Russia)", "Croatian (Croatia)", "Slovak (Slovakia)", "Albanian (Albania)", "Swedish (Sweden)", "Thai (Thailand)", "Turkish (Turkey)", "Urdu (Pakistan)", "Indonesian (Indonesia)", "Ukrainian (Ukraine)", "Belarusian (Belarus)", "Slovenian (Slovenia)", "Estonian (Estonia)", "Latvian (Latvia)", "Lithuanian (Lithuania)", "Tajik (Cyrillic, Tajikistan)", "Persian (Iran)", "Vietnamese (Vietnam)", "Armenian (Armenia)", "Azerbaijani (Latin, Azerbaijan)", "Basque (Spain)", "Upper Sorbian (Germany)", "Macedonian (Macedonia)", "Southern Sotho (South Africa)", "Tsonga (South Africa)", "Tswana (South Africa)", "Xhosa (South Africa)", "Zulu (South Africa)", "Afrikaans (South Africa)", "Georgian (Georgia)", "Faroese (Faroe Islands)", "Hindi (India)", "Maltese (Malta)", "Northern Sami (Norway)", "Malay (Malaysia)", "Kazakh (Kazakhstan)", "Kyrgyz (Kyrgyzstan)", "Swahili (Kenya)", "Turkmen (Turkmenistan)", "Uzbek (Latin, Uzbekistan)", "Tatar (Russia)", "Bangla (India)", "Gujarati (India)", "Odia (India)", "Tamil (India)", "Telugu (India)", "Kannada (India)", "Malayalam (India)", "Assamese (India)", "Marathi (India)", "Mongolian (Mongolia)", "Tibetan (China)", "Welsh (United Kingdom)", "Khmer (Cambodia)", "Lao (Laos)", "Burmese (Myanmar (Burma))", "Galician (Spain)", "Konkani (India)", "Sinhala (Sri Lanka)", "Amharic (Ethiopia)", "Nepali (Nepal)", "Western Frisian (Netherlands)", "Pashto (Afghanistan)", "Filipino (Philippines)", "Hausa (Latin, Nigeria)", "Yoruba (Nigeria)", "Northern Sotho (South Africa)", "Luxembourgish (Luxembourg)", "Kalaallisut (Greenland)", "Igbo (Nigeria)", "Oromo (Ethiopia)", "Tigrinya (Ethiopia)", "Hawaiian (United States)", "Somali (Somalia)", "Sichuan Yi (China)", "Breton (France)", "Uyghur (China)", "Swiss German (France)", "Sakha (Russia)", "Kinyarwanda (Rwanda)", "Scottish Gaelic (United Kingdom)", "Arabic (Iraq)", "Catalan (Spain)", "Chinese (Simplified)", "German (Switzerland)", "English (United Kingdom)", "Spanish (Mexico)", "French (Belgium)", "Italian (Switzerland)", "Dutch (Belgium)", "Norwegian Nynorsk (Norway)", "Portuguese (Portugal)", "Romanian (Moldova)", "Russian (Moldova)", "Swedish (Finland)", "Urdu (India)", "Azerbaijani (Cyrillic, Azerbaijan)", "Lower Sorbian (Germany)", "Tswana (Botswana)", "Northern Sami (Sweden)", "Irish (Ireland)", "Malay (Brunei)", "Uzbek (Cyrillic, Uzbekistan)", "Bangla (Bangladesh)", "Punjabi (Arabic, Pakistan)", "Tamil (Sri Lanka)", "Nepali (India)", "Tigrinya (Eritrea)", "Arabic (Egypt)", "Chinese (Traditional, Hong Kong SAR China)", "German (Austria)", "English (Australia)", "Spanish (Spain)", "French (Canada)", "Northern Sami (Finland)", "Arabic (Libya)", "Chinese (Simplified, Singapore)", "German (Luxembourg)", "English (Canada)", "Spanish (Guatemala)", "French (Switzerland)", "Croatian (Bosnia & Herzegovina)", "Arabic (Algeria)", "Chinese (Traditional, Macau SAR China)", "German (Liechtenstein)", "English (New Zealand)", "Spanish (Costa Rica)", "French (Luxembourg)", "Bosnian (Latin, Bosnia & Herzegovina)", "Arabic (Morocco)", "English (Ireland)", "Spanish (Panama)", "French (Monaco)", "Serbian (Latin, Bosnia & Herzegovina)", "Arabic (Tunisia)", "English (South Africa)", "Spanish (Dominican Republic)", "Serbian (Cyrillic, Bosnia & Herzegovina)", "Arabic (Oman)", "English (Jamaica)", "Spanish (Venezuela)", "French (R\u00e9union)", "Bosnian (Cyrillic, Bosnia & Herzegovina)", "Arabic (Yemen)", "Spanish (Colombia)", "French (Congo - Kinshasa)", "Serbian (Latin, Serbia)", "Inari Sami (Finland)", "Arabic (Syria)", "English (Belize)", "Spanish (Peru)", "French (Senegal)", "Serbian (Cyrillic, Serbia)", "Arabic (Jordan)", "English (Trinidad & Tobago)", "Spanish (Argentina)", "French (Cameroon)", "Serbian (Latin, Montenegro)", "Arabic (Lebanon)", "English (Zimbabwe)", "Spanish (Ecuador)", "French (C\u00f4te d\u2019Ivoire)", "Serbian (Cyrillic, Montenegro)", "Arabic (Kuwait)", "English (Philippines)", "Spanish (Chile)", "French (Mali)", "Arabic (United Arab Emirates)", "Spanish (Uruguay)", "French (Morocco)", "Arabic (Bahrain)", "English (Hong Kong SAR China)", "Spanish (Paraguay)", "French (Haiti)", "Arabic (Qatar)", "English (India)", "Spanish (Bolivia)", "English (Malaysia)", "Spanish (El Salvador)", "English (Singapore)", "Spanish (Honduras)", "Spanish (Nicaragua)", "Spanish (Puerto Rico)", "Spanish (United States)", "Spanish (Cuba)", "Bosnian (Cyrillic)", "Bosnian (Latin)", "Serbian (Cyrillic)", "Serbian (Latin)", "Inari Sami", "Azerbaijani (Cyrillic)", "Chinese (Simplified)", "Norwegian Nynorsk", "Bosnian", "Azerbaijani (Latin)", "Uzbek (Cyrillic)", "Mongolian (Cyrillic)", "Chinese (Traditional)", "Chinese (Traditional) Legacy", "Norwegian Bokm\u00e5l", "Serbian", "Tajik (Cyrillic)", "Lower Sorbian", "Uzbek (Latin)", "Punjabi (Arabic)", "Central Atlas Tamazight (Latin)", "Hausa (Latin)" } },
                 new() { horizontalTable = new string[] { "Text Context", "ID", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False", "False" } },
             };
 
             return tableData; // Return the assembled vertical table array representing the language database.
-        }
-
-        /// <summary>
-        /// Creates a GUIStyle for custom buttons with specified font size and formatting.
-        /// </summary>
-        /// <param name="fontSize">Font size to use in the button style.</param>
-        /// <returns>Custom GUIStyle object.</returns>
-        public static GUIStyle CreateCustomButtonStyle(int fontSize)
-        {
-            // Create and return a GUIStyle object with custom formatting.
-            return new GUIStyle(GUI.skin.button)
-            {
-                fontSize = fontSize,
-                fontStyle = FontStyle.Bold,
-                alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = Color.white },
-                hover = { textColor = Color.red }
-            };
         }
 
         /// <summary>
@@ -447,6 +503,10 @@ namespace LanguageTools.Editor
             return iDs;
         }
 
+        #endregion
+
+        #region === Asset & GUI Utilities ===
+
         /// <summary>
         /// Searches and loads a texture by filename from the Unity asset database.
         /// </summary>
@@ -477,20 +537,21 @@ namespace LanguageTools.Editor
         /// <summary>
         /// Draws a labeled text field inside a horizontal layout in the Unity Editor.
         /// </summary>
-        /// <param name="label">Label displayed beside the field.</param>
+        /// <param name="label">Label displayed beside the field, including optional tooltip.</param>
         /// <param name="currentString">Current value of the text field.</param>
         /// <param name="labelSize">Width of the label area.</param>
         /// <param name="textSize">Width of the text input field.</param>
         /// <returns>Updated text string.</returns>
-        public static string DrawLabeledTextField(string label, string currentString, int labelSize, int textSize)
+        public static string DrawLabeledTextField(GUIContent label, string currentString, int labelSize, int textSize)
         {
             // Begin a horizontal layout to align label and field.
             EditorGUILayout.BeginHorizontal();
 
-            // Display the label and the editable text field.
-            GUILayout.Label(label, GUILayout.Width(labelSize));
-            string newText = GUILayout.TextField(currentString, GUILayout.Width(textSize));
+            // Display the label with tooltip and the editable text field.
+            GUILayout.Label(label, GUILayout.Width(labelSize)); // Shows label text and tooltip on hover.
+            string newText = GUILayout.TextField(currentString, GUILayout.Width(textSize)); // Editable text area.
 
+            // End horizontal layout and return updated value.
             EditorGUILayout.EndHorizontal();
             return newText;
         }
@@ -498,20 +559,21 @@ namespace LanguageTools.Editor
         /// <summary>
         /// Draws a labeled integer input field in the Unity Editor.
         /// </summary>
-        /// <param name="label">Label for the field.</param>
+        /// <param name="label">Label for the field, including optional tooltip.</param>
         /// <param name="currentValue">Current integer value.</param>
         /// <param name="labelSize">Width of the label section.</param>
         /// <param name="textSize">Width of the input field.</param>
         /// <returns>Updated integer value.</returns>
-        public static int DrawLabeledIntField(string label, int currentValue, int labelSize, int textSize)
+        public static int DrawLabeledIntField(GUIContent label, int currentValue, int labelSize, int textSize)
         {
             // Begin a horizontal layout for label and field.
             EditorGUILayout.BeginHorizontal();
 
-            // Display the label and the integer input field.
-            GUILayout.Label(label, GUILayout.Width(labelSize));
-            int newValue = EditorGUILayout.IntField(currentValue, GUILayout.Width(textSize));
+            // Display the label with tooltip and the integer input field.
+            GUILayout.Label(label, GUILayout.Width(labelSize)); // Shows label text and tooltip on hover.
+            int newValue = EditorGUILayout.IntField(currentValue, GUILayout.Width(textSize)); // Integer input area.
 
+            // End horizontal layout and return updated value.
             EditorGUILayout.EndHorizontal();
             return newValue;
         }
@@ -533,28 +595,36 @@ namespace LanguageTools.Editor
         /// <summary>
         /// Draws a navigation arrow button and modifies the ID index if pressed.
         /// </summary>
-        /// <param name="label">Text label ("<--" or "-->") for the arrow.</param>
+        /// <param name="isLeftArrow">Defines whether this button represents a left arrow (true = decreases ID index, false = increases ID index).</param>
+        /// <param name="label">Button label and tooltip wrapped in a GUIContent.</param>
         /// <param name="idIndex">Current index to be modified (passed by reference).</param>
         /// <param name="minID">Minimum allowed index value.</param>
         /// <param name="maxID">Maximum allowed index value.</param>
         /// <param name="undoContext">Object to register for undo operations.</param>
         /// <param name="action">Action to invoke if the button is clicked.</param>
-        public static void DrawArrowButton(string label, ref int idIndex, int minID, int maxID, UnityEngine.Object undoContext, Action action)
+        public static void DrawArrowButton(bool isLeftArrow, GUIContent label, ref int idIndex, int minID, int maxID, UnityEngine.Object undoContext, Action action)
         {
-            // Enable button only if within valid ID range based on direction.
-            GUI.enabled = (label == "<--") ? idIndex > minID : idIndex < maxID;
+            // Enable the button only if within the valid ID range based on direction.
+            // If isLeftArrow is true, it decreases the index and must be greater than minID to be active.
+            // If isLeftArrow is false, it increases the index and must be less than maxID to be active.
+            GUI.enabled = isLeftArrow ? idIndex > minID : idIndex < maxID;
 
-            // Draw the button and perform action if clicked.
+            // Draw the button with custom style and fixed width.
+            // If the button is pressed, perform all necessary actions.
             if (GUILayout.Button(label, CreateCustomButtonStyle(15), GUILayout.Width(50)))
             {
                 Undo.RecordObject(undoContext, "Change ID Index"); // Register undo operation.
                 action(); // Invoke the provided action to change index.
-                GUI.FocusControl(null); // Clear GUI focus to avoid unexpected field selections.
+                GUI.FocusControl(null); // Clear GUI focus to avoid residual selection.
                 EditorUtility.SetDirty(undoContext); // Mark object as dirty so Unity detects the change.
             }
 
-            GUI.enabled = true; // Reset GUI state to enabled.
+            GUI.enabled = true; // Reset GUI state to enabled after drawing.
         }
+
+        #endregion
+
+        #region === Component Management ===
 
         /// <summary>
         /// Adds default language component and canvas data to the provided lists.
@@ -593,34 +663,35 @@ namespace LanguageTools.Editor
         }
 
         /// <summary>
-        /// Draws the appropriate icon for a language component type in the Unity Editor.
+        /// Draws the appropriate icon for a language component type in the Unity Editor, with tooltip support.
         /// </summary>
         /// <param name="componentType">Integer representing the component type.</param>
         public static void DisplayComponentIcon(int componentType)
         {
-            // Choose an icon texture based on component type.
-            var icon = componentType switch
+            // Choose an icon texture and tooltip based on component type.
+            (Texture2D icon, string tooltip) = componentType switch
             {
-                1 => FindTextureByName("LanguageText Icon"),
-                2 => FindTextureByName("LanguageTextMesh Icon"),
-                3 => FindTextureByName("LanguageTextInputField Icon"),
-                4 => FindTextureByName("LanguageScript Icon"),
-                5 => FindTextureByName("LanguageCreateFile Icon"),
-                6 => FindTextureByName("LanguageDropdown Icon"),
-                _ => FindTextureByName("Custom Item Icon"),
+                1 => (FindTextureByName("LanguageText Icon"), "Text component"),
+                2 => (FindTextureByName("LanguageTextMesh Icon"), "TextMesh component"),
+                3 => (FindTextureByName("LanguageTextInputField Icon"), "InputField component"),
+                4 => (FindTextureByName("LanguageScript Icon"), "Script component"),
+                5 => (FindTextureByName("LanguageCreateFile Icon"), "CreateFile component"),
+                6 => (FindTextureByName("LanguageDropdown Icon"), "Dropdown component"),
+                _ => (FindTextureByName("Custom Item Icon"), "Custom component"),
             };
 
-            // If the icon is found, draw it within a centered layout area.
             if (icon != null)
             {
                 GUILayout.BeginHorizontal();
-                GUILayout.FlexibleSpace(); // Center the content horizontally.
+                GUILayout.FlexibleSpace(); // Center the icon horizontally.
 
                 // Calculate position and size for the icon.
                 Rect lastRect = GUILayoutUtility.GetLastRect();
                 Rect imageRect = new(lastRect.x + lastRect.width - 70f, lastRect.y, 70f, 70f);
 
-                GUI.DrawTexture(imageRect, icon); // Draw the icon texture at calculated position.
+                // Draw the texture using a GUIContent to enable tooltip.
+                GUI.Label(imageRect, new GUIContent(icon, tooltip));
+
                 GUILayout.EndHorizontal();
             }
         }
@@ -642,7 +713,7 @@ namespace LanguageTools.Editor
             // Get the currently active scene so we only check objects in this scene.
             Scene activeScene = SceneManager.GetActiveScene();
 
-            foreach (GameObject obj in allObjects)
+            foreach (var obj in allObjects)
             {
                 // Ignore GameObjects that are not part of the active scene.
                 if (obj.scene != activeScene) continue;
@@ -656,10 +727,10 @@ namespace LanguageTools.Editor
                 TryMatchComponentID<LanguageTextInputField>(obj, id, foundObjects);
 
                 // Check if the object has components that contain a list of items, and any of those items has a matching 'iD' field.
-                TryMatchListComponentID<LanguageScript, ScriptText>(obj, id, comp => comp.scriptTexts, foundObjects);
-                TryMatchListComponentID<LanguageCreateFile, LanguageLines>(obj, id, comp => comp.fileLines, foundObjects);
-                TryMatchListComponentID<LanguageDropdownTMP, LanguageOptions>(obj, id, comp => comp.options, foundObjects);
-                TryMatchListComponentID<LanguageDropdown, LanguageOptions>(obj, id, comp => comp.options, foundObjects);
+                TryMatchListComponentID<LanguageScript, ScriptText>(obj, id, comp => comp.ScriptTexts, foundObjects);
+                TryMatchListComponentID<LanguageCreateFile, LanguageLines>(obj, id, comp => comp.FileLines, foundObjects);
+                TryMatchListComponentID<LanguageDropdownTMP, LanguageOptions>(obj, id, comp => comp.Options, foundObjects);
+                TryMatchListComponentID<LanguageDropdown, LanguageOptions>(obj, id, comp => comp.Options, foundObjects);
             }
 
             // If any matching objects were found, select them in the Hierarchy.
@@ -670,9 +741,23 @@ namespace LanguageTools.Editor
             else
             {
                 // Show a dialog if no matching objects were found.
-                EditorUtility.DisplayDialog("Notice", $"No object with ID {id} was found in the scene.", "OK");
+                int option = EditorUtility.DisplayDialogComplex(
+                    "Notice",
+                    $"No object with ID {id} was found in the current scene.\n\nWould you like to open the Language ID Scanner?",
+                    "Open Scanner",
+                    "Cancel",
+                    null);
+
+                if (option == 0)
+                {
+                    LanguageIDScannerWindow.ShowWindowID(id);
+                }
             }
         }
+
+        #endregion
+
+        #region === ID Matching Helpers ===
 
         /// <summary>
         /// Checks if the GameObject has a component of type T with the iD field equal to the one informed.
@@ -683,7 +768,7 @@ namespace LanguageTools.Editor
             if (!obj.TryGetComponent<T>(out var comp)) return;
 
             // Use reflection to find the 'iD' field on the component.
-            var idField = typeof(T).GetField("iD");
+            var idField = typeof(T).GetField("iD", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             if (idField != null && idField.FieldType == typeof(int))
             {
                 // Get the value of the 'iD' field and compare it.
@@ -712,7 +797,7 @@ namespace LanguageTools.Editor
             foreach (TItem item in items)
             {
                 // Use reflection to find the 'iD' field on the item type.
-                var idField = typeof(TItem).GetField("iD");
+                var idField = typeof(TItem).GetField("iD", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
                 if (idField != null && idField.FieldType == typeof(int))
                 {
                     // Get the value of the 'iD' field and compare it.
@@ -726,6 +811,45 @@ namespace LanguageTools.Editor
                 }
             }
         }
+
+        /// <summary>
+        /// Finds the nearest valid ID in the specified direction, skipping empty ID ranges.
+        /// </summary>
+        /// <param name="currentID">The current ID index.</param>
+        /// <param name="isLeft">If true, searches backward for the previous valid ID; otherwise, searches forward.</param>
+        /// <param name="componentSave">The list of components containing the valid IDs.</param>
+        /// <returns>The nearest valid ID index in the chosen direction. If none exists, returns the current ID.</returns>
+        public static int FindNearestValidID(int currentID, bool isLeft, List<LanguageForEditingSave> componentSave)
+        {
+            // Extract all valid IDs from the list.
+            List<int> validIDs = componentSave.Select(cs => cs.iD).Distinct().OrderBy(id => id).ToList();
+
+            // Find current index position in the valid ID list.
+            int currentIndex = validIDs.IndexOf(currentID);
+
+            // If current ID is not in the list, find the closest insertion point.
+            if (currentIndex == -1)
+            {
+                validIDs.Add(currentID);
+                validIDs.Sort();
+                currentIndex = validIDs.IndexOf(currentID);
+            }
+
+            // Move backward or forward, depending on the direction, if within range.
+            if (isLeft && currentIndex > 0)
+            {
+                return validIDs[currentIndex - 1]; // Go to the previous valid ID.
+            }
+            else if (!isLeft && currentIndex < validIDs.Count - 1)
+            {
+                return validIDs[currentIndex + 1]; // Go to the next valid ID.
+            }
+
+            // If no valid neighbor exists, return the same ID.
+            return currentID;
+        }
+
+        #endregion
     }
 }
 #endif

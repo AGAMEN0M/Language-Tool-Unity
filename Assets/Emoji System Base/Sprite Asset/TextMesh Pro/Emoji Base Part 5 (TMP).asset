@@ -12,9 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84a92b25f83d49b9bc132d206b370281, type: 3}
   m_Name: Emoji Base Part 5 (TMP)
   m_EditorClassIdentifier: 
-  hashCode: 198903756
-  material: {fileID: 2835107039125412546}
-  materialHashCode: 0
   m_Version: 1.1.0
   m_FaceInfo:
     m_FaceIndex: 0
@@ -38,6 +35,7 @@ MonoBehaviour:
     m_StrikethroughOffset: 0
     m_StrikethroughThickness: 0
     m_TabWidth: 0
+  m_Material: {fileID: 2835107039125412546}
   spriteSheet: {fileID: 2800000, guid: 94fe2fcd8197cb54e92ec07047a09578, type: 3}
   m_SpriteCharacterTable:
   - m_ElementType: 2
@@ -45,1058 +43,882 @@ MonoBehaviour:
     m_GlyphIndex: 0
     m_Scale: 1
     m_Name: Smileys - (4)_0
-    m_HashCode: 1857823555
   - m_ElementType: 2
     m_Unicode: 9201
     m_GlyphIndex: 1
     m_Scale: 1
     m_Name: Smileys - (4)_1
-    m_HashCode: 1857823554
   - m_ElementType: 2
     m_Unicode: 9202
     m_GlyphIndex: 2
     m_Scale: 1
     m_Name: Smileys - (4)_2
-    m_HashCode: 1857823553
   - m_ElementType: 2
     m_Unicode: 9200
     m_GlyphIndex: 3
     m_Scale: 1
     m_Name: Smileys - (4)_3
-    m_HashCode: 1857823552
   - m_ElementType: 2
     m_Unicode: 128368
     m_GlyphIndex: 4
     m_Scale: 1
     m_Name: Smileys - (4)_4
-    m_HashCode: 1857823559
   - m_ElementType: 2
     m_Unicode: 8987
     m_GlyphIndex: 5
     m_Scale: 1
     m_Name: Smileys - (4)_5
-    m_HashCode: 1857823558
   - m_ElementType: 2
     m_Unicode: 9203
     m_GlyphIndex: 6
     m_Scale: 1
     m_Name: Smileys - (4)_6
-    m_HashCode: 1857823557
   - m_ElementType: 2
     m_Unicode: 128225
     m_GlyphIndex: 7
     m_Scale: 1
     m_Name: Smileys - (4)_7
-    m_HashCode: 1857823556
   - m_ElementType: 2
     m_Unicode: 128267
     m_GlyphIndex: 8
     m_Scale: 1
     m_Name: Smileys - (4)_8
-    m_HashCode: 1857823563
   - m_ElementType: 2
     m_Unicode: 128268
     m_GlyphIndex: 9
     m_Scale: 1
     m_Name: Smileys - (4)_9
-    m_HashCode: 1857823562
   - m_ElementType: 2
     m_Unicode: 128161
     m_GlyphIndex: 10
     m_Scale: 1
     m_Name: Smileys - (4)_10
-    m_HashCode: 1178635186
   - m_ElementType: 2
     m_Unicode: 128294
     m_GlyphIndex: 11
     m_Scale: 1
     m_Name: Smileys - (4)_11
-    m_HashCode: 1178635187
   - m_ElementType: 2
     m_Unicode: 128367
     m_GlyphIndex: 12
     m_Scale: 1
     m_Name: Smileys - (4)_12
-    m_HashCode: 1178635184
   - m_ElementType: 2
     m_Unicode: 129519
     m_GlyphIndex: 13
     m_Scale: 1
     m_Name: Smileys - (4)_13
-    m_HashCode: 1178635185
   - m_ElementType: 2
     m_Unicode: 128738
     m_GlyphIndex: 14
     m_Scale: 1
     m_Name: Smileys - (4)_14
-    m_HashCode: 1178635190
   - m_ElementType: 2
     m_Unicode: 128717
     m_GlyphIndex: 15
     m_Scale: 1
     m_Name: Smileys - (4)_15
-    m_HashCode: 1178635191
   - m_ElementType: 2
     m_Unicode: 128184
     m_GlyphIndex: 16
     m_Scale: 1
     m_Name: Smileys - (4)_16
-    m_HashCode: 1178635188
   - m_ElementType: 2
     m_Unicode: 128181
     m_GlyphIndex: 17
     m_Scale: 1
     m_Name: Smileys - (4)_17
-    m_HashCode: 1178635189
   - m_ElementType: 2
     m_Unicode: 128180
     m_GlyphIndex: 18
     m_Scale: 1
     m_Name: Smileys - (4)_18
-    m_HashCode: 1178635194
   - m_ElementType: 2
     m_Unicode: 128182
     m_GlyphIndex: 19
     m_Scale: 1
     m_Name: Smileys - (4)_19
-    m_HashCode: 1178635195
   - m_ElementType: 2
     m_Unicode: 128183
     m_GlyphIndex: 20
     m_Scale: 1
     m_Name: Smileys - (4)_20
-    m_HashCode: 1178635089
   - m_ElementType: 2
     m_Unicode: 128176
     m_GlyphIndex: 21
     m_Scale: 1
     m_Name: Smileys - (4)_21
-    m_HashCode: 1178635088
   - m_ElementType: 2
     m_Unicode: 128179
     m_GlyphIndex: 22
     m_Scale: 1
     m_Name: Smileys - (4)_22
-    m_HashCode: 1178635091
   - m_ElementType: 2
     m_Unicode: 128142
     m_GlyphIndex: 23
     m_Scale: 1
     m_Name: Smileys - (4)_23
-    m_HashCode: 1178635090
   - m_ElementType: 2
     m_Unicode: 9878
     m_GlyphIndex: 24
     m_Scale: 1
     m_Name: Smileys - (4)_24
-    m_HashCode: 1178635093
   - m_ElementType: 2
     m_Unicode: 129520
     m_GlyphIndex: 25
     m_Scale: 1
     m_Name: Smileys - (4)_25
-    m_HashCode: 1178635092
   - m_ElementType: 2
     m_Unicode: 128295
     m_GlyphIndex: 26
     m_Scale: 1
     m_Name: Smileys - (4)_26
-    m_HashCode: 1178635095
   - m_ElementType: 2
     m_Unicode: 128296
     m_GlyphIndex: 27
     m_Scale: 1
     m_Name: Smileys - (4)_27
-    m_HashCode: 1178635094
   - m_ElementType: 2
     m_Unicode: 9874
     m_GlyphIndex: 28
     m_Scale: 1
     m_Name: Smileys - (4)_28
-    m_HashCode: 1178635097
   - m_ElementType: 2
     m_Unicode: 128736
     m_GlyphIndex: 29
     m_Scale: 1
     m_Name: Smileys - (4)_29
-    m_HashCode: 1178635096
   - m_ElementType: 2
     m_Unicode: 9935
     m_GlyphIndex: 30
     m_Scale: 1
     m_Name: Smileys - (4)_30
-    m_HashCode: 1178635120
   - m_ElementType: 2
     m_Unicode: 128297
     m_GlyphIndex: 31
     m_Scale: 1
     m_Name: Smileys - (4)_31
-    m_HashCode: 1178635121
   - m_ElementType: 2
     m_Unicode: 9881
     m_GlyphIndex: 32
     m_Scale: 1
     m_Name: Smileys - (4)_32
-    m_HashCode: 1178635122
   - m_ElementType: 2
     m_Unicode: 129521
     m_GlyphIndex: 33
     m_Scale: 1
     m_Name: Smileys - (4)_33
-    m_HashCode: 1178635123
   - m_ElementType: 2
     m_Unicode: 9939
     m_GlyphIndex: 34
     m_Scale: 1
     m_Name: Smileys - (4)_34
-    m_HashCode: 1178635124
   - m_ElementType: 2
     m_Unicode: 129522
     m_GlyphIndex: 35
     m_Scale: 1
     m_Name: Smileys - (4)_35
-    m_HashCode: 1178635125
   - m_ElementType: 2
     m_Unicode: 128299
     m_GlyphIndex: 36
     m_Scale: 1
     m_Name: Smileys - (4)_36
-    m_HashCode: 1178635126
   - m_ElementType: 2
     m_Unicode: 128163
     m_GlyphIndex: 37
     m_Scale: 1
     m_Name: Smileys - (4)_37
-    m_HashCode: 1178635127
   - m_ElementType: 2
     m_Unicode: 129512
     m_GlyphIndex: 38
     m_Scale: 1
     m_Name: Smileys - (4)_38
-    m_HashCode: 1178635128
   - m_ElementType: 2
     m_Unicode: 128298
     m_GlyphIndex: 39
     m_Scale: 1
     m_Name: Smileys - (4)_39
-    m_HashCode: 1178635129
   - m_ElementType: 2
     m_Unicode: 128481
     m_GlyphIndex: 40
     m_Scale: 1
     m_Name: Smileys - (4)_40
-    m_HashCode: 1178635287
   - m_ElementType: 2
     m_Unicode: 9876
     m_GlyphIndex: 41
     m_Scale: 1
     m_Name: Smileys - (4)_41
-    m_HashCode: 1178635286
   - m_ElementType: 2
     m_Unicode: 128737
     m_GlyphIndex: 42
     m_Scale: 1
     m_Name: Smileys - (4)_42
-    m_HashCode: 1178635285
   - m_ElementType: 2
     m_Unicode: 128684
     m_GlyphIndex: 43
     m_Scale: 1
     m_Name: Smileys - (4)_43
-    m_HashCode: 1178635284
   - m_ElementType: 2
     m_Unicode: 9904
     m_GlyphIndex: 44
     m_Scale: 1
     m_Name: Smileys - (4)_44
-    m_HashCode: 1178635283
   - m_ElementType: 2
     m_Unicode: 9905
     m_GlyphIndex: 45
     m_Scale: 1
     m_Name: Smileys - (4)_45
-    m_HashCode: 1178635282
   - m_ElementType: 2
     m_Unicode: 127994
     m_GlyphIndex: 46
     m_Scale: 1
     m_Name: Smileys - (4)_46
-    m_HashCode: 1178635281
   - m_ElementType: 2
     m_Unicode: 128302
     m_GlyphIndex: 47
     m_Scale: 1
     m_Name: Smileys - (4)_47
-    m_HashCode: 1178635280
   - m_ElementType: 2
     m_Unicode: 128255
     m_GlyphIndex: 48
     m_Scale: 1
     m_Name: Smileys - (4)_48
-    m_HashCode: 1178635295
   - m_ElementType: 2
     m_Unicode: 129535
     m_GlyphIndex: 49
     m_Scale: 1
     m_Name: Smileys - (4)_49
-    m_HashCode: 1178635294
   - m_ElementType: 2
     m_Unicode: 128136
     m_GlyphIndex: 50
     m_Scale: 1
     m_Name: Smileys - (4)_50
-    m_HashCode: 1178635318
   - m_ElementType: 2
     m_Unicode: 9879
     m_GlyphIndex: 51
     m_Scale: 1
     m_Name: Smileys - (4)_51
-    m_HashCode: 1178635319
   - m_ElementType: 2
     m_Unicode: 128301
     m_GlyphIndex: 52
     m_Scale: 1
     m_Name: Smileys - (4)_52
-    m_HashCode: 1178635316
   - m_ElementType: 2
     m_Unicode: 128300
     m_GlyphIndex: 53
     m_Scale: 1
     m_Name: Smileys - (4)_53
-    m_HashCode: 1178635317
   - m_ElementType: 2
     m_Unicode: 128371
     m_GlyphIndex: 54
     m_Scale: 1
     m_Name: Smileys - (4)_54
-    m_HashCode: 1178635314
   - m_ElementType: 2
     m_Unicode: 128138
     m_GlyphIndex: 55
     m_Scale: 1
     m_Name: Smileys - (4)_55
-    m_HashCode: 1178635315
   - m_ElementType: 2
     m_Unicode: 128137
     m_GlyphIndex: 56
     m_Scale: 1
     m_Name: Smileys - (4)_56
-    m_HashCode: 1178635312
   - m_ElementType: 2
     m_Unicode: 129516
     m_GlyphIndex: 57
     m_Scale: 1
     m_Name: Smileys - (4)_57
-    m_HashCode: 1178635313
   - m_ElementType: 2
     m_Unicode: 129440
     m_GlyphIndex: 58
     m_Scale: 1
     m_Name: Smileys - (4)_58
-    m_HashCode: 1178635326
   - m_ElementType: 2
     m_Unicode: 129515
     m_GlyphIndex: 59
     m_Scale: 1
     m_Name: Smileys - (4)_59
-    m_HashCode: 1178635327
   - m_ElementType: 2
     m_Unicode: 129514
     m_GlyphIndex: 60
     m_Scale: 1
     m_Name: Smileys - (4)_60
-    m_HashCode: 1178635221
   - m_ElementType: 2
     m_Unicode: 127777
     m_GlyphIndex: 61
     m_Scale: 1
     m_Name: Smileys - (4)_61
-    m_HashCode: 1178635220
   - m_ElementType: 2
     m_Unicode: 129529
     m_GlyphIndex: 62
     m_Scale: 1
     m_Name: Smileys - (4)_62
-    m_HashCode: 1178635223
   - m_ElementType: 2
     m_Unicode: 129530
     m_GlyphIndex: 63
     m_Scale: 1
     m_Name: Smileys - (4)_63
-    m_HashCode: 1178635222
   - m_ElementType: 2
     m_Unicode: 129531
     m_GlyphIndex: 64
     m_Scale: 1
     m_Name: Smileys - (4)_64
-    m_HashCode: 1178635217
   - m_ElementType: 2
     m_Unicode: 128701
     m_GlyphIndex: 65
     m_Scale: 1
     m_Name: Smileys - (4)_65
-    m_HashCode: 1178635216
   - m_ElementType: 2
     m_Unicode: 128688
     m_GlyphIndex: 66
     m_Scale: 1
     m_Name: Smileys - (4)_66
-    m_HashCode: 1178635219
   - m_ElementType: 2
     m_Unicode: 128703
     m_GlyphIndex: 67
     m_Scale: 1
     m_Name: Smileys - (4)_67
-    m_HashCode: 1178635218
   - m_ElementType: 2
     m_Unicode: 128705
     m_GlyphIndex: 68
     m_Scale: 1
     m_Name: Smileys - (4)_68
-    m_HashCode: 1178635229
   - m_ElementType: 2
     m_Unicode: 128704
     m_GlyphIndex: 69
     m_Scale: 1
     m_Name: Smileys - (4)_69
-    m_HashCode: 1178635228
   - m_ElementType: 2
     m_Unicode: 129532
     m_GlyphIndex: 70
     m_Scale: 1
     m_Name: Smileys - (4)_70
-    m_HashCode: 1178635252
   - m_ElementType: 2
     m_Unicode: 129533
     m_GlyphIndex: 71
     m_Scale: 1
     m_Name: Smileys - (4)_71
-    m_HashCode: 1178635253
   - m_ElementType: 2
     m_Unicode: 129524
     m_GlyphIndex: 72
     m_Scale: 1
     m_Name: Smileys - (4)_72
-    m_HashCode: 1178635254
   - m_ElementType: 2
     m_Unicode: 128718
     m_GlyphIndex: 73
     m_Scale: 1
     m_Name: Smileys - (4)_73
-    m_HashCode: 1178635255
   - m_ElementType: 2
     m_Unicode: 128273
     m_GlyphIndex: 74
     m_Scale: 1
     m_Name: Smileys - (4)_74
-    m_HashCode: 1178635248
   - m_ElementType: 2
     m_Unicode: 128477
     m_GlyphIndex: 75
     m_Scale: 1
     m_Name: Smileys - (4)_75
-    m_HashCode: 1178635249
   - m_ElementType: 2
     m_Unicode: 128682
     m_GlyphIndex: 76
     m_Scale: 1
     m_Name: Smileys - (4)_76
-    m_HashCode: 1178635250
   - m_ElementType: 2
     m_Unicode: 128715
     m_GlyphIndex: 77
     m_Scale: 1
     m_Name: Smileys - (4)_77
-    m_HashCode: 1178635251
   - m_ElementType: 2
     m_Unicode: 128719
     m_GlyphIndex: 78
     m_Scale: 1
     m_Name: Smileys - (4)_78
-    m_HashCode: 1178635260
   - m_ElementType: 2
     m_Unicode: 128716
     m_GlyphIndex: 79
     m_Scale: 1
     m_Name: Smileys - (4)_79
-    m_HashCode: 1178635261
   - m_ElementType: 2
     m_Unicode: 129528
     m_GlyphIndex: 80
     m_Scale: 1
     m_Name: Smileys - (4)_80
-    m_HashCode: 1178635419
   - m_ElementType: 2
     m_Unicode: 128444
     m_GlyphIndex: 81
     m_Scale: 1
     m_Name: Smileys - (4)_81
-    m_HashCode: 1178635418
   - m_ElementType: 2
     m_Unicode: 2979
     m_GlyphIndex: 82
     m_Scale: 1
     m_Name: Smileys - (4)_82
-    m_HashCode: 1178635417
   - m_ElementType: 2
     m_Unicode: 128722
     m_GlyphIndex: 83
     m_Scale: 1
     m_Name: Smileys - (4)_83
-    m_HashCode: 1178635416
   - m_ElementType: 2
     m_Unicode: 127873
     m_GlyphIndex: 84
     m_Scale: 1
     m_Name: Smileys - (4)_84
-    m_HashCode: 1178635423
   - m_ElementType: 2
     m_Unicode: 127880
     m_GlyphIndex: 85
     m_Scale: 1
     m_Name: Smileys - (4)_85
-    m_HashCode: 1178635422
   - m_ElementType: 2
     m_Unicode: 127887
     m_GlyphIndex: 86
     m_Scale: 1
     m_Name: Smileys - (4)_86
-    m_HashCode: 1178635421
   - m_ElementType: 2
     m_Unicode: 127872
     m_GlyphIndex: 87
     m_Scale: 1
     m_Name: Smileys - (4)_87
-    m_HashCode: 1178635420
   - m_ElementType: 2
     m_Unicode: 127882
     m_GlyphIndex: 88
     m_Scale: 1
     m_Name: Smileys - (4)_88
-    m_HashCode: 1178635411
   - m_ElementType: 2
     m_Unicode: 127881
     m_GlyphIndex: 89
     m_Scale: 1
     m_Name: Smileys - (4)_89
-    m_HashCode: 1178635410
   - m_ElementType: 2
     m_Unicode: 127886
     m_GlyphIndex: 90
     m_Scale: 1
     m_Name: Smileys - (4)_90
-    m_HashCode: 1178635450
   - m_ElementType: 2
     m_Unicode: 127982
     m_GlyphIndex: 91
     m_Scale: 1
     m_Name: Smileys - (4)_91
-    m_HashCode: 1178635451
   - m_ElementType: 2
     m_Unicode: 127888
     m_GlyphIndex: 92
     m_Scale: 1
     m_Name: Smileys - (4)_92
-    m_HashCode: 1178635448
   - m_ElementType: 2
     m_Unicode: 129511
     m_GlyphIndex: 93
     m_Scale: 1
     m_Name: Smileys - (4)_93
-    m_HashCode: 1178635449
   - m_ElementType: 2
     m_Unicode: 9993
     m_GlyphIndex: 94
     m_Scale: 1
     m_Name: Smileys - (4)_94
-    m_HashCode: 1178635454
   - m_ElementType: 2
     m_Unicode: 128233
     m_GlyphIndex: 95
     m_Scale: 1
     m_Name: Smileys - (4)_95
-    m_HashCode: 1178635455
   - m_ElementType: 2
     m_Unicode: 128232
     m_GlyphIndex: 96
     m_Scale: 1
     m_Name: Smileys - (4)_96
-    m_HashCode: 1178635452
   - m_ElementType: 2
     m_Unicode: 128231
     m_GlyphIndex: 97
     m_Scale: 1
     m_Name: Smileys - (4)_97
-    m_HashCode: 1178635453
   - m_ElementType: 2
     m_Unicode: 128140
     m_GlyphIndex: 98
     m_Scale: 1
     m_Name: Smileys - (4)_98
-    m_HashCode: 1178635442
   - m_ElementType: 2
     m_Unicode: 128229
     m_GlyphIndex: 99
     m_Scale: 1
     m_Name: Smileys - (4)_99
-    m_HashCode: 1178635443
   - m_ElementType: 2
     m_Unicode: 128228
     m_GlyphIndex: 100
     m_Scale: 1
     m_Name: Smileys - (4)_100
-    m_HashCode: 240255426
   - m_ElementType: 2
     m_Unicode: 128230
     m_GlyphIndex: 101
     m_Scale: 1
     m_Name: Smileys - (4)_101
-    m_HashCode: 240255427
   - m_ElementType: 2
     m_Unicode: 127991
     m_GlyphIndex: 102
     m_Scale: 1
     m_Name: Smileys - (4)_102
-    m_HashCode: 240255424
   - m_ElementType: 2
     m_Unicode: 128234
     m_GlyphIndex: 103
     m_Scale: 1
     m_Name: Smileys - (4)_103
-    m_HashCode: 240255425
   - m_ElementType: 2
     m_Unicode: 128235
     m_GlyphIndex: 104
     m_Scale: 1
     m_Name: Smileys - (4)_104
-    m_HashCode: 240255430
   - m_ElementType: 2
     m_Unicode: 128236
     m_GlyphIndex: 105
     m_Scale: 1
     m_Name: Smileys - (4)_105
-    m_HashCode: 240255431
   - m_ElementType: 2
     m_Unicode: 128237
     m_GlyphIndex: 106
     m_Scale: 1
     m_Name: Smileys - (4)_106
-    m_HashCode: 240255428
   - m_ElementType: 2
     m_Unicode: 128238
     m_GlyphIndex: 107
     m_Scale: 1
     m_Name: Smileys - (4)_107
-    m_HashCode: 240255429
   - m_ElementType: 2
     m_Unicode: 128239
     m_GlyphIndex: 108
     m_Scale: 1
     m_Name: Smileys - (4)_108
-    m_HashCode: 240255434
   - m_ElementType: 2
     m_Unicode: 128220
     m_GlyphIndex: 109
     m_Scale: 1
     m_Name: Smileys - (4)_109
-    m_HashCode: 240255435
   - m_ElementType: 2
     m_Unicode: 128195
     m_GlyphIndex: 110
     m_Scale: 1
     m_Name: Smileys - (4)_110
-    m_HashCode: 240255523
   - m_ElementType: 2
     m_Unicode: 128196
     m_GlyphIndex: 111
     m_Scale: 1
     m_Name: Smileys - (4)_111
-    m_HashCode: 240255522
   - m_ElementType: 2
     m_Unicode: 128209
     m_GlyphIndex: 112
     m_Scale: 1
     m_Name: Smileys - (4)_112
-    m_HashCode: 240255521
   - m_ElementType: 2
     m_Unicode: 129534
     m_GlyphIndex: 113
     m_Scale: 1
     m_Name: Smileys - (4)_113
-    m_HashCode: 240255520
   - m_ElementType: 2
     m_Unicode: 128202
     m_GlyphIndex: 114
     m_Scale: 1
     m_Name: Smileys - (4)_114
-    m_HashCode: 240255527
   - m_ElementType: 2
     m_Unicode: 128200
     m_GlyphIndex: 115
     m_Scale: 1
     m_Name: Smileys - (4)_115
-    m_HashCode: 240255526
   - m_ElementType: 2
     m_Unicode: 128201
     m_GlyphIndex: 116
     m_Scale: 1
     m_Name: Smileys - (4)_116
-    m_HashCode: 240255525
   - m_ElementType: 2
     m_Unicode: 128466
     m_GlyphIndex: 117
     m_Scale: 1
     m_Name: Smileys - (4)_117
-    m_HashCode: 240255524
   - m_ElementType: 2
     m_Unicode: 128467
     m_GlyphIndex: 118
     m_Scale: 1
     m_Name: Smileys - (4)_118
-    m_HashCode: 240255531
   - m_ElementType: 2
     m_Unicode: 128198
     m_GlyphIndex: 119
     m_Scale: 1
     m_Name: Smileys - (4)_119
-    m_HashCode: 240255530
   - m_ElementType: 2
     m_Unicode: 128197
     m_GlyphIndex: 120
     m_Scale: 1
     m_Name: Smileys - (4)_120
-    m_HashCode: 240255360
   - m_ElementType: 2
     m_Unicode: 128465
     m_GlyphIndex: 121
     m_Scale: 1
     m_Name: Smileys - (4)_121
-    m_HashCode: 240255361
   - m_ElementType: 2
     m_Unicode: 128199
     m_GlyphIndex: 122
     m_Scale: 1
     m_Name: Smileys - (4)_122
-    m_HashCode: 240255362
   - m_ElementType: 2
     m_Unicode: 128451
     m_GlyphIndex: 123
     m_Scale: 1
     m_Name: Smileys - (4)_123
-    m_HashCode: 240255363
   - m_ElementType: 2
     m_Unicode: 128499
     m_GlyphIndex: 124
     m_Scale: 1
     m_Name: Smileys - (4)_124
-    m_HashCode: 240255364
   - m_ElementType: 2
     m_Unicode: 128452
     m_GlyphIndex: 125
     m_Scale: 1
     m_Name: Smileys - (4)_125
-    m_HashCode: 240255365
   - m_ElementType: 2
     m_Unicode: 128203
     m_GlyphIndex: 126
     m_Scale: 1
     m_Name: Smileys - (4)_126
-    m_HashCode: 240255366
   - m_ElementType: 2
     m_Unicode: 128193
     m_GlyphIndex: 127
     m_Scale: 1
     m_Name: Smileys - (4)_127
-    m_HashCode: 240255367
   - m_ElementType: 2
     m_Unicode: 128194
     m_GlyphIndex: 128
     m_Scale: 1
     m_Name: Smileys - (4)_128
-    m_HashCode: 240255368
   - m_ElementType: 2
     m_Unicode: 128450
     m_GlyphIndex: 129
     m_Scale: 1
     m_Name: Smileys - (4)_129
-    m_HashCode: 240255369
   - m_ElementType: 2
     m_Unicode: 128478
     m_GlyphIndex: 130
     m_Scale: 1
     m_Name: Smileys - (4)_130
-    m_HashCode: 240255457
   - m_ElementType: 2
     m_Unicode: 128240
     m_GlyphIndex: 131
     m_Scale: 1
     m_Name: Smileys - (4)_131
-    m_HashCode: 240255456
   - m_ElementType: 2
     m_Unicode: 128211
     m_GlyphIndex: 132
     m_Scale: 1
     m_Name: Smileys - (4)_132
-    m_HashCode: 240255459
   - m_ElementType: 2
     m_Unicode: 128212
     m_GlyphIndex: 133
     m_Scale: 1
     m_Name: Smileys - (4)_133
-    m_HashCode: 240255458
   - m_ElementType: 2
     m_Unicode: 128210
     m_GlyphIndex: 134
     m_Scale: 1
     m_Name: Smileys - (4)_134
-    m_HashCode: 240255461
   - m_ElementType: 2
     m_Unicode: 128213
     m_GlyphIndex: 135
     m_Scale: 1
     m_Name: Smileys - (4)_135
-    m_HashCode: 240255460
   - m_ElementType: 2
     m_Unicode: 128215
     m_GlyphIndex: 136
     m_Scale: 1
     m_Name: Smileys - (4)_136
-    m_HashCode: 240255463
   - m_ElementType: 2
     m_Unicode: 128216
     m_GlyphIndex: 137
     m_Scale: 1
     m_Name: Smileys - (4)_137
-    m_HashCode: 240255462
   - m_ElementType: 2
     m_Unicode: 128217
     m_GlyphIndex: 138
     m_Scale: 1
     m_Name: Smileys - (4)_138
-    m_HashCode: 240255465
   - m_ElementType: 2
     m_Unicode: 128218
     m_GlyphIndex: 139
     m_Scale: 1
     m_Name: Smileys - (4)_139
-    m_HashCode: 240255464
   - m_ElementType: 2
     m_Unicode: 128214
     m_GlyphIndex: 140
     m_Scale: 1
     m_Name: Smileys - (4)_140
-    m_HashCode: 240255558
   - m_ElementType: 2
     m_Unicode: 128278
     m_GlyphIndex: 141
     m_Scale: 1
     m_Name: Smileys - (4)_141
-    m_HashCode: 240255559
   - m_ElementType: 2
     m_Unicode: 129527
     m_GlyphIndex: 142
     m_Scale: 1
     m_Name: Smileys - (4)_142
-    m_HashCode: 240255556
   - m_ElementType: 2
     m_Unicode: 128279
     m_GlyphIndex: 143
     m_Scale: 1
     m_Name: Smileys - (4)_143
-    m_HashCode: 240255557
   - m_ElementType: 2
     m_Unicode: 128206
     m_GlyphIndex: 144
     m_Scale: 1
     m_Name: Smileys - (4)_144
-    m_HashCode: 240255554
   - m_ElementType: 2
     m_Unicode: 128391
     m_GlyphIndex: 145
     m_Scale: 1
     m_Name: Smileys - (4)_145
-    m_HashCode: 240255555
   - m_ElementType: 2
     m_Unicode: 128208
     m_GlyphIndex: 146
     m_Scale: 1
     m_Name: Smileys - (4)_146
-    m_HashCode: 240255552
   - m_ElementType: 2
     m_Unicode: 128207
     m_GlyphIndex: 147
     m_Scale: 1
     m_Name: Smileys - (4)_147
-    m_HashCode: 240255553
   - m_ElementType: 2
     m_Unicode: 129518
     m_GlyphIndex: 148
     m_Scale: 1
     m_Name: Smileys - (4)_148
-    m_HashCode: 240255566
   - m_ElementType: 2
     m_Unicode: 128204
     m_GlyphIndex: 149
     m_Scale: 1
     m_Name: Smileys - (4)_149
-    m_HashCode: 240255567
   - m_ElementType: 2
     m_Unicode: 128205
     m_GlyphIndex: 150
     m_Scale: 1
     m_Name: Smileys - (4)_150
-    m_HashCode: 240255655
   - m_ElementType: 2
     m_Unicode: 9986
     m_GlyphIndex: 151
     m_Scale: 1
     m_Name: Smileys - (4)_151
-    m_HashCode: 240255654
   - m_ElementType: 2
     m_Unicode: 128394
     m_GlyphIndex: 152
     m_Scale: 1
     m_Name: Smileys - (4)_152
-    m_HashCode: 240255653
   - m_ElementType: 2
     m_Unicode: 128395
     m_GlyphIndex: 153
     m_Scale: 1
     m_Name: Smileys - (4)_153
-    m_HashCode: 240255652
   - m_ElementType: 2
     m_Unicode: 10002
     m_GlyphIndex: 154
     m_Scale: 1
     m_Name: Smileys - (4)_154
-    m_HashCode: 240255651
   - m_ElementType: 2
     m_Unicode: 128396
     m_GlyphIndex: 155
     m_Scale: 1
     m_Name: Smileys - (4)_155
-    m_HashCode: 240255650
   - m_ElementType: 2
     m_Unicode: 128397
     m_GlyphIndex: 156
     m_Scale: 1
     m_Name: Smileys - (4)_156
-    m_HashCode: 240255649
   - m_ElementType: 2
     m_Unicode: 128221
     m_GlyphIndex: 157
     m_Scale: 1
     m_Name: Smileys - (4)_157
-    m_HashCode: 240255648
   - m_ElementType: 2
     m_Unicode: 9999
     m_GlyphIndex: 158
     m_Scale: 1
     m_Name: Smileys - (4)_158
-    m_HashCode: 240255663
   - m_ElementType: 2
     m_Unicode: 128269
     m_GlyphIndex: 159
     m_Scale: 1
     m_Name: Smileys - (4)_159
-    m_HashCode: 240255662
   - m_ElementType: 2
     m_Unicode: 128270
     m_GlyphIndex: 160
     m_Scale: 1
     m_Name: Smileys - (4)_160
-    m_HashCode: 240255492
   - m_ElementType: 2
     m_Unicode: 128271
     m_GlyphIndex: 161
     m_Scale: 1
     m_Name: Smileys - (4)_161
-    m_HashCode: 240255493
   - m_ElementType: 2
     m_Unicode: 128272
     m_GlyphIndex: 162
     m_Scale: 1
     m_Name: Smileys - (4)_162
-    m_HashCode: 240255494
   - m_ElementType: 2
     m_Unicode: 128274
     m_GlyphIndex: 163
     m_Scale: 1
     m_Name: Smileys - (4)_163
-    m_HashCode: 240255495
   - m_ElementType: 2
     m_Unicode: 128275
     m_GlyphIndex: 164
     m_Scale: 1
     m_Name: Smileys - (4)_164
-    m_HashCode: 240255488
   - m_ElementType: 2
     m_Unicode: 10084
     m_GlyphIndex: 165
     m_Scale: 1
     m_Name: Smileys - (4)_165
-    m_HashCode: 240255489
   - m_ElementType: 2
     m_Unicode: 128148
     m_GlyphIndex: 166
     m_Scale: 1
     m_Name: Smileys - (4)_166
-    m_HashCode: 240255490
   - m_ElementType: 2
     m_Unicode: 10083
     m_GlyphIndex: 167
     m_Scale: 1
     m_Name: Smileys - (4)_167
-    m_HashCode: 240255491
   - m_ElementType: 2
     m_Unicode: 128149
     m_GlyphIndex: 168
     m_Scale: 1
     m_Name: Smileys - (4)_168
-    m_HashCode: 240255500
   - m_ElementType: 2
     m_Unicode: 128158
     m_GlyphIndex: 169
     m_Scale: 1
     m_Name: Smileys - (4)_169
-    m_HashCode: 240255501
   - m_ElementType: 2
     m_Unicode: 128147
     m_GlyphIndex: 170
     m_Scale: 1
     m_Name: Smileys - (4)_170
-    m_HashCode: 240255589
   - m_ElementType: 2
     m_Unicode: 128151
     m_GlyphIndex: 171
     m_Scale: 1
     m_Name: Smileys - (4)_171
-    m_HashCode: 240255588
   - m_ElementType: 2
     m_Unicode: 128150
     m_GlyphIndex: 172
     m_Scale: 1
     m_Name: Smileys - (4)_172
-    m_HashCode: 240255591
   - m_ElementType: 2
     m_Unicode: 128152
     m_GlyphIndex: 173
     m_Scale: 1
     m_Name: Smileys - (4)_173
-    m_HashCode: 240255590
   - m_ElementType: 2
     m_Unicode: 128157
     m_GlyphIndex: 174
     m_Scale: 1
     m_Name: Smileys - (4)_174
-    m_HashCode: 240255585
   - m_ElementType: 2
     m_Unicode: 128159
     m_GlyphIndex: 175
     m_Scale: 1
     m_Name: Smileys - (4)_175
-    m_HashCode: 240255584
-  m_SpriteGlyphTable:
+  m_GlyphTable:
   - m_Index: 0
     m_Metrics:
       m_Width: 120
@@ -3914,7 +3736,13 @@ MonoBehaviour:
     m_ClassDefinitionType: 0
     sprite: {fileID: 40271150, guid: 94fe2fcd8197cb54e92ec07047a09578, type: 3}
   spriteInfoList: []
-  fallbackSpriteAssets: []
+  fallbackSpriteAssets:
+  - {fileID: 11400000, guid: c2b7b2f067133d848a1f320e12a9959f, type: 2}
+  - {fileID: 11400000, guid: 35055fba2cbc46e44a95c4acf4a9b737, type: 2}
+  - {fileID: 11400000, guid: accfd6c286aa6f541affc7c75ee5d062, type: 2}
+  - {fileID: 11400000, guid: d9fcf8b6966c7ab4aa8e854fb7a44fa0, type: 2}
+  - {fileID: 11400000, guid: 9e7c82bea8a746b46908294870fc4c5d, type: 2}
+  - {fileID: 11400000, guid: af8742561e3d3984ea9839ef25a5c9f9, type: 2}
 --- !u!21 &2835107039125412546
 Material:
   serializedVersion: 8
@@ -3956,3 +3784,4 @@ Material:
     - _ClipRect: {r: -32767, g: -32767, b: 32767, a: 32767}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1

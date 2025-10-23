@@ -30,9 +30,15 @@ using System;
 [CustomEditor(typeof(LanguageSettingsData))]
 public class LanguageSettingsDataEditor : Editor
 {
+    #region === Fields ===
+
     private string[] availableCultureDisplayNames; // Stores display names for available cultures.
     private CultureInfo[] availableCultures; // Stores all available system cultures.
     private int currentSelectedCultureIndex; // Tracks selected culture index.
+
+    #endregion
+
+    #region === Unity Callbacks ===
 
     private void OnEnable()
     {
@@ -41,7 +47,7 @@ public class LanguageSettingsDataEditor : Editor
         availableCultureDisplayNames = new string[availableCultures.Length];
 
         for (int i = 0; i < availableCultures.Length; i++)
-            availableCultureDisplayNames[i] = availableCultures[i].EnglishName;
+            availableCultureDisplayNames[i] = availableCultures[i].NativeName;
     }
 
     public override void OnInspectorGUI()
@@ -53,31 +59,44 @@ public class LanguageSettingsDataEditor : Editor
 
         Undo.RecordObject(script, "Edit Language Settings");
 
+        #region === Script Reference ===
+
         // Display the script reference field (read-only).
         EditorGUI.BeginDisabledGroup(true);
         EditorGUILayout.ObjectField("Script", MonoScript.FromScriptableObject(script), typeof(MonoScript), false);
         EditorGUI.EndDisabledGroup();
 
+        #endregion
+
         EditorGUILayout.Space(10);
+
+        #region === Archives Location ===
 
         // Folder path section.
         EditorGUILayout.LabelField("Archives Location", titleStyle);
         EditorGUILayout.LabelField("Assets", EditorStyles.boldLabel);
-        script.folderName = EditorGUILayout.TextField("Folder Name:", script.folderName);
+        script.folderName = EditorGUILayout.TextField(new GUIContent("Folder Name:", "Folder where localization archives are stored."), script.folderName);
+
+        #endregion
 
         EditorGUILayout.Space(15);
+
+        #region === Default Language Selection ===
 
         // Default language section using dropdown.
         EditorGUILayout.LabelField("Default Language", titleStyle);
         currentSelectedCultureIndex = Array.FindIndex(availableCultures, c => c.Name == script.defaultLanguage);
-        currentSelectedCultureIndex = EditorGUILayout.Popup("Language:", currentSelectedCultureIndex, availableCultureDisplayNames);
+        currentSelectedCultureIndex = EditorGUILayout.Popup(new GUIContent("Language:", "Select the default language for the project."), currentSelectedCultureIndex, availableCultureDisplayNames);
         script.defaultLanguage = availableCultures[currentSelectedCultureIndex].Name;
+
+        #endregion
 
         EditorGUILayout.Space(15);
 
-        // Font data (regular).
+        #region === Font List Data (Regular) ===
+
         EditorGUILayout.LabelField("Font List Data", titleStyle);
-        script.fontListData = (LanguageFontListData)EditorGUILayout.ObjectField("Font List Data:", script.fontListData, typeof(LanguageFontListData), false);
+        script.fontListData = (LanguageFontListData)EditorGUILayout.ObjectField(new GUIContent("Font List Data:", "Assign a ScriptableObject that stores regular font references."), script.fontListData, typeof(LanguageFontListData), false);
 
         if (script.fontListData != null)
         {
@@ -86,10 +105,13 @@ public class LanguageSettingsDataEditor : Editor
             fontDataSO.ApplyModifiedProperties();
         }
 
+        #endregion
+
         EditorGUILayout.Space(10);
 
-        // Font data (TextMeshPro).
-        script.fontListDataTMP = (LanguageFontListDataTMP)EditorGUILayout.ObjectField("Font List Data (TMP):", script.fontListDataTMP, typeof(LanguageFontListDataTMP), false);
+        #region === Font List Data (TMP) ===
+
+        script.fontListDataTMP = (LanguageFontListDataTMP)EditorGUILayout.ObjectField(new GUIContent("Font List Data (TMP):", "Assign a ScriptableObject that stores TMP font references."), script.fontListDataTMP, typeof(LanguageFontListDataTMP), false);
 
         if (script.fontListDataTMP != null)
         {
@@ -98,26 +120,37 @@ public class LanguageSettingsDataEditor : Editor
             tmpFontDataSO.ApplyModifiedProperties();
         }
 
+        #endregion
+
         EditorGUILayout.Space(15);
 
-        // Canvas log reference.
+        #region === Canvas Log Reference ===
+
         EditorGUILayout.LabelField("Canvas Log", titleStyle);
-        script.errorLanguageTool = (GameObject)EditorGUILayout.ObjectField("Error Language Tool:", script.errorLanguageTool, typeof(GameObject), true);
+        script.errorLanguageTool = (GameObject)EditorGUILayout.ObjectField(new GUIContent("Error Language Tool:", "Optional GameObject used to display language errors in UI."), script.errorLanguageTool, typeof(GameObject), true);
+
+        #endregion
 
         EditorGUILayout.Space(10);
 
+        #region === Extracted Runtime Data (Read-Only) ===
+
         // Visualization of extracted runtime data.
-        GUI.enabled = false;
         EditorGUILayout.LabelField("Extracted Data", titleStyle);
-        script.selectedCulture = EditorGUILayout.TextField("Selected Culture:", script.selectedCulture);
+        GUI.enabled = false;
+        script.selectedCulture = EditorGUILayout.TextField(new GUIContent("Selected Culture:", "The culture currently extracted at runtime."), script.selectedCulture);
 
         SerializedObject scriptSO = new(script);
-        EditorGUILayout.PropertyField(scriptSO.FindProperty("availableLanguages"), new GUIContent("Available Languages"), true);
-        EditorGUILayout.PropertyField(scriptSO.FindProperty("idData"), new GUIContent("IDs"), true);
-        EditorGUILayout.PropertyField(scriptSO.FindProperty("idMetaData"), new GUIContent("IDs Meta"), true);
-        EditorGUILayout.PropertyField(scriptSO.FindProperty("idCanvasData"), new GUIContent("IDs Canvas"), true);
+        EditorGUILayout.PropertyField(scriptSO.FindProperty("availableLanguages"), new GUIContent("Available Languages", "List of languages detected in the project."), true);
+        EditorGUILayout.PropertyField(scriptSO.FindProperty("idData"), new GUIContent("IDs", "Runtime extracted IDs for localization."), true);
+        EditorGUILayout.PropertyField(scriptSO.FindProperty("idMetaData"), new GUIContent("IDs Meta", "Additional metadata for IDs."), true);
+        EditorGUILayout.PropertyField(scriptSO.FindProperty("idCanvasData"), new GUIContent("IDs Canvas", "Canvas-related ID mappings."), true);
         scriptSO.ApplyModifiedProperties();
         GUI.enabled = true;
+
+        #endregion
+
+        #region === Save Changes ===
 
         // Save changes if GUI changed.
         if (GUI.changed)
@@ -125,5 +158,9 @@ public class LanguageSettingsDataEditor : Editor
             EditorUtility.SetDirty(script);
             AssetDatabase.SaveAssets();
         }
+
+        #endregion
     }
+
+#endregion
 }

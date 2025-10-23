@@ -5,6 +5,7 @@
  *              LanguageSettingsData, populates the dropdown, applies the selected 
  *              language, and saves the choice for future sessions. It also triggers 
  *              a language update across the system.
+ *              
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
@@ -20,11 +21,35 @@ using static LanguageTools.LanguageFileManager;
 [AddComponentMenu("Language/UI/TextMesh Pro/Language Manager (TMP)")]
 public class LanguageManagerTMP : MonoBehaviour
 {
+    #region === Serialized Fields ===
+
     [Header("UI Components")]
-    [SerializeField] private TMP_Dropdown languageDropdown; // TMP Dropdown used for selecting the current language.
+    [SerializeField, Tooltip("TMP Dropdown used for selecting the current language.")]
+    private TMP_Dropdown languageDropdown;
+
+    #endregion
+
+    #region === Private Fields ===
 
     private List<LanguageAvailable> availableLanguages; // Cached list of available languages loaded from LanguageSettingsData.
     private LanguageSettingsData languageData; // Language configuration loaded from resources.
+
+    #endregion
+
+    #region === Properties ===
+
+    /// <summary>
+    /// Reference to the Dropdown UI for language selection.
+    /// </summary>
+    public TMP_Dropdown LanguageDropdown
+    {
+        get => languageDropdown;
+        set => languageDropdown = value;
+    }
+
+    #endregion
+
+    #region === Unity Events ===
 
     /// <summary>
     /// Initializes the dropdown with available languages and applies the saved selection.
@@ -54,6 +79,10 @@ public class LanguageManagerTMP : MonoBehaviour
         SetupDropdownSelection(); // Set up event listener to handle user language selection changes.
     }
 
+    #endregion
+
+    #region === Dropdown Population ===
+
     /// <summary>
     /// Populates the dropdown with localized language names and selects the saved culture.
     /// </summary>
@@ -80,6 +109,10 @@ public class LanguageManagerTMP : MonoBehaviour
         languageDropdown.AddOptions(options); // Add all language names to the dropdown options.
         languageDropdown.SetValueWithoutNotify(selectedIndex); // Set dropdown to saved or default selection index without firing events.
     }
+
+    #endregion
+
+    #region === Dropdown Selection Handling ===
 
     /// <summary>
     /// Subscribes to the TMP_Dropdown value change event to handle user selection.
@@ -109,4 +142,6 @@ public class LanguageManagerTMP : MonoBehaviour
         GetAllData(); // Reload all language data based on new selection.
         LanguageManagerDelegate.NotifyLanguageUpdate(); // Notify other components to update localized content.
     }
+
+    #endregion
 }

@@ -28,6 +28,8 @@ using System.IO;
 /// </summary>
 public class IDExistsAttribute : PropertyAttribute
 {
+    #region === Fields and Constructor ===
+
     /// <summary>
     /// Whether the check should be done against canvas IDs instead of component IDs.
     /// </summary>
@@ -41,6 +43,8 @@ public class IDExistsAttribute : PropertyAttribute
     {
         this.searchCanvas = searchCanvas;
     }
+
+    #endregion
 }
 
 #if UNITY_EDITOR
@@ -51,9 +55,15 @@ public class IDExistsAttribute : PropertyAttribute
 [CustomPropertyDrawer(typeof(IDExistsAttribute))]
 public class IDExistsDrawer : PropertyDrawer
 {
+    #region === Constants & Cached Data ===
+
     private const string FilePath = "ProjectSettings/LanguageFileData.json";
     private static LanguageFileManagerWindowData cachedData = new();
     private static System.DateTime lastFileWriteTime;
+
+    #endregion
+
+    #region === Unity Editor Rendering ===
 
     /// <summary>
     /// Renders the integer field and warning box if a duplicate ID is detected.
@@ -101,6 +111,10 @@ public class IDExistsDrawer : PropertyDrawer
         return CheckIDExists(property.intValue, existsAttribute.searchCanvas) ? EditorGUIUtility.singleLineHeight * 3f + 4 : EditorGUIUtility.singleLineHeight;
     }
 
+    #endregion
+
+    #region === Validation Logic ===
+
     /// <summary>
     /// Loads LanguageFileData.json (only if changed) and checks for duplicate IDs.
     /// </summary>
@@ -122,5 +136,7 @@ public class IDExistsDrawer : PropertyDrawer
         // Check for the presence of the ID in either the canvas or component list.
         return cachedData != null && (checkCanvas? cachedData.canvasSave?.Any(c => c.canvasID == id) == true : cachedData.componentSave?.Any(c => c.iD == id) == true);
     }
+
+    #endregion
 }
 #endif

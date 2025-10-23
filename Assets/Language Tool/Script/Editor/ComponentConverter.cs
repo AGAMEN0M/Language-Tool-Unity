@@ -4,6 +4,7 @@
  *              (e.g., Text, Image, TMP components) into LanguageTool-compatible
  *              components. Ensures no duplicates are added, handles Undo
  *              registration, and logs conversion results for user feedback.
+ *              
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
@@ -18,8 +19,14 @@ using TMPro;
 
 public class ComponentConverter
 {
+    #region === Variables ===
+
     private static int callCount = 0; // Tracks the number of times the conversion method has been called during a multi-object selection.
     private static int expectedCalls = 0; // Stores the expected number of calls to ensure conversion is only triggered once per selection.
+
+    #endregion
+
+    #region === Entry Point ===
 
     /// <summary>
     /// Entry point to convert selected GameObjects' components into LanguageTool-compatible components.
@@ -44,6 +51,10 @@ public class ComponentConverter
 
         foreach (var obj in selectedObjects) ObjectAnalysis(obj);
     }
+
+    #endregion
+
+    #region === Object Analysis ===
 
     /// <summary>
     /// Analyzes the selected GameObject and applies component conversion if applicable.
@@ -79,6 +90,10 @@ public class ComponentConverter
         }
     }
 
+    #endregion
+
+    #region === UI Component Converters ===
+
     /// <summary>
     /// Converts a Button by converting its child Text or TMP_Text.
     /// </summary>
@@ -113,7 +128,7 @@ public class ComponentConverter
 
         // Add LanguageText component and assign reference.
         var component = Undo.AddComponent<LanguageText>(text.gameObject);
-        component.textComponent = text;
+        component.TextComponent = text;
 
         Undo.RegisterCreatedObjectUndo(component, "Add LanguageText");
         Debug.Log("Text converted.", text.gameObject);
@@ -132,7 +147,7 @@ public class ComponentConverter
 
         // Add LanguageImage component and assign reference.
         var component = Undo.AddComponent<LanguageImage>(image.gameObject);
-        component.image = image;
+        component.Image = image;
 
         Undo.RegisterCreatedObjectUndo(component, "Add LanguageImage");
         Debug.Log("Image converted.", image.gameObject);
@@ -150,7 +165,7 @@ public class ComponentConverter
         }
 
         var component = Undo.AddComponent<LanguageRawImage>(rawImage.gameObject);
-        component.rawImage = rawImage;
+        component.RawImage = rawImage;
 
         Undo.RegisterCreatedObjectUndo(component, "Add LanguageRawImage");
         Debug.Log("RawImage converted.", rawImage.gameObject);
@@ -176,18 +191,22 @@ public class ComponentConverter
         // Add sizing helper to template object.
         Undo.AddComponent<AdjustSizeToDropdown>(dropdown.template.gameObject);
         var component = Undo.AddComponent<LanguageDropdown>(dropdown.gameObject);
-        component.dropdown = dropdown;
+        component.Dropdown = dropdown;
 
         // Convert each dropdown option to LanguageOptions.
         List<LanguageOptions> optionsList = new();
         foreach (var option in dropdown.options)
             optionsList.Add(new() { text = option.text, sprite = option.image });
 
-        component.options = optionsList;
+        component.Options = optionsList;
 
         Undo.RegisterCreatedObjectUndo(component, "Add LanguageDropdown");
         Debug.Log("Dropdown converted.", dropdown.gameObject);
     }
+
+    #endregion
+
+    #region === TMP Converters ===
 
     /// <summary>
     /// Converts a TMP_Dropdown to LanguageDropdownTMP and adds AdjustSizeToDropdownTMP.
@@ -208,13 +227,13 @@ public class ComponentConverter
 
         Undo.AddComponent<AdjustSizeToDropdownTMP>(tmpDropdown.template.gameObject);
         var component = Undo.AddComponent<LanguageDropdownTMP>(tmpDropdown.gameObject);
-        component.dropdown = tmpDropdown;
+        component.Dropdown = tmpDropdown;
 
         List<LanguageOptions> optionsList = new();
         foreach (var option in tmpDropdown.options)
             optionsList.Add(new() { text = option.text, sprite = option.image });
 
-        component.options = optionsList;
+        component.Options = optionsList;
 
         Undo.RegisterCreatedObjectUndo(component, "Add LanguageDropdownTMP");
         Debug.Log("TMP_Dropdown converted.", tmpDropdown.gameObject);
@@ -232,7 +251,7 @@ public class ComponentConverter
         }
 
         var component = Undo.AddComponent<LanguageTextInputField>(inputField.gameObject);
-        component.inputField = inputField;
+        component.InputField = inputField;
 
         Undo.RegisterCreatedObjectUndo(component, "Add LanguageTextInputField");
         Debug.Log("InputField converted.", inputField.gameObject);
@@ -250,7 +269,7 @@ public class ComponentConverter
         }
 
         var component = Undo.AddComponent<LanguageTextInputFieldTMP>(tmpInputField.gameObject);
-        component.inputField = tmpInputField;
+        component.InputField = tmpInputField;
 
         Undo.RegisterCreatedObjectUndo(component, "Add LanguageTextInputFieldTMP");
         Debug.Log("TMP_InputField converted.", tmpInputField.gameObject);
@@ -268,11 +287,15 @@ public class ComponentConverter
         }
 
         var component = Undo.AddComponent<LanguageTextTMP>(tmpText.gameObject);
-        component.textComponent = tmpText;
+        component.TextComponent = tmpText;
 
         Undo.RegisterCreatedObjectUndo(component, "Add LanguageTextTMP");
         Debug.Log("TMP_Text converted.", tmpText.gameObject);
     }
+
+    #endregion
+
+    #region === 3D and Audio Converters ===
 
     /// <summary>
     /// Converts a TextMesh to LanguageTextMesh.
@@ -286,7 +309,7 @@ public class ComponentConverter
         }
 
         var component = Undo.AddComponent<LanguageTextMesh>(textMesh.gameObject);
-        component.textComponent = textMesh;
+        component.TextComponent = textMesh;
 
         Undo.RegisterCreatedObjectUndo(component, "Add LanguageTextMesh");
         Debug.Log("TextMesh converted.", textMesh.gameObject);
@@ -304,7 +327,7 @@ public class ComponentConverter
         }
 
         var component = Undo.AddComponent<LanguageTextMeshTMP>(meshRenderer.gameObject);
-        component.textComponent = textComponent;
+        component.TextComponent = textComponent;
 
         Undo.RegisterCreatedObjectUndo(component, "Add LanguageTextMeshTMP");
         Debug.Log("TMP_TextMesh converted.", meshRenderer.gameObject);
@@ -322,9 +345,11 @@ public class ComponentConverter
         }
 
         var component = Undo.AddComponent<LanguageAudioPlayer>(audioSource.gameObject);
-        component.audioSource = audioSource;
+        component.AudioSource = audioSource;
 
         Undo.RegisterCreatedObjectUndo(component, "Add LanguageAudioPlayer");
         Debug.Log("AudioSource converted.", audioSource.gameObject);
     }
+
+    #endregion
 }

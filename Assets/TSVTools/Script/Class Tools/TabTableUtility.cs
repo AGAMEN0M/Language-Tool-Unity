@@ -14,7 +14,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using System.Text;
 using System.IO;
+using System;
 
 namespace TSVTools
 {
@@ -24,6 +26,21 @@ namespace TSVTools
     /// </summary>
     public class TabTableUtility
     {
+        #region === ENUMS ===
+
+        /// <summary>
+        /// Defines the direction of line operations in the table (Vertical or Horizontal).
+        /// </summary>
+        public enum LineDirection
+        {
+            Vertical,
+            Horizontal
+        }
+
+        #endregion
+
+        #region === TEXT CONVERSION ===
+
         /// <summary>
         /// Converts text between raw format and readable format by replacing or restoring special tokens.
         /// </summary>
@@ -48,14 +65,18 @@ namespace TSVTools
             return text; // Return the modified text.
         }
 
+        #endregion
+
+        #region === FILE OPERATIONS ===
+
         /// <summary>
-        /// Loads a TSV file into a table of VerticalTable objects.
+        /// Loads a TSV file into a table of VerticalTable objects, automatically detecting UTF-8 with or without BOM.
         /// </summary>
         /// <param name="filePath">The path to the file to load.</param>
         /// <param name="table">The table to populate with the loaded data.</param>
         public static void LoadTableFile(string filePath, ref VerticalTable[] table)
         {
-            // Check if the file exists. If not, log an error and return..
+            // Check if the file exists. If not, log an error and return.
             if (!File.Exists(filePath))
             {
                 Debug.LogError($"File not found: {filePath}");
@@ -65,31 +86,46 @@ namespace TSVTools
             // Initialize a list to store the rows dynamically (avoiding array resizing).
             var tableList = new List<VerticalTable>();
 
-            // Open the file using StreamReader for efficient reading.
-            using (StreamReader reader = new(filePath))
+            try
             {
-                string line;
-
-                // Read each line one by one.
-                while ((line = reader.ReadLine()) != null)
+                // --- Detect file encoding automatically ---
+                // This helps handle files saved with BOM (Byte Order Mark) or without it.
+                Encoding encodingUsed;
+                using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
                 {
-                    // Convert the line into a VerticalTable object and add it to the list.
-                    var verticalTable = new VerticalTable
+                    // Create a StreamReader with UTF8 encoding and BOM detection enabled.
+                    using var reader = new StreamReader(fileStream, Encoding.UTF8, detectEncodingFromByteOrderMarks: true);
+                    encodingUsed = reader.CurrentEncoding; // Store the detected encoding.
+
+                    string line;
+                    while ((line = reader.ReadLine()) != null)
                     {
-                        // Split each line into cells based on tab characters and convert the text.
-                        horizontalTable = line.Split('\t').Select(cell => ConvertText(cell)).ToArray()
-                    };
+                        // Convert the line into a VerticalTable object and add it to the list.
+                        var verticalTable = new VerticalTable
+                        {
+                            // Split each line into cells based on tab characters and convert the text.
+                            horizontalTable = line.Split('\t').Select(cell => ConvertText(cell)).ToArray()
+                        };
 
-                    tableList.Add(verticalTable);
+                        tableList.Add(verticalTable);
+                    }
                 }
-            }
 
-            // After processing all lines, convert the list to an array.
-            table = tableList.ToArray();
+                // After processing all lines, convert the list to an array.
+                table = tableList.ToArray();
+
+                Debug.Log($"TSV file loaded successfully using encoding: {encodingUsed.EncodingName}");
+            }
+            catch (Exception ex)
+            {
+                // Catch and log any errors that occur during reading.
+                Debug.LogError($"Failed to load TSV file: {ex.Message}");
+            }
         }
 
         /// <summary>
         /// Saves the given table to a TSV file, ensuring all rows have the same number of columns.
+        /// Uses UTF-8 encoding without BOM for maximum compatibility.
         /// </summary>
         /// <param name="filePath">The path to save the file to.</param>
         /// <param name="table">The table data to save.</param>
@@ -102,34 +138,71 @@ namespace TSVTools
                 return;
             }
 
-            // Find the maximum number of columns in any row.
-            int maxColumns = table.Max(row => row.horizontalTable?.Length ?? 0);
-
-            // Normalize all rows to have the same number of columns.
-            foreach (var row in table)
+            try
             {
-                if (row.horizontalTable == null)
+                // Ensure the target directory exists before saving.
+                string directoryPath = Path.GetDirectoryName(filePath);
+                if (!string.IsNullOrEmpty(directoryPath) && !Directory.Exists(directoryPath))
                 {
-                    row.horizontalTable = new string[maxColumns];
+                    Directory.CreateDirectory(directoryPath);
+                    Debug.Log($"Directory created: {directoryPath}");
                 }
-                else if (row.horizontalTable.Length < maxColumns)
+
+                // Find the maximum number of columns in any row.
+                int maxColumns = table.Max(row => row.horizontalTable?.Length ?? 0);
+
+                // Normalize all rows to have the same number of columns.
+                foreach (var row in table)
                 {
-                    var extendedRow = new string[maxColumns];
-                    row.horizontalTable.CopyTo(extendedRow, 0); // Copy existing data.
-                    for (int i = row.horizontalTable.Length; i < maxColumns; i++)
+                    if (row.horizontalTable == null)
                     {
-                        extendedRow[i] = string.Empty; // Fill missing cells with empty string.
+                        row.horizontalTable = new string[maxColumns];
                     }
-                    row.horizontalTable = extendedRow;
+                    else if (row.horizontalTable.Length < maxColumns)
+                    {
+                        var extendedRow = new string[maxColumns];
+                        row.horizontalTable.CopyTo(extendedRow, 0); // Copy existing data.
+                        for (int i = row.horizontalTable.Length; i < maxColumns; i++)
+                        {
+                            extendedRow[i] = string.Empty; // Fill missing cells with empty string.
+                        }
+                        row.horizontalTable = extendedRow;
+                    }
                 }
+
+                // Convert each row of the table into a string with tab-separated values.
+                string[] lines = table.Select(row => string.Join("\t", row.horizontalTable.Select(cell => ConvertText(cell)))).ToArray();
+
+                // --- Use UTF-8 without BOM ---
+                // This encoding ensures compatibility with most tools while avoiding unwanted BOM markers.
+                var utf8NoBom = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
+
+                // Write the lines into the specified file using the chosen encoding.
+                File.WriteAllLines(filePath, lines, utf8NoBom);
+
+                Debug.Log($"TSV file saved successfully at: {filePath} using encoding: {utf8NoBom.EncodingName}");
             }
-
-            // Convert each row of the table into a string with tab-separated values.
-            string[] lines = table.Select(row => string.Join("\t", row.horizontalTable.Select(cell => ConvertText(cell)))).ToArray();
-
-            // Write the lines into the specified file.
-            File.WriteAllLines(filePath, lines);
+            catch (UnauthorizedAccessException)
+            {
+                Debug.LogError($"Access denied. The file '{filePath}' cannot be written due to insufficient permissions.");
+            }
+            catch (DirectoryNotFoundException)
+            {
+                Debug.LogError($"The directory for the file '{filePath}' was not found and could not be created.");
+            }
+            catch (IOException ioEx)
+            {
+                Debug.LogError($"I/O error while saving TSV file '{filePath}': {ioEx.Message}");
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Unexpected error while saving TSV file: {ex.Message}");
+            }
         }
+
+        #endregion
+
+        #region === TABLE ACCESS ===
 
         /// <summary>
         /// Retrieves the text from a specific cell in the table based on its vertical and horizontal indices.
@@ -189,7 +262,9 @@ namespace TSVTools
             table[columnVertical].horizontalTable[columnHorizontal] = text;
         }
 
-        public enum LineDirection { Vertical, Horizontal }
+        #endregion
+
+        #region === TABLE MODIFICATION ===
 
         /// <summary>
         /// Adds a new line to the table, either vertically (row) or horizontally (column).
@@ -230,7 +305,7 @@ namespace TSVTools
                     {
                         if (row.horizontalTable == null)
                         {
-                            Debug.LogError("Linha inválida na tabela.");
+                            Debug.LogError("Invalid row in table.");
                             return;
                         }
 
@@ -313,12 +388,16 @@ namespace TSVTools
                     break;
             }
         }
+
+        #endregion
     }
+
+    #region === DATA STRUCTURES ===
 
     /// <summary>
     /// Represents a vertical table, where each row contains a horizontal table (array of strings).
     /// </summary>
-    [System.Serializable]
+    [Serializable]
     public class VerticalTable
     {
         /// <summary>
@@ -326,4 +405,6 @@ namespace TSVTools
         /// </summary>
         public string[] horizontalTable;
     }
+
+    #endregion
 }

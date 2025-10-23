@@ -2,6 +2,10 @@ Give an explanation of how the script works, talking about each variable and met
 
 
 
+Give an explanation of how the script works, talking about each variable and method and Usage. without using csharp (if possible be neutral since both systems do the same thing)
+
+
+
 /*
  * ---------------------------------------------------------------------------
  * Description: [Add a short description of the script here.]

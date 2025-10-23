@@ -3,6 +3,7 @@
  * Description: Component responsible for managing localized texts in the scene.
  *              It synchronizes UI or 3D elements with translated content using
  *              language IDs and applies changes through UnityEvents.
+ *              
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
@@ -13,12 +14,12 @@ using UnityEngine.Events;
 using LanguageTools;
 using UnityEngine;
 
-#if UNITY_EDITOR
-using static LanguageTools.Editor.LanguageEditorUtilities;
-using UnityEditor;
-#endif
-
 using static LanguageTools.LanguageFileManager;
+
+#if UNITY_EDITOR
+using UnityEditor;
+using static LanguageTools.Editor.LanguageEditorUtilities;
+#endif
 
 /// <summary>
 /// Handles localization of UI or 3D texts in the scene by updating content
@@ -27,13 +28,48 @@ using static LanguageTools.LanguageFileManager;
 [AddComponentMenu("Language/3D Object/Language Script")]
 public class LanguageScript : MonoBehaviour
 {
+    #region === Serialized Fields ===
+
     [Header("Script Components")]
-    [SerializeField] private bool debug = false; // Show debug messages when updating texts.
+    [SerializeField, Tooltip("Show debug messages when updating texts.")]
+    private bool debug = false;
+
     [Space(5)]
-    [Tooltip("List of localized texts with assigned language IDs.")]
-    public List<ScriptText> scriptTexts = new() { new ScriptText { iD = -9, text = "Test Language Script" } };
+
+    [SerializeField, Tooltip("List of localized texts with assigned language IDs.")]
+    private List<ScriptText> scriptTexts = new() { new() { iD = -9, text = "Test Language Script" } };
+
+    #endregion
+
+    #region === Private Fields ===
 
     private LanguageSettingsData languageData; // Current language settings.
+
+    #endregion
+
+    #region === Properties ===
+
+    /// <summary>
+    /// Gets or sets whether debug messages should be displayed.
+    /// </summary>
+    public bool DebugLog
+    {
+        get => debug;
+        set => debug = value;
+    }
+
+    /// <summary>
+    /// Gets or sets the list of localized ScriptText entries.
+    /// </summary>
+    public List<ScriptText> ScriptTexts
+    {
+        get => scriptTexts;
+        set => scriptTexts = value;
+    }
+
+    #endregion
+
+    #region === Unity Events ===
 
     /// <summary>
     /// Subscribes to the language update event and immediately updates the text.
@@ -48,6 +84,10 @@ public class LanguageScript : MonoBehaviour
     /// Unsubscribes from the language update event.
     /// </summary>
     private void OnDisable() => LanguageManagerDelegate.OnLanguageUpdate -= LanguageUpdate;
+
+    #endregion
+
+    #region === Core Methods ===
 
     /// <summary>
     /// Updates all registered scriptTexts using the selected language settings.
@@ -75,6 +115,10 @@ public class LanguageScript : MonoBehaviour
             ApplyUnityEvent(scriptText.targetScripts, scriptText.text);
         }
     }
+
+    #endregion
+
+    #region === Utility Methods ===
 
     /// <summary>
     /// Invokes all methods in a UnityEvent with the provided string value.
@@ -105,9 +149,14 @@ public class LanguageScript : MonoBehaviour
             }
         }
     }
+
+    #endregion
 }
 
 #if UNITY_EDITOR
+
+#region === Custom Editor ===
+
 /// <summary>
 /// Custom inspector for LanguageScript. Provides buttons for importing and editing language settings.
 /// </summary>
@@ -124,10 +173,10 @@ public class LanguageScriptEditor : Editor
         using (new EditorGUI.DisabledScope(targets.Length > 1))
         {
             // Draw an import button and assign click behavior.
-            if (GUILayout.Button("Import Settings", CreateCustomButtonStyle(15), GUILayout.Height(30)))
+            if (GUILayout.Button(new GUIContent("Import Settings", "Imports or updates language entries into the current LanguageScript component based on existing IDs."), CreateCustomButtonStyle(15), GUILayout.Height(30)))
             {
                 // Check if any IDs in scriptTexts already exist in the language system.
-                bool alreadySaved = script.scriptTexts.Exists(i => IsIDInLanguageList(i.iD));
+                bool alreadySaved = script.ScriptTexts.Exists(i => IsIDInLanguageList(i.iD));
 
                 // Ask user whether to overwrite existing IDs.
                 if (alreadySaved && !EditorUtility.DisplayDialog("Replace ID", "An ID with this number is already saved. Do you want to replace it?", "Yes", "No"))
@@ -136,7 +185,7 @@ public class LanguageScriptEditor : Editor
                 }
 
                 // Open the editor window for each entry to allow manual editing.
-                foreach (var i in script.scriptTexts) OpenEditorWindowWithComponent(i.iD, 4, i.text, 0, 0, 0);
+                foreach (var i in script.ScriptTexts) OpenEditorWindowWithComponent(i.iD, 4, i.text, 0, 0, 0);
             }
         }
 
@@ -148,4 +197,7 @@ public class LanguageScriptEditor : Editor
         serializedObject.ApplyModifiedProperties();
     }
 }
+
+#endregion
+
 #endif

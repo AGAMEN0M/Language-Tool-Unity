@@ -3,6 +3,7 @@
  * Description: Integrates LanguageTools with a legacy UnityEngine.UI.Dropdown 
  *              to localize dropdown option texts and adjust font styling 
  *              (font, alignment, size) based on the current language metadata.
+ *              
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
@@ -13,31 +14,79 @@ using UnityEngine.UI;
 using LanguageTools;
 using UnityEngine;
 
-#if UNITY_EDITOR
-using static LanguageTools.Editor.LanguageEditorUtilities;
-using UnityEditor;
-#endif
-
-using static LanguageTools.LanguageFileManager;
 using static LanguageTools.Legacy.FontAndAlignmentUtility;
+using static LanguageTools.LanguageFileManager;
+
+#if UNITY_EDITOR
+using UnityEditor;
+using static LanguageTools.Editor.LanguageEditorUtilities;
+#endif
 
 [AddComponentMenu("Language/UI/Legacy/Language Dropdown (Legacy)")]
 public class LanguageDropdown : MonoBehaviour
 {
+    #region === Serialized Fields ===
+
     [Header("UI Components")]
-    public Dropdown dropdown; // Reference to the legacy UnityEngine.UI Dropdown component to localize.
-    public bool translateText = true; // Determines whether to translate the option texts using LanguageTools.
+    [SerializeField, Tooltip("Legacy Unity Dropdown component to localize.")] 
+    private Dropdown dropdown;
+    
+    [SerializeField, Tooltip("Whether to translate option texts.")] 
+    private bool translateText = true;
+    
     [Space(10)]
-    public List<LanguageOptions> options = new()
+
+    [SerializeField, Tooltip("List of dropdown options with text, sprite, and localization ID.")]
+    private List<LanguageOptions> options = new()
     {
         new() { text = "Option A", sprite = null, iD = -2 },
         new() { text = "Option B", sprite = null, iD = -3 },
         new() { text = "Option C", sprite = null, iD = -4 }
-    }; // List of dropdown options with their texts, sprites, and associated localization IDs.
+    };
+
+    #endregion
+
+    #region === Private Fields ===
 
     private LanguageSettingsData languageData; // Holds the currently loaded language data including text and metadata.
     private Text captionText; // Reference to the dropdown's caption Text component.
     private Text itemText; // Reference to the dropdown's item Text component.
+
+    #endregion
+
+    #region === Properties ===
+
+    /// <summary>
+    /// Gets or sets the legacy Dropdown component to be localized.
+    /// </summary>
+    public Dropdown Dropdown
+    {
+        get => dropdown;
+        set => dropdown = value;
+    }
+
+    /// <summary>
+    /// Gets or sets whether the dropdown option texts should be translated
+    /// according to the current language settings.
+    /// </summary>
+    public bool TranslateText
+    {
+        get => translateText;
+        set => translateText = value;
+    }
+
+    /// <summary>
+    /// Gets or sets the list of dropdown options including their text, sprites, and localization IDs.
+    /// </summary>
+    public List<LanguageOptions> Options
+    {
+        get => options;
+        set => options = value;
+    }
+
+    #endregion
+
+    #region === Unity Events ===
 
     /// <summary>
     /// Registers for language change events and updates dropdown localization.
@@ -52,6 +101,10 @@ public class LanguageDropdown : MonoBehaviour
     /// Unregisters from language change events when the object is disabled.
     /// </summary>
     private void OnDisable() => LanguageManagerDelegate.OnLanguageUpdate -= LanguageUpdate;
+
+    #endregion
+
+    #region === Language Update ===
 
     /// <summary>
     /// Updates dropdown options, font, alignment, and size based on selected language metadata.
@@ -148,9 +201,14 @@ public class LanguageDropdown : MonoBehaviour
         captionText.text = options[previousIndex].text; // Update caption text to match the restored selection.
         dropdown.SetValueWithoutNotify(previousIndex); // Set dropdown value without triggering any callbacks.
     }
+
+    #endregion
 }
 
 #if UNITY_EDITOR
+
+#region === Custom Inspector ===
+
 /// <summary>
 /// Custom Inspector for LanguageDropdown. Adds import functionality for language metadata.
 /// </summary>
@@ -170,29 +228,29 @@ public class LanguageDropdownEditor : Editor
         using (new EditorGUI.DisabledScope(targets.Length > 1))
         {
             // Draw "Import Settings" button with custom style.
-            if (GUILayout.Button("Import Settings", CreateCustomButtonStyle(15), GUILayout.Height(30)))
+            if (GUILayout.Button(new GUIContent("Import Settings", "Import the dropdown options and their metadata into the LanguageTools system."), CreateCustomButtonStyle(15), GUILayout.Height(30)))
             {
                 // Check if any option IDs already exist in the language list.
-                bool alreadyExists = script.options.Exists(opt => IsIDInLanguageList(opt.iD));
+                bool alreadyExists = script.Options.Exists(opt => IsIDInLanguageList(opt.iD));
 
                 // Confirm with the user before replacing existing IDs.
                 if (alreadyExists && !EditorUtility.DisplayDialog("Replace ID", "An ID with this number is already saved. Do you want to replace it?", "Yes", "No"))
                     return;
 
                 // Retrieve current alignment, font size, and font index from captionText.
-                int alignment = ConvertToAlignmentCode(script.dropdown.captionText.alignment);
-                int fontSize = script.dropdown.captionText.fontSize;
-                int fontListIndex = GetFontIndex(script.dropdown.captionText.font);
+                int alignment = ConvertToAlignmentCode(script.Dropdown.captionText.alignment);
+                int fontSize = script.Dropdown.captionText.fontSize;
+                int fontListIndex = GetFontIndex(script.Dropdown.captionText.font);
 
                 // Open the language editor window for the first option.
-                OpenEditorWindowWithComponent(script.options[0].iD, 6, script.options[0].text, alignment, fontSize, fontListIndex);
+                OpenEditorWindowWithComponent(script.Options[0].iD, 6, script.Options[0].text, alignment, fontSize, fontListIndex);
 
                 // For additional options, open editor windows without style metadata.
-                if (script.translateText)
+                if (script.TranslateText)
                 {
-                    for (int i = 1; i < script.options.Count; i++)
+                    for (int i = 1; i < script.Options.Count; i++)
                     {
-                        var option = script.options[i];
+                        var option = script.Options[i];
                         OpenEditorWindowWithComponent(option.iD, 6, option.text, 0, 0, 0);
                     }
                 }
@@ -206,4 +264,7 @@ public class LanguageDropdownEditor : Editor
         serializedObject.ApplyModifiedProperties();
     }
 }
+
+#endregion
+
 #endif

@@ -3,6 +3,7 @@
  * Description: Localizes TMP_InputField text and placeholder using the LanguageTools 
  *              system. Automatically updates the placeholder text, font, alignment, 
  *              and font size based on the selected language configuration.
+ *              
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
@@ -12,26 +13,73 @@ using LanguageTools;
 using UnityEngine;
 using TMPro;
 
-#if UNITY_EDITOR
-using static LanguageTools.Editor.LanguageEditorUtilities;
-using UnityEditor;
-#endif
-
-using static LanguageTools.LanguageFileManager;
 using static LanguageTools.TMP.FontAndAlignmentUtilityTMP;
+using static LanguageTools.LanguageFileManager;
+
+#if UNITY_EDITOR
+using UnityEditor;
+using static LanguageTools.Editor.LanguageEditorUtilities;
+#endif
 
 [AddComponentMenu("Language/UI/TextMesh Pro/Language Text Input Field (TMP)")]
 public class LanguageTextInputFieldTMP : MonoBehaviour
 {
+    #region === Serialized Fields ===
+
     [Header("UI Components")]
-    public TMP_InputField inputField; // Reference to the TMP_InputField to localize.
-    [SerializeField] private bool translateText = true; // Whether or not the placeholder text should be translated.
+    [SerializeField, Tooltip("Reference to the TMP_InputField to localize.")]
+    private TMP_InputField inputField;
+
+    [SerializeField, Tooltip("Determines whether the placeholder text should be automatically translated.")]
+    private bool translateText = true;
+
     [Space(10)]
-    [IDExists] public int iD = -6; // LanguageTools ID used to fetch localization data.
+
+    [SerializeField, IDExists, Tooltip("LanguageTools ID used to fetch localized text and metadata.")]
+    private int iD = -6;
+
+    #endregion
+
+    #region === Private Fields ===
 
     private LanguageSettingsData languageData; // Cached language configuration data.
     private TMP_Text text; // Reference to the input field's text component.
     private TMP_Text placeholder; // Reference to the input field's placeholder text component.
+
+    #endregion
+
+    #region === Properties ===
+
+    /// <summary>
+    /// Gets or sets the TMP_InputField component to localize.
+    /// </summary>
+    public TMP_InputField InputField
+    {
+        get => inputField;
+        set => inputField = value;
+    }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the placeholder text should be automatically translated.
+    /// </summary>
+    public bool TranslateText
+    {
+        get => translateText;
+        set => translateText = value;
+    }
+
+    /// <summary>
+    /// Gets or sets the ID used to retrieve localized text and metadata from language files.
+    /// </summary>
+    public int ID
+    {
+        get => iD;
+        set => iD = value;
+    }
+
+    #endregion
+
+    #region === Unity Events ===
 
     /// <summary>
     /// Subscribes to the language update event and applies localization.
@@ -46,6 +94,10 @@ public class LanguageTextInputFieldTMP : MonoBehaviour
     /// Unsubscribes from the language update event.
     /// </summary>
     private void OnDisable() => LanguageManagerDelegate.OnLanguageUpdate -= LanguageUpdate;
+
+    #endregion
+
+    #region === Localization ===
 
     /// <summary>
     /// Updates placeholder and input text with localized text, font, alignment, and font size.
@@ -111,9 +163,14 @@ public class LanguageTextInputFieldTMP : MonoBehaviour
             text.font = font;
         }
     }
+
+    #endregion
 }
 
 #if UNITY_EDITOR
+
+#region === Custom Editor ===
+
 /// <summary>
 /// Custom editor for the LanguageTextInputFieldTMP component.
 /// </summary>
@@ -132,21 +189,21 @@ public class LanguageTextInputFieldTMPEditor : Editor
         using (new EditorGUI.DisabledScope(targets.Length > 1))
         {
             // Draw "Import Settings" button.
-            if (GUILayout.Button("Import Settings", CreateCustomButtonStyle(15), GUILayout.Height(30)))
+            if (GUILayout.Button(new GUIContent("Import Settings", "Imports the current InputField placeholder settings (text, font, size, alignment) into the LanguageTools editor."), CreateCustomButtonStyle(15), GUILayout.Height(30)))
             {
                 // Validate ID before importing.
-                if (IsIDInLanguageList(script.iD) && !EditorUtility.DisplayDialog("Replace ID", "An ID with this number is already saved. Do you want to replace it?", "Yes", "No"))
+                if (IsIDInLanguageList(script.ID) && !EditorUtility.DisplayDialog("Replace ID", "An ID with this number is already saved. Do you want to replace it?", "Yes", "No"))
                     return;
 
                 // Extract and pass current values to the editor window if valid.
-                if (script.inputField != null && script.inputField.placeholder.TryGetComponent<TMP_Text>(out var placeholder))
+                if (script.InputField != null && script.InputField.placeholder.TryGetComponent<TMP_Text>(out var placeholder))
                 {
                     string text = placeholder.text;
                     int alignment = ConvertToAlignmentCode(placeholder.alignment);
-                    int fontSize = (int)script.inputField.pointSize;
-                    int fontListIndex = GetFontIndex(script.inputField.fontAsset);
+                    int fontSize = (int)script.InputField.pointSize;
+                    int fontListIndex = GetFontIndex(script.InputField.fontAsset);
 
-                    OpenEditorWindowWithComponent(script.iD, 3, text, alignment, fontSize, fontListIndex);
+                    OpenEditorWindowWithComponent(script.ID, 3, text, alignment, fontSize, fontListIndex);
                 }
                 else
                 {
@@ -161,4 +218,7 @@ public class LanguageTextInputFieldTMPEditor : Editor
         serializedObject.ApplyModifiedProperties();
     }
 }
+
+#endregion
+
 #endif

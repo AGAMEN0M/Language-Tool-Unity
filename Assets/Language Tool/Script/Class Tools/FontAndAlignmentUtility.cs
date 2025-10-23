@@ -4,6 +4,7 @@
  *              alignment in multilingual applications. Provides font access 
  *              by index or asset, and conversion between integer alignment 
  *              codes and UnityEngine.TextAnchor values.
+ *              
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
@@ -17,6 +18,8 @@ namespace LanguageTools.Legacy
 {
     public static class FontAndAlignmentUtility
     {
+        #region === Font Retrieval ===
+
         /// <summary>
         /// Retrieves a Font from the language settings by its index.
         /// </summary>
@@ -49,6 +52,10 @@ namespace LanguageTools.Legacy
 
             return 0; // Return 0 if the font is not found.
         }
+
+        #endregion
+
+        #region === Alignment Conversion ===
 
         /// <summary>
         /// Converts an integer alignment code to TextAnchor.
@@ -108,5 +115,7 @@ namespace LanguageTools.Legacy
 
             return alignmentValue;
         }
+
+        #endregion
     }
 }
