@@ -1,15 +1,22 @@
 /*
  * ---------------------------------------------------------------------------
- * Description: Forces the import and caching of all TMP_FontAssets listed in
- *              the LanguageSettingsData by creating temporary TextMeshPro
- *              objects to ensure all fonts are referenced in the build.
+ * Description: Ensures that all TMP_FontAssets referenced inside the LanguageSettingsData 
+ *              are properly imported and included in the Unity build. This is achieved by 
+ *              automatically generating temporary TextMeshPro objects for every detected 
+ *              font, forcing Unity to recognize and cache those assets during import. 
  *              
+ *              This component is intended for Editor use only and should be placed in an 
+ *              initialization scene (such as a splash or main menu) to guarantee that all 
+ *              fonts required for multilingual text rendering are safely embedded in the 
+ *              final build.
+ *
  * Author: Lucas Gomes Cecchini
  * Pseudonym: AGAMENOM
  * ---------------------------------------------------------------------------
-*/
+ */
 
 using UnityEngine;
+using System;
 using TMPro;
 
 using static LanguageTools.LanguageFileManager;
@@ -24,11 +31,35 @@ public class ForceImportOfFontsTMP : MonoBehaviour
 {
 #if UNITY_EDITOR
 
+    #region === Structs ===
+
+    /// <summary>
+    /// Represents a pair of text content and its corresponding TMP_FontAsset.
+    /// This allows the system to detect when a specific font should use a
+    /// custom preview string instead of the default font name.
+    /// </summary>
+    [Serializable]
+    public struct FontText
+    {
+        [Tooltip("Sample text that will be displayed when this font is imported.")]
+        public string text;
+
+        [Tooltip("The TMP_FontAsset that this sample text belongs to.")]
+        public TMP_FontAsset font;
+    }
+
+    #endregion
+
     #region === Fields ===
 
     [Header("References")]
     [SerializeField, Tooltip("Reference TextMeshPro GameObject used as the base for font import testing.")]
     private GameObject textMesh;
+
+    [Space(10)]
+
+    [SerializeField, Tooltip("Optional sample texts for specific fonts.")]
+    private FontText[] fontTexts;
 
     [Space(10)]
 
@@ -49,6 +80,15 @@ public class ForceImportOfFontsTMP : MonoBehaviour
     }
 
     /// <summary>
+    /// Optional dictionary of sample texts associated with specific TMP_FontAssets.
+    /// </summary>
+    public FontText[] FontTexts
+    {
+        get => fontTexts;
+        set => fontTexts = value;
+    }
+
+    /// <summary>
     /// Array that stores all generated TextMeshPro objects to prevent duplication.
     /// </summary>
     public GameObject[] GameObjects
@@ -66,10 +106,9 @@ public class ForceImportOfFontsTMP : MonoBehaviour
     /// <summary>
     /// Called manually or on component initialization to rebuild all TMP font instances.
     /// </summary>
-    [ContextMenu("Reload (Font List Data)")]
-    private void Start()
+    public void Start()
     {
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
         // Validate the TextMesh reference.
         if (textMesh == null)
         {
@@ -116,7 +155,6 @@ public class ForceImportOfFontsTMP : MonoBehaviour
 
             // Create clone under this component’s transform.
             GameObject clone = Instantiate(textMesh, transform);
-            clone.name = $"Text ({fontData.name})";
 
             // Try to retrieve the TMP_Text component.
             if (!clone.TryGetComponent<TMP_Text>(out var tmp))
@@ -126,21 +164,42 @@ public class ForceImportOfFontsTMP : MonoBehaviour
                 continue;
             }
 
-            // Apply font asset and display name.
+            string finalText = fontData.name; // Default text.
+
+            if (fontTexts != null && fontTexts.Length > 0)
+            {
+                foreach (var ft in fontTexts)
+                {
+                    if (ft.font == fontData)
+                    {
+                        finalText = $"Text ({fontData.name}) - [{ft.text}]";
+                        break;
+                    }
+                }
+            }
+
+            // Apply font asset.
             tmp.font = fontData;
-            tmp.text = fontData.name;
+
+            // Apply final text.
+            tmp.text = finalText;
+
+            // Set clone name for hierarchy clarity.
+            clone.name = $"Text ({fontData.name})";
+
+            // Activate clone object.
             clone.SetActive(true);
 
-            // Store the clone reference.
+            // Store clone reference.
             gameObjects[index++] = clone;
         }
 
         Debug.Log($"ForceImportOfFontsTMP: Successfully created {index} TMP font import instances.", this);
 
-    #else
+#else
         // Automatically remove this script at runtime.
         Destroy(this);
-    #endif
+#endif
     }
 
     #endregion
@@ -159,20 +218,30 @@ public class ForceImportOfFontsTMPEditor : Editor
 {
     public override void OnInspectorGUI()
     {
+        var script = (ForceImportOfFontsTMP)target;
+
         serializedObject.Update();
 
         // Display help box explaining the script’s function.
         GUI.color = Color.yellow;
         EditorGUILayout.HelpBox(
             "Due to how Unity imports TMP_FontAssets, many fonts may not be included in the Build.\n" +
-            "The recommended fix is to pre-import them in the initial scene or in the main menu using this tool.",
+            "The recommended fix is to pre-import them in the initial scene or main menu using this tool.",
             MessageType.Warning
         );
         GUI.color = Color.white;
 
         EditorGUILayout.Space(10);
 
-        // Draw the default inspector (fields).
+        // Reload button that rebuilds all TMP font instances.
+        if (GUILayout.Button(new GUIContent("Reload (Font List Data)", "Rebuilds all TMP font instances from the LanguageSettingsData."), GUILayout.Height(30)))
+        {
+            script.Start();
+        }
+
+        EditorGUILayout.Space(10);
+
+        // Draw inspector fields.
         DrawDefaultInspector();
 
         serializedObject.ApplyModifiedProperties();

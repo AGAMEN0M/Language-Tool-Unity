@@ -148,7 +148,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -256,4 +256,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ForceImportOfFontsTMP
   textMesh: {fileID: 1268935945730032517}
+  fontTexts:
+  - text: English
+    font: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  - text: "portugu\xEAs (Brasil)"
+    font: {fileID: 11400000, guid: e9e623fce2a0f8f46858d0ee8271924d, type: 2}
+  - text: "\u65E5\u672C\u8A9E"
+    font: {fileID: 11400000, guid: 00609718784f3744fb2d91de47aad511, type: 2}
+  - text: "\u4E2D\u6587 (\u53F0\u6E7E)"
+    font: {fileID: 11400000, guid: c773f59ee5a4ac94fb701762590f2090, type: 2}
   gameObjects: []
